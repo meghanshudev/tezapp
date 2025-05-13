@@ -1,0 +1,384 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:provider/provider.dart';
+import 'package:tez_mobile/dummy_data/language_json.dart';
+import 'package:tez_mobile/helpers/constant.dart';
+import 'package:tez_mobile/helpers/network.dart';
+import 'package:tez_mobile/helpers/styles.dart';
+import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tez_mobile/helpers/utils.dart';
+import 'package:tez_mobile/provider/has_group.dart';
+import 'package:tez_mobile/ui_elements/card_item.dart';
+import '../../ui_elements/slider_widget.dart';
+
+class AccountPage extends StatefulWidget {
+  const AccountPage({Key? key}) : super(key: key);
+
+  @override
+  _AccountPageState createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  List groupMember = [];
+  int orderDay = 0;
+  String byLeader = '';
+  String name = '';
+  String phoneNumber = '';
+  String groupProfile = '';
+  List ads = [];
+  bool isAdsLoading = false;
+  int orderTotal = 0;
+  String createdDate = '';
+  int langIndex = 0;
+  String lang = "English";
+
+  @override
+  void initState() {
+    super.initState();
+
+    fetchAds();
+    getMember();
+
+    name = !checkIsNullValue(userSession['name']) ? userSession['name'] : "N/A";
+    phoneNumber = !checkIsNullValue(userSession['phone_number'])
+        ? userSession['phone_number']
+        : "N/A";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: white,
+      body: getBody(),
+    );
+  }
+
+  fetchAds() async {
+    setState(() {
+      isAdsLoading = true;
+    });
+
+    var params = {"limit": "0", "order": "rgt", "sort": "asc"};
+
+    var response = await netGet(endPoint: "advertisement", params: params);
+    if (response["resp_code"] == "200") {
+      var data = response["resp_data"]["data"];
+      List adsItems = data['list'] ?? [];
+      if (mounted) {
+        setState(() {
+          ads = adsItems;
+        });
+      }
+    } else {
+      setState(() {
+        ads = [];
+      });
+    }
+    setState(() {
+      isAdsLoading = false;
+    });
+  }
+
+  getMember() async {
+    if (!checkIsNullValue(userSession['group'])) {
+      var groupId = userSession['group']['id'];
+      var response = await netGet(endPoint: "group/$groupId");
+      if (response["resp_code"] == "200") {
+        List data = response['resp_data']['data']['members'];
+        setState(() {
+          groupMember = data;
+          orderDay = response['resp_data']['data']['order_day'];
+          orderTotal = response['resp_data']['data']['total_group_orders'];
+          createdDate = response['resp_data']['data']['created_date'];
+          groupProfile =
+              !checkIsNullValue(response['resp_data']['data']['image'])
+                  ? response['resp_data']['data']['image'].toString()
+                  : DEFAULT_GROUP_IMAGE;
+        });
+        if (!checkIsNullValue(
+            response['resp_data']['data']['leader']['name'])) {
+          setState(() {
+            byLeader = response['resp_data']['data']['leader']['name'];
+          });
+        } else {
+          setState(() {
+            byLeader = " • ";
+          });
+        }
+      }
+    }
+    // set group leader profile
+    // context.read<HasGroupProvider>().refreshGroupLeaderProfile(groupProfile);
+  }
+
+  void getCurrentLang(BuildContext context) async {
+    var currentLang = context.locale.toString();
+    if (currentLang == "en_US") {
+      setState(() {
+        lang = "English";
+      });
+    } else {
+      setState(() {
+        lang = "हिन्दी";
+      });
+    }
+  }
+
+  setLang(int index) async {
+    if (index == 0) {
+      // Set Session
+      var lang = "en";
+      await setStorage(LANGUAGE, lang);
+      await getStorage(LANGUAGE);
+      context.setLocale(APP_LOCALES[0]);
+    } else {
+      // Set Session
+      var lang = "hi";
+      await setStorage(LANGUAGE, lang);
+      await getStorage(LANGUAGE);
+      context.setLocale(APP_LOCALES[1]);
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    getCurrentLang(context);
+    super.didChangeDependencies();
+  }
+
+  Widget getBody() {
+    var size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(15),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: normalBoldBlackTitle,
+                  ),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  Text(
+                    phoneNumber,
+                    style: smallMediumGreyText,
+                  )
+                ],
+              ),
+              TextButton(
+                onPressed: () async {
+                  dynamic result = await Navigator.of(context)
+                      .pushNamed('/edit_profile_page');
+                  setState(() {
+                    name = result;
+                  });
+                },
+                child: Text(
+                  "edit_profile".tr().toUpperCase(),
+                  style: meduimBoldPrimaryText,
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 25,
+          ),
+          getAccountSection(),
+          SizedBox(
+            height: 20,
+          ),
+          getHelpAndFeedbackSection(),
+          SizedBox(
+            height: 25,
+          ),
+          getLogoutSection(),
+          SizedBox(
+            height: 10,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getAccountSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CardItem(
+          onTap: () => Navigator.pushNamed(context, '/wallet_page'),
+          icon: MaterialCommunityIcons.wallet,
+          title: "tez_cash".tr(),
+          subTitle: "view_your_wallet".tr(),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        context.watch<HasGroupProvider>().hasGroup
+            ? CardItem(
+                onTap: () =>
+                    Navigator.pushNamed(context, '/user_group_view_page'),
+                icon: MaterialCommunityIcons.account_group,
+                title: "Tez Group",
+                subTitle: "Join or start your Tez group",
+              )
+            : CardItem(
+                onTap: () => Navigator.pushNamed(context, '/user_group_page'),
+                icon: MaterialCommunityIcons.account_group,
+                title: "Tez Group",
+                subTitle: "Join or start your Tez group"),
+        SizedBox(
+          height: 10,
+        ),
+        CardItem(
+          onTap: () => Navigator.pushNamed(context, '/choose_location_page'),
+          icon: MaterialCommunityIcons.crosshairs_gps,
+          title: "change_location".tr(),
+          subTitle: "set_or_change_your_delivery_location".tr(),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CardItem(
+          onTap: () => onChangedLang(),
+          icon: MaterialIcons.language,
+          title: lang,
+          subTitle: "choose_your_language".tr(),
+        ),
+      ],
+    );
+  }
+
+  Widget getHelpAndFeedbackSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "help_&_feedback",
+          style: normalBoldBlackTitle,
+        ).tr(),
+        SizedBox(
+          height: 20,
+        ),
+        CardItem(
+          onTap: () => Navigator.pushNamed(context, '/customer_support_page'),
+          icon: MaterialIcons.chat,
+          title: "customer_support".tr(),
+          subTitle: "have_an_issue_chat_with_us".tr(),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CardItem(
+          onTap: () => Navigator.pushNamed(context, '/suggest_page'),
+          icon: MaterialIcons.tag_faces,
+          title: "suggest_us".tr(),
+          subTitle: "tell_us_what_you_want_on_tez".tr(),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        CardItem(
+          onTap: () => Navigator.pushNamed(context, '/general_info_page'),
+          icon: MaterialIcons.info,
+          title: "general_information".tr(),
+          subTitle: "privacy_policy_terms_&_about_tez".tr(),
+        ),
+      ],
+    );
+  }
+
+  Widget getLogoutSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        TextButton(
+          onPressed: () {
+            onSignOut(context);
+          },
+          child: Text(
+            "logout",
+            style: normalBoldPrimaryTitle,
+          ).tr(),
+        ),
+      ],
+    );
+  }
+
+  onChangedLang() async {
+    int tempIndex = 0;
+    await showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            height: 230.0,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.only(left: 10, right: 10),
+                  height: 40,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("cancel",
+                                style: TextStyle(color: primary, fontSize: 16))
+                            .tr(),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            langIndex = tempIndex;
+                          });
+                          setLang(langIndex);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("done",
+                                style: TextStyle(color: primary, fontSize: 16))
+                            .tr(),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: CupertinoPicker(
+                    scrollController: new FixedExtentScrollController(
+                      initialItem: langIndex,
+                    ),
+                    itemExtent: 32.0,
+                    onSelectedItemChanged: (int index) {
+                      setState(() {
+                        tempIndex = index;
+                      });
+                      setLang(langIndex);
+                    },
+                    children: List.generate(languages.length, (index) {
+                      return new Center(
+                        child: new Text(
+                          languages[index],
+                          style: TextStyle(color: black),
+                        ),
+                      );
+                    }),
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+}
