@@ -1,7 +1,7 @@
 
-import 'package:tez_mobile/models/product.dart';
-import 'package:tez_mobile/respositories/base/base_repository.dart';
-import 'package:tez_mobile/respositories/search/search_factory.dart';
+import 'package:tezapp/models/product.dart';
+import 'package:tezapp/respositories/base/base_repository.dart';
+import 'package:tezapp/respositories/search/search_factory.dart';
 
 import '../../helpers/network_V2.dart';
 import '../../helpers/response.dart';

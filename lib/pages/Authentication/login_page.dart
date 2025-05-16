@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/ui_elements/custom_primary_button.dart';
-import 'package:tez_mobile/ui_elements/custom_textfield_phone.dart';
-import 'package:tez_mobile/ui_elements/error_message.dart';
-import 'package:tez_mobile/helpers/crypto.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/crypto.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/ui_elements/custom_primary_button.dart';
+import 'package:tezapp/ui_elements/custom_textfield_phone.dart';
+import 'package:tezapp/ui_elements/error_message.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -205,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   loginDirectly() async {
@@ -215,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
         "-" +
         new DateTime.now().millisecondsSinceEpoch.toString();
     var encryptAccess = encrypt(value, CREDENTIAL_KEY, CREDENTIAL_IV);
-
+    print("SKIP LOGIN - $encryptAccess");
     var response =
         await netPost(isUserToken: false, endPoint: "auth/login", params: {
       "phone_number": encryptAccess,
@@ -272,6 +272,7 @@ class _LoginPageState extends State<LoginPage> {
     var phoneNumber = phoneNumberController.text;
 
     var data = {"phone_number": phoneNumber};
+    print(data);
 
     Navigator.pushNamed(context, "/enter_otp_page", arguments: {"data": data});
   }

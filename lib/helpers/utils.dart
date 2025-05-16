@@ -9,28 +9,29 @@ import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/theme.dart';
 import 'package:intl/intl.dart' as date;
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/provider/credit_provider.dart';
-import 'package:tez_mobile/provider/has_group.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/provider/credit_provider.dart';
+import 'package:tezapp/provider/has_group.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:http/http.dart' as http;
 
 import '../provider/cart_provider.dart';
 
-final GlobalKey<NavigatorState> navigatorKey =
-    GlobalKey(debugLabel: "Main Navigator");
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey(
+  debugLabel: "Main Navigator",
+);
 var scaffoldKey = GlobalKey<ScaffoldState>();
 var userSession;
 Map<String, dynamic> userProfile = {
   "name": "N/A",
   "phone_number": "N/A",
-  "email": ""
+  "email": "",
 };
 
 Future<void> getStorageUser() async {
@@ -83,10 +84,12 @@ int convertInt(dynamic value) {
 myFormatDateTime(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    String formattedDate =
-        date.DateFormat('dd/MM/yyyy').format(DateTime.parse(datetime));
-    String formattedTime =
-        date.DateFormat('hh:mm a').format(DateTime.parse(datetime));
+    String formattedDate = date.DateFormat(
+      'dd/MM/yyyy',
+    ).format(DateTime.parse(datetime));
+    String formattedTime = date.DateFormat(
+      'hh:mm a',
+    ).format(DateTime.parse(datetime));
     return formattedDate + " at " + formattedTime;
   } catch (e) {
     return datetime;
@@ -96,8 +99,9 @@ myFormatDateTime(datetime) {
 getDay(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    String formattedDate =
-        date.DateFormat('EEEE').format(DateTime.parse(datetime));
+    String formattedDate = date.DateFormat(
+      'EEEE',
+    ).format(DateTime.parse(datetime));
 
     return formattedDate;
   } catch (e) {
@@ -108,7 +112,7 @@ getDay(datetime) {
 formatDate(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    return Jiffy(datetime).format("do MMMM yyyy");
+    return Jiffy.parse(datetime).format(pattern: "do MMMM yyyy");
   } catch (e) {
     return datetime;
   }
@@ -117,7 +121,7 @@ formatDate(datetime) {
 formatDateOne(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    return Jiffy(datetime).format("MMMM dd, yyyy");
+    return Jiffy.parse(datetime).format(pattern: "MMMM dd, yyyy");
   } catch (e) {
     return datetime;
   }
@@ -126,7 +130,7 @@ formatDateOne(datetime) {
 formatFullDateTime(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    return Jiffy(datetime).format("EEEE, MMMM dd, hh:mm a");
+    return Jiffy.parse(datetime).format(pattern: "EEEE, MMMM dd, hh:mm a");
   } catch (e) {
     return datetime;
   }
@@ -136,7 +140,7 @@ formatFullDateTime(datetime) {
 formatDay(datetime) {
   if (['', null, 0].contains(datetime)) return datetime.toString();
   try {
-    return Jiffy(datetime).format("EEEE");
+    return Jiffy.parse(datetime).format(pattern: "EEEE");
   } catch (e) {
     return datetime;
   }
@@ -145,8 +149,10 @@ formatDay(datetime) {
 sendEmail(receiverEmail) {
   String? encodeQueryParameters(Map<String, String> params) {
     return params.entries
-        .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
   }
 
@@ -169,6 +175,7 @@ launchSocialLink(link) async {
 
 getProfileData(BuildContext context) async {
   var response = await netGet(isUserToken: true, endPoint: "me/profile");
+  await removeStorage(STORAGE_USER);
   if (response['resp_code'] == "200") {
     var object = {
       "id": response['resp_data']['data']['id'],
@@ -184,18 +191,19 @@ getProfileData(BuildContext context) async {
       "group": response['resp_data']['data']['group'],
       "access_token": userSession['access_token'],
       "is_first_time_login": userSession['is_first_time_login'],
-      "token_type": userSession['token_type']
+      "token_type": userSession['token_type'],
     };
-    context
-        .read<CreditProvider>()
-        .refreshCredit(convertDouble(response['resp_data']['data']['balance']));
-    context
-        .read<AccountInfoProvider>()
-        .refreshName(response['resp_data']['data']['name']);
+    context.read<CreditProvider>().refreshCredit(
+      convertDouble(response['resp_data']['data']['balance']),
+    );
+    context.read<AccountInfoProvider>().refreshName(
+      response['resp_data']['data']['name'] ?? '',
+    );
     // set group
-    bool hasGroup = !checkIsNullValue(response['resp_data']['data']['group'])
-        ? true
-        : false;
+    bool hasGroup =
+        !checkIsNullValue(response['resp_data']['data']['group'])
+            ? true
+            : false;
     context.read<HasGroupProvider>().refreshGroup(hasGroup);
     return object;
   } else {
@@ -229,56 +237,65 @@ Future<Position> determineUserLocationPosition(BuildContext context) async {
       // Android's shouldShowRequestPermissionRationale
       // returned true. According to Android guidelines
       // your App should show an explanatory UI now.
-      notifyAlert(context,
-          desc: "Location permissions are denied",
-          btnTitle: "Ok!", onConfirm: () {
-        Navigator.pop(context);
-      });
+      notifyAlert(
+        context,
+        desc: "Location permissions are denied",
+        btnTitle: "Ok!",
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      );
       return Future.error('Location permissions are denied');
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
     // Permissions are denied forever, handle appropriately.
-    notifyAlert(context,
-        desc:
-            'Location permissions are denied. Please enable Location from settings.',
-        btnTitle: "Ok!", onConfirm: () {
-      Navigator.pop(context);
-    });
+    notifyAlert(
+      context,
+      desc:
+          'Location permissions are denied. Please enable Location from settings.',
+      btnTitle: "Ok!",
+      onConfirm: () {
+        Navigator.pop(context);
+      },
+    );
     return Future.error(
-        'Location permissions are denied. Please enable Location from settings.');
+      'Location permissions are denied. Please enable Location from settings.',
+    );
   }
 
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
   return await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high);
+    desiredAccuracy: LocationAccuracy.high,
+  );
 }
 
 var alertStyle = AlertStyle(
-    animationType: AnimationType.shrink,
-    isCloseButton: false,
-    isOverlayTapDismiss: false,
-    descStyle: const TextStyle(fontSize: 15, color: greyLight),
-    descTextAlign: TextAlign.center,
-    animationDuration: const Duration(milliseconds: 400),
-    alertBorder: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10.0),
-      side: const BorderSide(
-        color: Colors.grey,
-      ),
-    ),
-    constraints: const BoxConstraints.expand(width: 300),
-    overlayColor: const Color(0x55000000),
-    alertElevation: 0,
-    alertAlignment: Alignment.center);
-dynamic confirmAlert(context,
-    {final GestureTapCallback? onCancel,
-    final GestureTapCallback? onConfirm,
-    final String btnCancelTitle = "Cancel",
-    final String btnConfirmTitle = "Continue",
-    final des = ""}) {
+  animationType: AnimationType.shrink,
+  isCloseButton: false,
+  isOverlayTapDismiss: false,
+  descStyle: const TextStyle(fontSize: 15, color: greyLight),
+  descTextAlign: TextAlign.center,
+  animationDuration: const Duration(milliseconds: 400),
+  alertBorder: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(10.0),
+    side: const BorderSide(color: Colors.grey),
+  ),
+  constraints: const BoxConstraints.expand(width: 300),
+  overlayColor: const Color(0x55000000),
+  alertElevation: 0,
+  alertAlignment: Alignment.center,
+);
+dynamic confirmAlert(
+  context, {
+  final GestureTapCallback? onCancel,
+  final GestureTapCallback? onConfirm,
+  final String btnCancelTitle = "Cancel",
+  final String btnConfirmTitle = "Continue",
+  final des = "",
+}) {
   return Alert(
     context: context,
     style: alertStyle,
@@ -290,7 +307,10 @@ dynamic confirmAlert(context,
         child: Text(
           btnCancelTitle,
           style: const TextStyle(
-              color: primary, fontSize: 15, fontWeight: FontWeight.bold),
+            color: primary,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         color: Colors.transparent,
         onPressed: onCancel,
@@ -301,7 +321,10 @@ dynamic confirmAlert(context,
         child: Text(
           btnConfirmTitle,
           style: const TextStyle(
-              color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         onPressed: onConfirm,
         color: primary,
@@ -336,8 +359,10 @@ removeStorage(storageName) async {
 onSignOut(context) async {
   await removeStorage(STORAGE_USER);
   userSession = '';
-  navigatorKey.currentState!
-      .pushNamedAndRemoveUntil("/login_page", (Route<dynamic> route) => false);
+  navigatorKey.currentState!.pushNamedAndRemoveUntil(
+    "/login_page",
+    (Route<dynamic> route) => false,
+  );
   // Navigator.pushNamedAndRemoveUntil(
   //     context, "/login_page", (Route<dynamic> route) => false);
 }
@@ -347,13 +372,19 @@ checkIsNullValueAndReturn(value, {dynamic dValue = ""}) {
   return checkIsNullValue(value) ? dValue : value;
 }
 
-//check if nullvalue
-bool checkIsNullValue(value) {
-  return [null, "null", 0, "0", ""].contains(value);
+bool checkIsNullValue(dynamic value) {
+  return value == null ||
+      value == "null" ||
+      value == 0 ||
+      value == "0" ||
+      value == "";
 }
 
-reponseErrorMessage(response,
-    {String defaultMsg = "Error", required List requestedParams}) {
+reponseErrorMessage(
+  response, {
+  String defaultMsg = "Error",
+  required List requestedParams,
+}) {
   switch (response["resp_code"]) {
     case "403":
     case "401":
@@ -370,8 +401,11 @@ reponseErrorMessage(response,
   }
 }
 
-reponseErrorMessageDy(response,
-    {String defaultMsg = "Error", required List requestedParams}) {
+reponseErrorMessageDy(
+  response, {
+  String defaultMsg = "Error",
+  required List requestedParams,
+}) {
   switch (response["resp_code"]) {
     case "403":
     case "400":
@@ -400,87 +434,78 @@ reponseErrorMessageDy(response,
 
 loadingPopup(context) {
   var alertStyle = AlertStyle(
-      animationType: AnimationType.shrink,
-      isCloseButton: false,
-      isOverlayTapDismiss: false,
-      descStyle: TextStyle(fontSize: 15, color: primary),
-      descTextAlign: TextAlign.center,
-      animationDuration: Duration(milliseconds: 400),
-      alertBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0), side: BorderSide.none),
-      titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      constraints: BoxConstraints.expand(width: 50, height: 50),
-      overlayColor: Color(0x55000000),
-      alertElevation: 0,
-      alertAlignment: Alignment.center);
+    animationType: AnimationType.shrink,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontSize: 15, color: primary),
+    descTextAlign: TextAlign.center,
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10.0),
+      side: BorderSide.none,
+    ),
+    titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+    constraints: BoxConstraints.expand(width: 50, height: 50),
+    overlayColor: Color(0x55000000),
+    alertElevation: 0,
+    alertAlignment: Alignment.center,
+  );
 
   Alert(
-      context: context,
-      style: alertStyle,
-      content: Column(
-        children: [
-          SizedBox(
-            height: 30,
-          ),
-          CustomCircularProgress(),
-        ],
-      ),
-      buttons: []).show();
+    context: context,
+    style: alertStyle,
+    content: Column(children: [SizedBox(height: 30), CustomCircularProgress()]),
+    buttons: [],
+  ).show();
 }
 
-loadingAlert(context,
-    {String title = "request", String detail = "requesting_for_otp_code"}) {
+loadingAlert(
+  context, {
+  String title = "request",
+  String detail = "requesting_for_otp_code",
+}) {
   var alertStyle = AlertStyle(
-      animationType: AnimationType.shrink,
-      isCloseButton: false,
-      isOverlayTapDismiss: false,
-      descStyle: TextStyle(fontSize: 15, color: greyLight),
-      descTextAlign: TextAlign.start,
-      animationDuration: Duration(milliseconds: 400),
-      alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
-          color: Colors.grey,
-        ),
-      ),
-      titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-      constraints: BoxConstraints.expand(width: 300),
-      //First to chars "55" represents transparency of color
-      overlayColor: Color(0x55000000),
-      alertElevation: 0,
-      alertAlignment: Alignment.center);
+    animationType: AnimationType.shrink,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontSize: 15, color: greyLight),
+    descTextAlign: TextAlign.start,
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10.0),
+      side: BorderSide(color: Colors.grey),
+    ),
+    titleStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+    constraints: BoxConstraints.expand(width: 300),
+    //First to chars "55" represents transparency of color
+    overlayColor: Color(0x55000000),
+    alertElevation: 0,
+    alertAlignment: Alignment.center,
+  );
 
   // Alert dialog using custom alert style
   Alert(
-      context: context,
-      style: alertStyle,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 40,
-          ),
-          CustomCircularProgress(),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            title.tr(),
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            detail.tr(),
-            style: TextStyle(fontSize: 16, color: greyLight),
-          )
-        ],
-      ),
-      // title: "Requesting",
-      // desc: "Processing to verify customer",
-      buttons: []).show();
+    context: context,
+    style: alertStyle,
+    content: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(height: 40),
+        CustomCircularProgress(),
+        SizedBox(height: 20),
+        Text(
+          title.tr(),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        Text(detail.tr(), style: TextStyle(fontSize: 16, color: greyLight)),
+      ],
+    ),
+    // title: "Requesting",
+    // desc: "Processing to verify customer",
+    buttons: [],
+  ).show();
 }
 
 notifyAlert(
@@ -491,23 +516,22 @@ notifyAlert(
   final GestureTapCallback? onConfirm,
 }) {
   var alertStyle = AlertStyle(
-      animationType: AnimationType.shrink,
-      isCloseButton: false,
-      isOverlayTapDismiss: false,
-      descStyle: TextStyle(fontSize: 15, color: greyLight),
-      descTextAlign: TextAlign.center,
-      animationDuration: Duration(milliseconds: 400),
-      alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
-          color: Colors.grey,
-        ),
-      ),
-      constraints: BoxConstraints.expand(width: 300),
-      //First to chars "55" represents transparency of color
-      overlayColor: Color(0x55000000),
-      alertElevation: 0,
-      alertAlignment: Alignment.center);
+    animationType: AnimationType.shrink,
+    isCloseButton: false,
+    isOverlayTapDismiss: false,
+    descStyle: TextStyle(fontSize: 15, color: greyLight),
+    descTextAlign: TextAlign.center,
+    animationDuration: Duration(milliseconds: 400),
+    alertBorder: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10.0),
+      side: BorderSide(color: Colors.grey),
+    ),
+    constraints: BoxConstraints.expand(width: 300),
+    //First to chars "55" represents transparency of color
+    overlayColor: Color(0x55000000),
+    alertElevation: 0,
+    alertAlignment: Alignment.center,
+  );
   Alert(
     context: context,
     style: alertStyle,
@@ -537,27 +561,29 @@ ImageProvider displayImage(String imageUrl) {
 }
 
 showToast(String message, BuildContext context) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    duration: Duration(milliseconds: 1800),
-    content: Text("$message"),
-  ));
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(duration: Duration(milliseconds: 1800), content: Text("$message")),
+  );
 }
 
 String getCartInfo(BuildContext context) {
   String res = "";
-  res = context.watch<CartProvider>().cartCount > 1
-      ? context.watch<CartProvider>().cartCount.toString() +
-          " " +
-          "items".tr() +
-          " • $CURRENCY" +
-          double.parse(context.watch<CartProvider>().cartGrandTotal.toString())
-              .toStringAsFixed(0)
-      : context.watch<CartProvider>().cartCount.toString() +
-          " " +
-          "items".tr() +
-          " • $CURRENCY" +
-          double.parse(context.watch<CartProvider>().cartGrandTotal.toString())
-              .toStringAsFixed(0);
+  res =
+      context.watch<CartProvider>().cartCount > 1
+          ? context.watch<CartProvider>().cartCount.toString() +
+              " " +
+              "items".tr() +
+              " • $CURRENCY" +
+              double.parse(
+                context.watch<CartProvider>().cartGrandTotal.toString(),
+              ).toStringAsFixed(0)
+          : context.watch<CartProvider>().cartCount.toString() +
+              " " +
+              "items".tr() +
+              " • $CURRENCY" +
+              double.parse(
+                context.watch<CartProvider>().cartGrandTotal.toString(),
+              ).toStringAsFixed(0);
   // List _cartItems = cart["lines"];
   // var _total = cart["total"];
   // res = "${_cartItems.length} " +
@@ -569,7 +595,7 @@ String getCartInfo(BuildContext context) {
 String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
 int nowTimeStamp() => DateTime.now().millisecondsSinceEpoch;
 
-Future<File> getFileImage(file) async {
+Future<XFile> getFileImage(file) async {
   final dir = await path_provider.getTemporaryDirectory();
 
   final targetPath = dir.absolute.path + "/" + timestamp() + ".jpg";
@@ -578,7 +604,7 @@ Future<File> getFileImage(file) async {
   return imgFile;
 }
 
-Future<File> testCompressAndGetFile(File file, String targetPath) async {
+Future<XFile> testCompressAndGetFile(File file, String targetPath) async {
   final result = await FlutterImageCompress.compressAndGetFile(
     file.absolute.path,
     targetPath,

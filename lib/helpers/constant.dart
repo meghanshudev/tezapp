@@ -5,8 +5,8 @@ import 'package:event_bus/event_bus.dart';
 const ENV = 'production';
 
 const API_URL = (ENV == "production")
-    ? "https://api.teznow.com/api/v1/"
-    : "https://tez-api.sopheamen.com/api/v1/";
+    ? "https://tezapi.demogames.cloud/api/v1/"
+    : "https://tezapi.demogames.cloud/api/v1/";
 
 const ONE_SIGNAL_ID = (ENV == "production")
     ? "7c2c4ea1-0c6d-4365-85cd-028ae88dfe85"

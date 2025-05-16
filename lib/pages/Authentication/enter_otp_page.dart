@@ -1,20 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/crypto.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/ui_elements/custom_button_loading.dart';
-import 'package:tez_mobile/ui_elements/error_message.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/crypto.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/ui_elements/custom_button_loading.dart';
+import 'package:tezapp/ui_elements/error_message.dart';
 
 class EnterOTPPage extends StatefulWidget {
   final data;
@@ -395,7 +395,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   verifyLogin() async {

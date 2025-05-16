@@ -2,23 +2,23 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geocode/geocode.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/network.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/network.dart';
 import 'dart:async';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
 
 import '../../ui_elements/custom_footer_buttons.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/provider/has_group.dart';
+import 'package:tezapp/provider/has_group.dart';
 import 'package:http/http.dart' as http;
 
 class CreateUserGroupPage extends StatefulWidget {
@@ -69,14 +69,14 @@ class _CreateUserGroupPageState extends State<CreateUserGroupPage> {
       zipCodeLabel = !checkIsNullValue(userSession['zip_code'])
           ? userSession['zip_code']
           : "";
-      deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+      deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     });
 
     initMixpanel();
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   @override

@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
 
 import '../../ui_elements/loading_widget.dart';
 

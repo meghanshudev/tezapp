@@ -2,20 +2,20 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geocode/geocode.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/pages/Account/account_page.dart';
-import 'package:tez_mobile/pages/Home/home_page.dart';
-import 'package:tez_mobile/pages/Account/order_history_page.dart';
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/provider/cart_provider.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/pages/Account/account_page.dart';
+import 'package:tezapp/pages/Account/order_history_page.dart';
+import 'package:tezapp/pages/Home/home_page.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/provider/cart_provider.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 
@@ -55,6 +55,8 @@ class _RootAppState extends State<RootApp> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
+    print("ROOT PAGE");
+
 
     pageIndex = !checkIsNullValue(widget.data) &&
             widget.data.containsKey("activePageIndex")
@@ -78,7 +80,7 @@ class _RootAppState extends State<RootApp> {
 
     initPage();
     getProfileData(context);
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
@@ -87,7 +89,7 @@ class _RootAppState extends State<RootApp> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   checkInOperationCity({lat = 0.0, lng = 0.0}) async {

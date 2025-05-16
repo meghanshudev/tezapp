@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/custom_textfield.dart';
-import 'package:tez_mobile/ui_elements/slider_widget.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/custom_textfield.dart';
+import 'package:tezapp/ui_elements/slider_widget.dart';
 
 import '../../ui_elements/custom_footer_buttons.dart';
 import '../../ui_elements/error_message.dart';
@@ -35,7 +35,7 @@ class _CreateUserGroupNamePageState extends State<CreateUserGroupNamePage> {
   void initState() {
     super.initState();
     initPage();
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";

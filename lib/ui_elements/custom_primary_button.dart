@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
 
 class CustomPrimaryButton extends StatelessWidget {
   final String text;

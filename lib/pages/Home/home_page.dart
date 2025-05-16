@@ -6,14 +6,14 @@ import 'package:line_icons/line_icons.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/ui_elements/category_item.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
-import 'package:tez_mobile/ui_elements/loading_widget.dart';
-import 'package:tez_mobile/ui_elements/product_item_network.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/ui_elements/category_item.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/ui_elements/loading_widget.dart';
+import 'package:tezapp/ui_elements/product_item_network.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../helpers/network.dart';
 import '../../ui_elements/slider_widget.dart';
@@ -68,70 +68,71 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   initPage() async {
     await fetchAds();
-    // 0 feature as false
-    // 1 feature as true
     await loadCategories();
     await loadFeatureCategories();
 
-    // push notification
-    OneSignal.shared.setNotificationOpenedHandler(
-        (OSNotificationOpenedResult result) async {
-      var resultNotification = result.notification.additionalData ?? {};
+    // Push notification opened handler (new API)
+    OneSignal.Notifications.addClickListener((event) async {
+      final resultNotification = event.notification.additionalData ?? {};
 
       if (!checkIsNullValue(resultNotification['id'])) {
-        setState(() {
-          HOME_PAGE_LEAVE = false;
-        });
-        await Navigator.pushNamed(context, "/order_detail_page",
-            arguments: {"id": resultNotification['id'].toString()});
-        setState(() {
-          HOME_PAGE_LEAVE = true;
-        });
+        HOME_PAGE_LEAVE = false;
+        await Navigator.pushNamed(
+          context,
+          "/order_detail_page",
+          arguments: {"id": resultNotification['id'].toString()},
+        );
+        HOME_PAGE_LEAVE = true;
       } else {
-        // go to order history
-        setState(() {
-          HOME_PAGE_LEAVE = false;
-        });
+        HOME_PAGE_LEAVE = false;
         await Navigator.pushNamed(context, "/order_history_page");
-        setState(() {
-          HOME_PAGE_LEAVE = true;
-        });
+        HOME_PAGE_LEAVE = true;
       }
     });
 
-    getDeviceToken();
+    // Register device for push notifications
+    await getDeviceToken();
   }
 
-  Future getDeviceToken() async {
-    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+  Future<void> getDeviceToken() async {
+    // Set log level for debugging (optional)
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
-    OneSignal.shared.setAppId(ONE_SIGNAL_ID);
-    await OneSignal.shared.consentGranted(true);
-    await OneSignal.shared.setRequiresUserPrivacyConsent(true);
-    // OneSignal.shared
-    //     .setInFocusDisplayType(OSNotificationDisplayType.notification);
-    OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-      print("Accepted permission: $accepted");
-    });
-    var sendTags = {'id': userSession['id']};
-    OneSignal.shared.sendTags(sendTags).then((response) {
-      // print("Successfully sent tags with response: $response");
-    }).catchError((error) {
-      // print("Encountered an error sending tags: $error");
-    });
+    // Initialize OneSignal with your App ID
+    OneSignal.initialize(ONE_SIGNAL_ID);
+
+    // Grant consent (if required)
+    // OneSignal.consentGranted(true);
+
+
+    // Request push notification permission from the user
+    final accepted = await OneSignal.Notifications.requestPermission(true);
+    print("Accepted permission: $accepted");
+
+    // Opt-in to push subscription (optional, but recommended)
+    OneSignal.User.pushSubscription.optIn();
+
+    // Send custom tags (e.g. user ID)
+    try {
+      await OneSignal.User.addTagWithKey("id", userSession['id'].toString());
+      print("User tag sent successfully");
+    } catch (e) {
+      print("Failed to send tag: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      body: getBody(),
-    );
+    return Scaffold(backgroundColor: white, body: getBody());
   }
 
   fetchAds() async {
@@ -169,9 +170,10 @@ class _HomePageState extends State<HomePage> {
       List tempCategories = data["list"];
       if (mounted) {
         setState(() {
-          categories = tempCategories
-              .where((element) => element["is_sub_category"] == false)
-              .toList();
+          categories =
+              tempCategories
+                  .where((element) => element["is_sub_category"] == false)
+                  .toList();
         });
       }
     }
@@ -187,7 +189,7 @@ class _HomePageState extends State<HomePage> {
       "limit": "5",
       "order": "feature_order",
       "sort": "asc",
-      "feature": "1"
+      "feature": "1",
     };
     //  var params = {"page": "1", "limit": "0", "order": "rgt", "sort": "asc"};
     //  var params = {"page": "1", "limit": "5", "order": "rgt", "sort": "asc"};
@@ -201,7 +203,9 @@ class _HomePageState extends State<HomePage> {
 
         for (var item in tempCategories) {
           List products = await loadProductFeature(
-              item['id'].toString(), item['is_sub_category']);
+            item['id'].toString(),
+            item['is_sub_category'],
+          );
 
           item["products"] = products;
         }
@@ -245,9 +249,8 @@ class _HomePageState extends State<HomePage> {
       padding: EdgeInsets.fromLTRB(15, 0, 15, 15),
       child: Column(
         children: [
-          SizedBox(
-            height: 20,
-          ),
+          Text("jbffggfhsgfh"),
+          SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(left: 5),
             child: Wrap(
@@ -258,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     dynamic dataPanel = {
                       "phone": userSession['phone_number'],
-                      "category": categories[index]['name']
+                      "category": categories[index]['name'],
                     };
 
                     mixpanel.track(CLICK_CATEGORY, properties: dataPanel);
@@ -272,20 +275,18 @@ class _HomePageState extends State<HomePage> {
                       arguments: {
                         "category": categories[index],
                         "allCategories": categories,
-                        "isParent": true
+                        "isParent": true,
                       },
                     );
                     setState(() {
                       HOME_PAGE_LEAVE = true;
                     });
                   },
-                  child: CategoryItem(
-                    data: categories[index],
-                  ),
+                  child: CategoryItem(data: categories[index]),
                 );
               }),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -298,20 +299,22 @@ class _HomePageState extends State<HomePage> {
         await launch(WHATSAPP_IOS_URL + WHATSAPP + "&text=${Uri.parse(text)}");
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     } else {
       if (await canLaunch(WHATSAPP_ANDROID_URL + WHATSAPP)) {
         await launch(WHATSAPP_ANDROID_URL + WHATSAPP + "&text=" + text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     }
     // mix panel
     dynamic dataPanel = {
       "phone": userSession['phone_number'],
-      "order_kirana_whatsapp": "order_kirana_whatsapp"
+      "order_kirana_whatsapp": "order_kirana_whatsapp",
     };
 
     mixpanel.track(CLICK_ORDER_KIRANA_ON_WHATSAPP, properties: dataPanel);
@@ -375,9 +378,7 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.only(right: 20, left: 20),
           child: GestureDetector(
@@ -392,76 +393,50 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(
-                    LineIcons.whatSApp,
-                    color: white,
-                    size: 25,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    "order_kirana_on_whatsapp",
-                    style: normalWhiteText,
-                  ).tr(),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Icon(
-                    LineIcons.camera,
-                    color: white,
-                    size: 25,
-                  ),
+                  Icon(LineIcons.whatSApp, color: white, size: 25),
+                  SizedBox(width: 5),
+                  Text("order_kirana_on_whatsapp", style: normalWhiteText).tr(),
+                  SizedBox(width: 5),
+                  Icon(LineIcons.camera, color: white, size: 25),
                 ],
               ),
             ),
           ),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
-          child: SliderWidget(
-            items: ads,
-          ),
+          child: SliderWidget(items: ads),
         ),
         getCategories(),
-        SizedBox(
-          height: 5,
-        ),
-        Divider(
-          thickness: 0.8,
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 5),
+        Divider(thickness: 0.8),
+        SizedBox(height: 10),
         (isLoading && page == 1 && !isPulling)
             ? SizedBox(
-                height: 150, child: Center(child: CustomCircularProgress()))
+              height: 150,
+              child: Center(child: CustomCircularProgress()),
+            )
             : Column(
-                children: List.generate(categoryFeatures.length, (index) {
-                  List products = categoryFeatures[index]['products'];
+              children: List.generate(categoryFeatures.length, (index) {
+                List products = categoryFeatures[index]['products'];
 
-                  return products.length > 0
-                      ? Padding(
-                          padding: const EdgeInsets.only(bottom: 25),
-                          child: getProductByCagories(
-                              index,
-                              categoryFeatures[index]['name'] ?? "",
-                              categoryFeatures[index]['description'] ?? "",
-                              categoryFeatures[index]['products'] ?? []),
-                        )
-                      : Container();
-                }),
-              ),
-        SizedBox(
-          height: 20,
-        ),
+                return products.length > 0
+                    ? Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: getProductByCagories(
+                        index,
+                        categoryFeatures[index]['name'] ?? "",
+                        categoryFeatures[index]['description'] ?? "",
+                        categoryFeatures[index]['products'] ?? [],
+                      ),
+                    )
+                    : Container();
+              }),
+            ),
+        SizedBox(height: 20),
         (isLoading && page > 1) ? LoadingData() : Container(),
-        SizedBox(
-          height: 40,
-        ),
+        SizedBox(height: 40),
       ],
     );
   }
@@ -492,18 +467,18 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Text(
                       title,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(
-                      height: 3,
+                    SizedBox(height: 3),
+                    Text(
+                      subTitle,
+                      style: TextStyle(fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(subTitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -515,7 +490,7 @@ class _HomePageState extends State<HomePage> {
                     arguments: {
                       "category": categoryFeatures[index],
                       "allCategories": categoryFeatures,
-                      "isParent": !categoryFeatures[index]["is_sub_category"]
+                      "isParent": !categoryFeatures[index]["is_sub_category"],
                     },
                   );
                   setState(() {
@@ -523,7 +498,7 @@ class _HomePageState extends State<HomePage> {
                   });
                   dynamic dataPanel = {
                     "phone": userSession['phone_number'],
-                    "category": categories[index]
+                    "category": categories[index],
                   };
                   mixpanel.track(CLICK_CATEGORY, properties: dataPanel);
                   setState(() {
@@ -532,15 +507,8 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: Row(
                   children: [
-                    Text(
-                      "see_more",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ).tr(),
-                    SizedBox(
-                      width: 3,
-                    ),
+                    Text("see_more", style: TextStyle(fontSize: 16)).tr(),
+                    SizedBox(width: 3),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Icon(
@@ -548,10 +516,10 @@ class _HomePageState extends State<HomePage> {
                         color: black,
                         size: 18,
                       ),
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -567,35 +535,40 @@ class _HomePageState extends State<HomePage> {
                   onTap: () async {
                     dynamic dataPanel = {
                       "phone": userSession['phone_number'],
-                      "product": products[index]['product']['name']
+                      "product": products[index]['product']['name'],
                     };
 
                     mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
                     setState(() {
                       HOME_PAGE_LEAVE = false;
                     });
-                    await Navigator.pushNamed(context, "/product_detail_page",
-                        arguments: {"product": products[index]});
+                    await Navigator.pushNamed(
+                      context,
+                      "/product_detail_page",
+                      arguments: {"product": products[index]},
+                    );
                     setState(() {
                       HOME_PAGE_LEAVE = true;
                     });
                   },
                   child: ProductItemNetwork(
-                      product: product,
-                      discountLabel:
-                          convertDouble(product['percent_off']).toInt(),
-                      kgLabel: product["attributes"].length == 0
-                          ? ""
-                          : product["attributes"][0]["value"],
-                      image: product['image'],
-                      name: product['name'],
-                      priceStrike: CURRENCY + "${product["unit_price"]}",
-                      price: CURRENCY + "${product["sale_price"]}"),
+                    product: product,
+                    discountLabel:
+                        convertDouble(product['percent_off']).toInt(),
+                    kgLabel:
+                        product["attributes"].length == 0
+                            ? ""
+                            : product["attributes"][0]["value"],
+                    image: product['image'],
+                    name: product['name'],
+                    priceStrike: CURRENCY + "${product["unit_price"]}",
+                    price: CURRENCY + "${product["sale_price"]}",
+                  ),
                 ),
               );
             }),
           ),
-        )
+        ),
       ],
     );
   }

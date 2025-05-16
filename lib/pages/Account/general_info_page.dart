@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/custom_button.dart';
-import 'package:tez_mobile/ui_elements/custom_footer.dart';
-import 'package:tez_mobile/ui_elements/custom_sub_header.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/custom_button.dart';
+import 'package:tezapp/ui_elements/custom_footer.dart';
+import 'package:tezapp/ui_elements/custom_sub_header.dart';
 
 class GeneralInfoPage extends StatefulWidget {
   const GeneralInfoPage({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
   @override
   void initState() {
     super.initState();
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";

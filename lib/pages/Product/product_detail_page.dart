@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/product_detail_loading.dart';
-import 'package:tez_mobile/ui_elements/product_item_network.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/product_detail_loading.dart';
+import 'package:tezapp/ui_elements/product_item_network.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_icons/flutter_icons.dart';
 
 import '../../helpers/network.dart';
 import '../../provider/cart_provider.dart';
@@ -47,7 +47,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     super.initState();
     initPage();
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
@@ -71,7 +71,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   initPage() async {
@@ -224,7 +224,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return isLoading
         // ? Center(child: CustomCircularProgress())
         ? ProductDetailLoading()
-        : products.length == 0
+        : products.isEmpty
             ? Container()
             : SingleChildScrollView(
                 child: Column(
@@ -241,7 +241,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             height: 180,
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: displayImage(products[0]["image"]),
+                                image: displayImage(products.first["image"]),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -275,14 +275,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            products[0]["name"],
+                            products.first["name"],
                             style: normalBlackText,
                           ),
                           SizedBox(
                             height: 5,
                           ),
                           Text(
-                            products[0]["attributes"][0]["value"],
+                            products.first["attributes"][0]["value"],
                             style: smallBlackText,
                           ),
                           SizedBox(
@@ -296,17 +296,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     MainAxisAlignment.spaceBetween,
                                 // crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  checkIsNullValue(products[0]["percent_off"])
+                                  checkIsNullValue(products.first["percent_off"])
                                       ? Text(
                                           CURRENCY +
-                                              "${products[0]["unit_price"]}",
+                                              "${products.first["unit_price"]}",
                                           style: normalBoldBlackTitle,
                                         )
                                       : Row(
                                           children: [
                                             Text(
                                               CURRENCY +
-                                                  "${products[0]["sale_price"]}",
+                                                  "${products.first["sale_price"]}",
                                               style: normalBoldBlackTitle,
                                             ),
                                             SizedBox(
@@ -314,7 +314,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                             ),
                                             Text(
                                               CURRENCY +
-                                                  "${products[0]["unit_price"]}",
+                                                  "${products.first["unit_price"]}",
                                               style: smallStrikeBoldBlackText,
                                             ),
                                           ],
@@ -323,8 +323,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                     width: 10,
                                   ),
                                   (!checkIsNullValue(
-                                              products[0]["percent_off"]) &&
-                                          products[0]["percent_off"] > 0)
+                                              products.first["percent_off"]) &&
+                                          products.first["percent_off"] > 0)
                                       ? Container(
                                           width: 80,
                                           height: 25,
@@ -335,7 +335,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                                   BorderRadius.circular(10)),
                                           child: Center(
                                             child: Text(
-                                              "${products[0]['percent_off']}% " +
+                                              "${products.first['percent_off']}% " +
                                                   "off".tr(),
                                               style: smallBoldWhiteText,
                                             ),
@@ -358,7 +358,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                         ),
                                 ],
                               ),
-                              AddToCardButtonItem(product: products[0])
+                              AddToCardButtonItem(product: products.first)
                             ],
                           )
                         ],
@@ -431,7 +431,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      !checkIsNullValue(_attribute[0])
+                      _attribute.isNotEmpty
                           ? _attribute[0]["value"]
                           : "N/A",
                       style: meduimBlackText,

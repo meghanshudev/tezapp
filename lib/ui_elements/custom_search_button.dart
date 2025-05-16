@@ -1,6 +1,6 @@
  import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tezapp/helpers/theme.dart';
 
 Widget getSearchButton(context , 
   Function onOpenSearch,

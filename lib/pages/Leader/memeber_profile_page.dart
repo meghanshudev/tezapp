@@ -1,17 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/has_group.dart';
-import 'package:tez_mobile/ui_elements/border_button.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar_dynamic.dart';
-import 'package:tez_mobile/ui_elements/custom_button.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
-import 'package:tez_mobile/ui_elements/custom_sub_header.dart';
-import 'package:tez_mobile/ui_elements/icon_box.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/has_group.dart';
+import 'package:tezapp/ui_elements/border_button.dart';
+import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
+import 'package:tezapp/ui_elements/custom_button.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/ui_elements/custom_sub_header.dart';
+import 'package:tezapp/ui_elements/icon_box.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 

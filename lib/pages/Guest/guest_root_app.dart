@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/pages/Guest/guest_home_page.dart';
-import 'package:tez_mobile/pages/Guest/guest_custom_appbar.dart';
-import '../../helpers/utils.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Guest/guest_custom_appbar.dart';
+import 'package:tezapp/pages/Guest/guest_home_page.dart';
 
 class GuestRootApp extends StatefulWidget {
   GuestRootApp({Key? key, this.data}) : super(key: key);
@@ -31,12 +31,12 @@ class _GuestRootAppState extends State<GuestRootApp> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
+    print("GUEST PAGE");
 
     pageIndex = !checkIsNullValue(widget.data) &&
             widget.data.containsKey("activePageIndex")
         ? widget.data["activePageIndex"]
         : pageIndex;
-
     initPage();
   }
 

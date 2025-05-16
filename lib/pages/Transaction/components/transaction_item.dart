@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/models/transaction.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/models/transaction.dart';
 
 class TransactionItem extends StatefulWidget {
 

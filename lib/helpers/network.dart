@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:tez_mobile/helpers/constant.dart';
+import 'package:tezapp/helpers/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:tez_mobile/helpers/utils.dart';
+import 'package:tezapp/helpers/utils.dart';
 
 netGet(
     {String endPoint = "",

@@ -1,5 +1,5 @@
 
-import 'package:tez_mobile/models/cart.dart';
+import 'package:tezapp/models/cart.dart';
 
 abstract class CartFactory{
   Future<List<Cart>> list();

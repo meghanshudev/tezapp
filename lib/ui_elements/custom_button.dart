@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:tezapp/helpers/theme.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton(

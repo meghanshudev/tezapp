@@ -1,6 +1,6 @@
 
-import 'package:tez_mobile/respositories/base/base_repository.dart';
-import 'package:tez_mobile/respositories/suggest_us/suggest_us_factory.dart';
+import 'package:tezapp/respositories/base/base_repository.dart';
+import 'package:tezapp/respositories/suggest_us/suggest_us_factory.dart';
 
 class SuggestUsRepository extends BaseRepository implements SuggestUsFactory{
   final String endPoint;

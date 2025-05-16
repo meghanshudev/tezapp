@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
 
 class CustomPrimaryButtonSuffixIcon extends StatelessWidget {
   final String text;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/ui_elements/content_placeholder.dart';
+import 'package:tezapp/ui_elements/content_placeholder.dart';
 
 class HomeLoading extends StatelessWidget {
   const HomeLoading({ Key? key }) : super(key: key);

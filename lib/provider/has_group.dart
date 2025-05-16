@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:tez_mobile/helpers/utils.dart';
+import 'package:tezapp/helpers/utils.dart';
 
 class HasGroupProvider with ChangeNotifier, DiagnosticableTreeMixin {
   bool isHasGroup = false;

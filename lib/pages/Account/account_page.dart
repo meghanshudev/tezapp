@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/dummy_data/language_json.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/has_group.dart';
-import 'package:tez_mobile/ui_elements/card_item.dart';
+import 'package:tezapp/dummy_data/language_json.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/has_group.dart';
+import 'package:tezapp/ui_elements/card_item.dart';
 import '../../ui_elements/slider_widget.dart';
 
 class AccountPage extends StatefulWidget {
@@ -41,7 +41,7 @@ class _AccountPageState extends State<AccountPage> {
     fetchAds();
     getMember();
 
-    name = !checkIsNullValue(userSession['name']) ? userSession['name'] : "N/A";
+    name = !checkIsNullValue(userSession['name'] ?? "") ? userSession['name'] ?? "" : "N/A";
     phoneNumber = !checkIsNullValue(userSession['phone_number'])
         ? userSession['phone_number']
         : "N/A";

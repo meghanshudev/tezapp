@@ -1,4 +1,4 @@
-import 'package:tez_mobile/helpers/utils.dart';
+import 'package:tezapp/helpers/utils.dart';
 
 class Cart{
 

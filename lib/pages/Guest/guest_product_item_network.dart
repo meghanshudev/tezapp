@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/pages/Guest/guest_add_to_cart_button_item.dart';
-import 'package:tez_mobile/ui_elements/custom_image.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Guest/guest_add_to_cart_button_item.dart';
+import 'package:tezapp/ui_elements/custom_image.dart';
 
 class GuestProductItemNetwork extends StatelessWidget {
   final double? width;

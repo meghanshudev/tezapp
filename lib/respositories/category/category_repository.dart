@@ -1,6 +1,6 @@
 
-import 'package:tez_mobile/models/category.dart';
-import 'package:tez_mobile/respositories/base/base_repository.dart';
+import 'package:tezapp/models/category.dart';
+import 'package:tezapp/respositories/base/base_repository.dart';
 
 import '../../helpers/network_V2.dart';
 import '../../helpers/response.dart';

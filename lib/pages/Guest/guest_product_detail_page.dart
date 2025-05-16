@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/pages/guest/guest_custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/product_detail_loading.dart';
-import 'package:tez_mobile/pages/Guest/guest_product_item_network.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/guest/guest_custom_appbar.dart';
+import 'package:tezapp/ui_elements/product_detail_loading.dart';
+import 'package:tezapp/pages/Guest/guest_product_item_network.dart';
 
 import '../../helpers/network.dart';
 import '../../pages/Guest/guest_add_to_cart_button_item.dart';
@@ -39,7 +39,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
     super.initState();
     initPage();
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
@@ -62,6 +62,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
   }
 
   initPage() async {
+    print("WIDGET ${widget.data}");
     productId = widget.data["product"]["id"];
     await loadProductDetail(productId);
     await fetchRecommendedProduct();
@@ -119,6 +120,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("products $products");
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -147,10 +149,11 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
   }
 
   Widget getBody() {
+    print("isLoading : $isLoading");
     return isLoading
         // ? Center(child: CustomCircularProgress())
         ? ProductDetailLoading()
-        : products.length == 0
+        : products.isEmpty
             ? Container()
             : SingleChildScrollView(
                 child: Column(
@@ -167,7 +170,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                             height: 180,
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                image: displayImage(products[0]["image"]),
+                                image: displayImage(products.first["image"]),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -192,14 +195,14 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            products[0]["name"],
+                            products.first["name"],
                             style: normalBlackText,
                           ),
                           SizedBox(
                             height: 5,
                           ),
                           Text(
-                            products[0]["attributes"][0]["value"],
+                            products.first["attributes"][0]["value"],
                             style: smallBlackText,
                           ),
                           SizedBox(
@@ -213,17 +216,17 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                                     MainAxisAlignment.spaceBetween,
                                 // crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  checkIsNullValue(products[0]["percent_off"])
+                                  checkIsNullValue(products.first["percent_off"])
                                       ? Text(
                                           CURRENCY +
-                                              "${products[0]["unit_price"]}",
+                                              "${products.first["unit_price"]}",
                                           style: normalBoldBlackTitle,
                                         )
                                       : Row(
                                           children: [
                                             Text(
                                               CURRENCY +
-                                                  "${products[0]["sale_price"]}",
+                                                  "${products.first["sale_price"]}",
                                               style: normalBoldBlackTitle,
                                             ),
                                             SizedBox(
@@ -231,7 +234,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                                             ),
                                             Text(
                                               CURRENCY +
-                                                  "${products[0]["unit_price"]}",
+                                                  "${products.first["unit_price"]}",
                                               style: smallStrikeBoldBlackText,
                                             ),
                                           ],
@@ -240,8 +243,8 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                                     width: 10,
                                   ),
                                   (!checkIsNullValue(
-                                              products[0]["percent_off"]) &&
-                                          products[0]["percent_off"] > 0)
+                                              products.first["percent_off"]) &&
+                                          products.first["percent_off"] > 0)
                                       ? Container(
                                           width: 80,
                                           height: 25,
@@ -252,7 +255,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                                                   BorderRadius.circular(10)),
                                           child: Center(
                                             child: Text(
-                                              "${products[0]['percent_off']}% " +
+                                              "${products.first['percent_off']}% " +
                                                   "off".tr(),
                                               style: smallBoldWhiteText,
                                             ),
@@ -288,7 +291,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                     SizedBox(
                       height: 20,
                     ),
-                    getRelatedProducts(),
+                    // getRelatedProducts(),
                   ],
                 ),
               );
@@ -348,8 +351,8 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      !checkIsNullValue(_attribute[0])
-                          ? _attribute[0]["value"]
+                      _attribute.isNotEmpty
+                          ? _attribute.first["value"]
                           : "N/A",
                       style: meduimBlackText,
                     ),

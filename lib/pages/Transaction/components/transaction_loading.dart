@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/ui_elements/content_placeholder.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/ui_elements/content_placeholder.dart';
 
 class TransactionLoading extends StatelessWidget {
   const TransactionLoading({ Key? key }) : super(key: key);

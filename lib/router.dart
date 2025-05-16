@@ -1,43 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/pages/Account/customer_support_page.dart';
-import 'package:tez_mobile/pages/Account/edit_profile_page.dart';
-import 'package:tez_mobile/pages/Account/general_info_page.dart';
-import 'package:tez_mobile/pages/Account/open_source_page.dart';
-import 'package:tez_mobile/pages/Account/order_detail_page.dart';
-import 'package:tez_mobile/pages/Account/order_history_page.dart';
-import 'package:tez_mobile/pages/Account/privacy_page.dart';
-import 'package:tez_mobile/pages/Authentication/privacy_policy_login_page.dart';
-import 'package:tez_mobile/pages/Account/suggest_page.dart';
-import 'package:tez_mobile/pages/Authentication/term_condition_login_page.dart';
-import 'package:tez_mobile/pages/Account/term_condition_page.dart';
-import 'package:tez_mobile/pages/Account/wallet_page.dart';
-import 'package:tez_mobile/pages/Authentication/add_name_page.dart';
-import 'package:tez_mobile/pages/Authentication/enter_otp_page.dart';
-import 'package:tez_mobile/pages/Authentication/login_page.dart';
-import 'package:tez_mobile/pages/Cart/add_coupon_page.dart';
-import 'package:tez_mobile/pages/Cart/cart_page.dart';
-import 'package:tez_mobile/pages/Cart/order_confirmed_page.dart';
-import 'package:tez_mobile/pages/Category/category_page.dart';
-import 'package:tez_mobile/pages/Leader/leader_order_detail_page.dart';
-import 'package:tez_mobile/pages/Leader/leader_view_detail_page.dart';
-import 'package:tez_mobile/pages/Leader/member_request_page.dart';
-import 'package:tez_mobile/pages/Location/choose_location_page.dart';
-import 'package:tez_mobile/pages/Location/location_picker_page.dart';
-import 'package:tez_mobile/pages/Product/product_detail_page.dart';
-import 'package:tez_mobile/pages/Product/product_search_page.dart';
-import 'package:tez_mobile/pages/Transaction/transaction_page.dart';
-import 'package:tez_mobile/pages/UserGroup/create_user_group_page.dart';
-import 'package:tez_mobile/pages/UserGroup/edit_user_group_page.dart';
-import 'package:tez_mobile/pages/UserGroup/user_group_view_page.dart';
-import 'package:tez_mobile/pages/UserGroup/youtube_link_page.dart';
-import 'package:tez_mobile/root_app.dart';
-import 'package:tez_mobile/pages/Guest/guest_root_app.dart';
-import 'package:tez_mobile/pages/Guest/guest_category_page.dart';
-import 'package:tez_mobile/pages/Guest/guest_product_detail_page.dart';
-import 'package:tez_mobile/pages/Guest/guest_category_page.dart';
-import 'package:tez_mobile/pages/UserGroup/user_group_page.dart';
-
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Account/customer_support_page.dart';
+import 'package:tezapp/pages/Account/edit_profile_page.dart';
+import 'package:tezapp/pages/Account/general_info_page.dart';
+import 'package:tezapp/pages/Account/open_source_page.dart';
+import 'package:tezapp/pages/Account/order_detail_page.dart';
+import 'package:tezapp/pages/Account/order_history_page.dart';
+import 'package:tezapp/pages/Account/privacy_page.dart';
+import 'package:tezapp/pages/Account/suggest_page.dart';
+import 'package:tezapp/pages/Account/term_condition_page.dart';
+import 'package:tezapp/pages/Account/wallet_page.dart';
+import 'package:tezapp/pages/Authentication/add_name_page.dart';
+import 'package:tezapp/pages/Authentication/enter_otp_page.dart';
+import 'package:tezapp/pages/Authentication/login_page.dart';
+import 'package:tezapp/pages/Authentication/privacy_policy_login_page.dart';
+import 'package:tezapp/pages/Authentication/term_condition_login_page.dart';
+import 'package:tezapp/pages/Cart/add_coupon_page.dart';
+import 'package:tezapp/pages/Cart/cart_page.dart';
+import 'package:tezapp/pages/Cart/order_confirmed_page.dart';
+import 'package:tezapp/pages/Category/category_page.dart';
+import 'package:tezapp/pages/Guest/guest_category_page.dart';
+import 'package:tezapp/pages/Guest/guest_product_detail_page.dart';
+import 'package:tezapp/pages/Guest/guest_root_app.dart';
+import 'package:tezapp/pages/Leader/leader_order_detail_page.dart';
+import 'package:tezapp/pages/Leader/leader_view_detail_page.dart';
+import 'package:tezapp/pages/Leader/member_request_page.dart';
+import 'package:tezapp/pages/Location/choose_location_page.dart';
+import 'package:tezapp/pages/Location/location_picker_page.dart';
+import 'package:tezapp/pages/Product/product_detail_page.dart';
+import 'package:tezapp/pages/Product/product_search_page.dart';
+import 'package:tezapp/pages/Transaction/transaction_page.dart';
+import 'package:tezapp/pages/UserGroup/create_user_group_page.dart';
+import 'package:tezapp/pages/UserGroup/edit_user_group_page.dart';
+import 'package:tezapp/pages/UserGroup/user_group_page.dart';
+import 'package:tezapp/pages/UserGroup/user_group_view_page.dart';
+import 'package:tezapp/pages/UserGroup/youtube_link_page.dart';
+import 'package:tezapp/root_app.dart';
 import 'pages/Leader/leader_all_order_page.dart';
 import 'pages/Leader/memeber_profile_page.dart';
 import 'pages/UserGroup/create_user_group_name_page.dart';
@@ -150,12 +148,12 @@ Route<dynamic> generateRoute(RouteSettings setting) {
     case "/term_condition_page":
       return MaterialPageRoute(builder: (context) => TermConditionPage());
     case "youtube_link_page":
-      return MaterialPageRoute(
-        builder: (context) => YoutubeLinkPage(
-          link: args['link'],
-          title: args['title'],
-        ),
-      );
+      // return MaterialPageRoute(
+      //   builder: (context) => YoutubeLinkPage(
+      //     link: args['link'],
+      //     title: args['title'],
+      //   ),
+      // );
     case "/open_source_page":
       return MaterialPageRoute(builder: (context) => OpenSourcePage());
     case "/term_condition_login_page":

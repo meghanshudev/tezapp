@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/ui_elements/category_loading.dart';
-import 'package:tez_mobile/pages/guest/guest_custom_appbar.dart';
-import 'package:tez_mobile/pages/Guest/guest_product_category_item.dart';
-import 'package:tez_mobile/ui_elements/sub_category_item.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/ui_elements/category_loading.dart';
+import 'package:tezapp/pages/guest/guest_custom_appbar.dart';
+import 'package:tezapp/pages/Guest/guest_product_category_item.dart';
+import 'package:tezapp/ui_elements/sub_category_item.dart';
 import '../../helpers/network.dart';
 import '../../helpers/utils.dart';
 import '../../ui_elements/circle_category_loading.dart';
@@ -48,7 +48,7 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
     super.initState();
     initPage();
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";

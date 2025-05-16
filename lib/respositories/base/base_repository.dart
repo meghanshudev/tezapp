@@ -1,7 +1,7 @@
-import 'package:tez_mobile/helpers/network_V2.dart';
-import 'package:tez_mobile/helpers/response.dart';
-import 'package:tez_mobile/models/transaction.dart';
-import 'package:tez_mobile/respositories/base/base_factory.dart';
+import 'package:tezapp/helpers/network_V2.dart';
+import 'package:tezapp/helpers/response.dart';
+import 'package:tezapp/models/transaction.dart';
+import 'package:tezapp/respositories/base/base_factory.dart';
 
 class BaseRepository implements BaseFactory{
 

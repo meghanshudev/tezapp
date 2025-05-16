@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/models/cart.dart';
-import 'package:tez_mobile/respositories/cart/cart_factory.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/models/cart.dart';
+import 'package:tezapp/respositories/cart/cart_factory.dart';
 
 class CartRepository implements CartFactory{
   

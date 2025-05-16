@@ -2,21 +2,21 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/event/ProductListEvent.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/models/cart.dart';
-import 'package:tez_mobile/provider/cart_provider.dart';
-import 'package:tez_mobile/provider/has_group.dart';
-import 'package:tez_mobile/respositories/cart/cart_repository.dart';
-import 'package:tez_mobile/ui_elements/cart_loading.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
-import 'package:tez_mobile/ui_elements/slider_widget.dart';
+import 'package:tezapp/event/ProductListEvent.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/models/cart.dart';
+import 'package:tezapp/provider/cart_provider.dart';
+import 'package:tezapp/provider/has_group.dart';
+import 'package:tezapp/respositories/cart/cart_repository.dart';
+import 'package:tezapp/ui_elements/cart_loading.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/ui_elements/slider_widget.dart';
 
 import '../../helpers/constant.dart';
 import '../../helpers/network.dart';
@@ -62,7 +62,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   initPage() async {
@@ -1237,26 +1237,28 @@ class _CartPageState extends State<CartPage> {
     return res;
   }
 
-  final SlidableController slidableController = SlidableController();
-  Widget getSlidable(Widget child, product, qty) {
-    return Slidable(
-      controller: slidableController,
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.2,
-      child: child,
-      secondaryActions: <Widget>[
-        IconSlideAction(
-          color: removingItem ? greyLight70 : Colors.red,
-          foregroundColor: removingItem ? greyLight80 : null,
-          caption: 'remove'.tr(),
-          icon: Icons.delete,
-          onTap: () async {
+Widget getSlidable(Widget child, product, qty) {
+  return Slidable(
+    // Each Slidable must have a key
+    key: ValueKey(product.id), // or any unique identifier
+    endActionPane: ActionPane(
+      motion: const DrawerMotion(),
+      extentRatio: 0.2,
+      children: [
+        SlidableAction(
+          onPressed: (_) async {
             await removeItem(product, qty);
           },
+          backgroundColor: removingItem ? greyLight70 : Colors.red,
+          foregroundColor: removingItem ? greyLight80 : null,
+          icon: Icons.delete,
+          label: 'remove'.tr(),
         ),
       ],
-    );
-  }
+    ),
+    child: child,
+  );
+}
 
   Widget getEmptyCart() {
     return Column(

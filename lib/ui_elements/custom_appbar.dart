@@ -1,12 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
-import 'package:tez_mobile/helpers/styles.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/provider/credit_provider.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/provider/credit_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tez_mobile/ui_elements/custom_search_button.dart';
+import 'package:tezapp/ui_elements/custom_search_button.dart';
 
 class CustomAppBar extends StatefulWidget {
   const CustomAppBar(

@@ -1,4 +1,4 @@
-import 'package:tez_mobile/helpers/constant.dart';
+import 'package:tezapp/helpers/constant.dart';
 
 const List category_json = [
   {

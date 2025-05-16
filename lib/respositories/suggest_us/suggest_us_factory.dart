@@ -1,5 +1,5 @@
 
-import 'package:tez_mobile/respositories/base/base_factory.dart';
+import 'package:tezapp/respositories/base/base_factory.dart';
 
 abstract class SuggestUsFactory extends BaseFactory {
   

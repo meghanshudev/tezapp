@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/theme.dart';
-import 'package:tez_mobile/provider/account_info_provider.dart';
-import 'package:tez_mobile/ui_elements/border_button.dart';
-import 'package:tez_mobile/ui_elements/custom_appbar.dart';
-import 'package:tez_mobile/ui_elements/custom_circular_progress.dart';
-import 'package:tez_mobile/ui_elements/custom_footer.dart' as footer;
-import 'package:tez_mobile/ui_elements/custom_sub_header.dart';
-import 'package:tez_mobile/ui_elements/order_history_box.dart';
-import 'package:tez_mobile/ui_elements/order_history_loading.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/provider/account_info_provider.dart';
+import 'package:tezapp/ui_elements/border_button.dart';
+import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezapp/ui_elements/custom_circular_progress.dart';
+import 'package:tezapp/ui_elements/custom_footer.dart' as footer;
+import 'package:tezapp/ui_elements/custom_sub_header.dart';
+import 'package:tezapp/ui_elements/order_history_box.dart';
+import 'package:tezapp/ui_elements/order_history_loading.dart';
 
 import '../../helpers/network.dart';
 import '../../helpers/utils.dart';
@@ -41,7 +41,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     super.initState();
     initPage();
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] : "";
+    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";

@@ -3,17 +3,16 @@ import 'dart:developer';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
-import 'package:tez_mobile/event/ProductListEvent.dart';
-import 'package:tez_mobile/helpers/constant.dart';
-import 'package:tez_mobile/helpers/network.dart';
-import 'package:tez_mobile/helpers/utils.dart';
-import 'package:tez_mobile/models/cart.dart';
-import 'package:tez_mobile/provider/cart_provider.dart';
-import 'package:tez_mobile/respositories/cart/cart_repository.dart';
-
-import '../helpers/styles.dart';
-import '../helpers/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:tezapp/event/ProductListEvent.dart';
+import 'package:tezapp/helpers/constant.dart';
+import 'package:tezapp/helpers/network.dart';
+import 'package:tezapp/helpers/styles.dart';
+import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/models/cart.dart';
+import 'package:tezapp/provider/cart_provider.dart';
+import 'package:tezapp/respositories/cart/cart_repository.dart';
 
 class AddToCardButtonItem extends StatefulWidget {
   final product;
@@ -40,7 +39,7 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
      initMixpanel();
   }
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false);
+    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   initialize() async {
