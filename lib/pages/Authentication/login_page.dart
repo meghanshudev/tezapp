@@ -5,26 +5,34 @@ import 'package:flutter/material.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/crypto.dart';
 import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Authentication/enter_otp_page.dart';
+import 'package:tezapp/pages/Authentication/privacy_policy_login_page.dart';
+import 'package:tezapp/pages/Authentication/term_condition_login_page.dart';
+import 'package:tezapp/pages/Guest/guest_root_app.dart';
+import 'package:tezapp/provider/credit_provider.dart';
 import 'package:tezapp/ui_elements/custom_primary_button.dart';
 import 'package:tezapp/ui_elements/custom_textfield_phone.dart';
 import 'package:tezapp/ui_elements/error_message.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   MaskTextInputFormatter phoneFormatter = new MaskTextInputFormatter(
-      mask: PHONE_FORMAT, filter: {"#": RegExp(r'[0-9]')});
+    mask: PHONE_FORMAT,
+    filter: {"#": RegExp(r'[0-9]')},
+  );
   bool isSignIn = false;
 
   TextEditingController phoneNumberController = TextEditingController();
@@ -47,141 +55,141 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        backgroundColor: white,
-        body: getBody(),
-      ),
+      child: Scaffold(backgroundColor: white, body: getBody()),
     );
   }
 
   Widget getBody() {
     var size = MediaQuery.of(context).size;
     return Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(color: primary),
-        child: KeyboardAvoider(
-            autoScroll: true,
-            child: Column(
-              children: [
-                Container(
-                  width: size.width,
-                  height: size.height * 0.40,
-                  decoration: BoxDecoration(color: primary),
-                  child: Center(
-                      child: Text(
-                    "tez",
-                    style: logoText,
-                  )),
-                ),
-                Container(
-                  width: size.width,
-                  height: size.height * 0.6,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10), color: white),
-                  child: Column(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(color: primary),
+      child: KeyboardAvoider(
+        autoScroll: true,
+        child: Column(
+          children: [
+            Container(
+              width: size.width,
+              height: size.height * 0.40,
+              decoration: BoxDecoration(color: primary),
+              child: Center(child: Text("tez", style: logoText)),
+            ),
+            Container(
+              width: size.width,
+              height: size.height * 0.6,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: white,
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    height: 70,
+                    width: size.width,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(width: 1, color: placeHolderColor),
+                      ),
+                    ),
+                    child: Center(
+                      child:
+                          Text("login_or_signup", style: normalBlackText).tr(),
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20, left: 20),
+                    child: CustomTextFieldPhone(
+                      controller: phoneNumberController,
+                      keyboardType: TextInputType.phone,
+                      // inputFormatters: [phoneFormatter],
+                      hintText: "enter_your_phone_number".tr(),
+                    ),
+                  ),
+                  ErrorMessage(
+                    isError: isPhoneNumber,
+                    message: phoneNumberMessage,
+                  ),
+                  SizedBox(height: 25),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20, left: 20),
+                    child: InkWell(
+                      onTap: () {
+                        onSignIn();
+                      },
+                      child: CustomPrimaryButton(
+                        isLoading: isLoadingButton,
+                        text: "send_otp".tr(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  Column(
                     children: [
-                      Container(
-                        height: 70,
-                        width: size.width,
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                    width: 1, color: placeHolderColor))),
-                        child: Center(
-                            child: Text(
-                          "login_or_signup",
-                          style: normalBlackText,
-                        ).tr()),
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20, left: 20),
-                        child: CustomTextFieldPhone(
-                          controller: phoneNumberController,
-                          keyboardType: TextInputType.phone,
-                          // inputFormatters: [phoneFormatter],
-                          hintText: "enter_your_phone_number".tr(),
-                        ),
-                      ),
-                      ErrorMessage(
-                        isError: isPhoneNumber,
-                        message: phoneNumberMessage,
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20, left: 20),
-                        child: InkWell(
-                            onTap: () {
-                              onSignIn();
-                              // Navigator.pushNamed(context, "/enter_otp_page");
-                            },
-                            child: CustomPrimaryButton(
-                              isLoading: isLoadingButton,
-                              text: "send_otp".tr(),
-                            )),
-                      ),
-                      SizedBox(
-                        height: 25,
-                      ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () => loginDirectly(),
-                                child: Text(
-                                  "Skip this step",
-                                  style: meduimPrimaryText,
+                          GestureDetector(
+                            onTap: () => loginDirectly(),
+                            child: Text(
+                              "Skip this step",
+                              style: meduimPrimaryText,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 25),
+                      Text(
+                        "by_continuing_you_agree_to_tez's",
+                        style: smallBlackText,
+                      ).tr(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => TermConditionLoginPage(),
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: 25,
-                          ),
-                          Text(
-                            "by_continuing_you_agree_to_tez's",
-                            style: smallBlackText,
-                          ).tr(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(
-                                    context, '/term_condition_login_page'),
-                                child: Text(
+                            child:
+                                Text(
                                   // "Terms & Conditions ",
                                   "terms_&_conditions",
                                   style: smallBoldBlackText,
                                 ).tr(),
-                              ),
-                              Text(
-                                "and",
-                                style: smallBlackText,
-                              ).tr(),
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(
-                                    context, '/privacy_policy_login_page'),
-                                child: Text(
+                          ),
+                          Text("and", style: smallBlackText).tr(),
+                          GestureDetector(
+                            onTap:
+                                () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => PrivacyPolicyLoginPage(),
+                                  ),
+                                ),
+                            child:
+                                Text(
                                   "privacy_policy",
                                   style: smallBoldBlackText,
                                 ).tr(),
-                              ),
-                            ],
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
-                ),
-              ],
-            )));
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   onValidate() {
@@ -205,56 +213,90 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   loginDirectly() async {
     var phoneNumber = "9000000000";
 
-    String value = phoneNumber +
-        "-" +
-        new DateTime.now().millisecondsSinceEpoch.toString();
+    String value =
+        phoneNumber + "-" + DateTime.now().millisecondsSinceEpoch.toString();
     var encryptAccess = encrypt(value, CREDENTIAL_KEY, CREDENTIAL_IV);
     print("SKIP LOGIN - $encryptAccess");
-    var response =
-        await netPost(isUserToken: false, endPoint: "auth/login", params: {
-      "phone_number": encryptAccess,
+
+    setState(() {
+      isVerifyOTP = false;
+      isLoadingButton = true;
     });
-    if (mounted)
+
+    try {
+      var response = await netPost(
+        isUserToken: false,
+        endPoint: "auth/login",
+        params: {"phone_number": encryptAccess},
+      );
+
+      if (!mounted) return;
+
       setState(() {
-        isVerifyOTP = false;
         isLoadingButton = false;
       });
 
-    if (response['resp_code'] == "200") {
-      var userData = response["resp_data"]['data'];
+      if (response['resp_code'] == "200") {
+        var userData = response["resp_data"]['data'];
 
-      // no profile account
-      await setStorage(STORAGE_USER, userData);
+        // store login token
+        await setStorage(STORAGE_USER, userData);
+        await getStorageUser();
 
-      await getStorageUser();
+        // Get profile data before navigation
+        var user = await getProfileData(context);
+        await setStorage(STORAGE_USER, user);
+        await getStorageUser();
 
-      // profile + token
-      var user = await getProfileData(context);
+        if (!mounted) return;
 
-      await setStorage(STORAGE_USER, user);
-
-      await getStorageUser();
-      // second time
-      Future.delayed(Duration.zero, () async {
-        Navigator.pushNamedAndRemoveUntil(
+        // Navigate after all data is ready
+        Navigator.pushAndRemoveUntil(
           context,
-          "/guest_root_app",
-          (route) => false,
-          arguments: {"activePageIndex": 0},
+          MaterialPageRoute(
+            builder: (context) => GuestRootApp(data: {"activePageIndex": 0}),
+          ),
+          (Route<dynamic> route) => false, // remove all previous routes
         );
+      } else {
+        var message = reponseErrorMessage(
+          response,
+          requestedParams: ["verification_code", "user_id"],
+        );
+        if (!mounted) return;
+        notifyAlert(
+          context,
+          desc: message,
+          btnTitle: "Ok!",
+          onConfirm: () {
+            Navigator.pop(context);
+          },
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+      if (!mounted) return;
+      setState(() {
+        isLoadingButton = false;
       });
-    } else {
-      var message = reponseErrorMessage(response,
-          requestedParams: ["verification_code", "user_id"]);
-      notifyAlert(context, desc: message, btnTitle: "Ok!", onConfirm: () {
-        Navigator.pop(context);
-      });
+      notifyAlert(
+        context,
+        desc: "An error occurred during login",
+        btnTitle: "Ok!",
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      );
     }
   }
 
@@ -272,8 +314,11 @@ class _LoginPageState extends State<LoginPage> {
     var phoneNumber = phoneNumberController.text;
 
     var data = {"phone_number": phoneNumber};
-    print(data);
-
-    Navigator.pushNamed(context, "/enter_otp_page", arguments: {"data": data});
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EnterOTPPage(data: data),
+      ),
+    );
   }
 }

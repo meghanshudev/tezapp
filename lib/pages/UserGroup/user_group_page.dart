@@ -8,6 +8,7 @@ import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/UserGroup/create_user_group_name_page.dart';
 import 'package:tezapp/provider/has_group.dart';
 import 'package:tezapp/root_app.dart';
 import 'package:tezapp/ui_elements/custom_button.dart';
@@ -20,9 +21,7 @@ import 'package:tezapp/ui_elements/custom_footer.dart';
 import 'package:tezapp/provider/account_info_provider.dart';
 
 class UserGroupPage extends StatefulWidget {
-  const UserGroupPage({
-    Key? key,
-  }) : super(key: key);
+  const UserGroupPage({Key? key}) : super(key: key);
 
   @override
   _UserGroupPageState createState() => _UserGroupPageState();
@@ -49,34 +48,39 @@ class _UserGroupPageState extends State<UserGroupPage> {
     // TODO: implement initState
     super.initState();
     initPage();
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
 
     initMixpanel();
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: CustomAppBar(
+          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
+          subtitleIcon: Entypo.location_pin,
         ),
-        body: getBody(),
-        bottomNavigationBar: CustomFooter(
-          onTapBack: () {
-            Navigator.of(context).pop();
-          },
-        ));
+      ),
+      body: getBody(),
+      bottomNavigationBar: CustomFooter(
+        onTapBack: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 
   initPage() async {
@@ -116,170 +120,138 @@ class _UserGroupPageState extends State<UserGroupPage> {
   Widget getBody() {
     var size = MediaQuery.of(context).size;
     return SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      SizedBox(
-        height: 5,
-      ),
-      Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "your_tez_group",
-              style: normalBoldBlackTitle,
-            ).tr(),
-            SizedBox(
-              height: 2,
-            ),
-            Text(
-              "get_upto_75%_off_when_you_buy_in_a_group",
-              style: smallMediumGreyText,
-            ).tr(),
-            SizedBox(
-              height: 20,
-            ),
-            SliderWidget(
-              items: ads,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                "become_a_tez_group_leader_and_get_your_kirana_for_free_5%_commission_and_more",
-                textAlign: TextAlign.center,
-                style: smallMediumBoldBlackText.copyWith(height: 1.5),
-              ).tr(),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            CustomButton(
-              icon: Icons.add,
-              title: "create_a_tez_group".tr(),
-              onTap: () {
-                Navigator.pushNamed(context, "/create_user_group_name_page");
-              },
-            )
-          ],
-        ),
-      ),
-      Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Flexible(
-            child: Divider(
-              thickness: 0.8,
-              color: placeHolderColor,
+          SizedBox(height: 5),
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("your_tez_group", style: normalBoldBlackTitle).tr(),
+                SizedBox(height: 2),
+                Text(
+                  "get_upto_75%_off_when_you_buy_in_a_group",
+                  style: smallMediumGreyText,
+                ).tr(),
+                SizedBox(height: 20),
+                SliderWidget(items: ads),
+                SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child:
+                      Text(
+                        "become_a_tez_group_leader_and_get_your_kirana_for_free_5%_commission_and_more",
+                        textAlign: TextAlign.center,
+                        style: smallMediumBoldBlackText.copyWith(height: 1.5),
+                      ).tr(),
+                ),
+                SizedBox(height: 20),
+                CustomButton(
+                  icon: Icons.add,
+                  title: "create_a_tez_group".tr(),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateUserGroupNamePage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-          SizedBox(
-            width: 20,
+          Row(
+            children: [
+              Flexible(child: Divider(thickness: 0.8, color: placeHolderColor)),
+              SizedBox(width: 20),
+              Text("or", style: normalGreyText).tr(),
+              SizedBox(width: 20),
+              Flexible(child: Divider(thickness: 0.8, color: placeHolderColor)),
+            ],
           ),
-          Text(
-            "or",
-            style: normalGreyText,
-          ).tr(),
-          SizedBox(
-            width: 20,
-          ),
-          Flexible(
-            child: Divider(
-              thickness: 0.8,
-              color: placeHolderColor,
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("join_a_tez_group", style: normalBoldBlackTitle).tr(),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 3,
+                      child: CustomTextField(
+                        controller: groupCodeController,
+                        hintText: "enter_group_id".tr(),
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    Flexible(
+                      flex: 2,
+                      child: GestureDetector(
+                        onTap: () {
+                          joinGroup();
+                        },
+                        child: CustomPrimaryButtonSuffixIcon(
+                          isLoading: isLoadingButton,
+                          text: "join".tr(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                ErrorMessage(isError: isEnterGroupID, message: groupIDMessage),
+                SizedBox(height: 20),
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.center,
+                //   children: [
+                //     Row(
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       children: [
+                //         Text(
+                //           "You can also click on the ",
+                //           style: smallMediumGreyText,
+                //         ),
+                //         Text(
+                //           "Group Invite Link ",
+                //           style: smallMediumBoldBlackText,
+                //         ),
+                //       ],
+                //     ),
+                //     SizedBox(
+                //       height: 5,
+                //     ),
+                //     Row(
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       children: [
+                //         Text(
+                //           "that you received to directly join the group.",
+                //           style: smallMediumGreyText,
+                //         ),
+                //       ],
+                //     )
+                //   ],
+                // ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child:
+                      Text(
+                        "you_can_also_click",
+                        textAlign: TextAlign.center,
+                        style: smallMediumGreyText.copyWith(height: 1.5),
+                      ).tr(),
+                ),
+                SizedBox(height: 40),
+              ],
             ),
           ),
         ],
       ),
-      Padding(
-          padding: const EdgeInsets.all(15),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(
-              "join_a_tez_group",
-              style: normalBoldBlackTitle,
-            ).tr(),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  flex: 3,
-                  child: CustomTextField(
-                    controller: groupCodeController,
-                    hintText: "enter_group_id".tr(),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Flexible(
-                  flex: 2,
-                  child: GestureDetector(
-                    onTap: () {
-                      joinGroup();
-                    },
-                    child: CustomPrimaryButtonSuffixIcon(
-                      isLoading: isLoadingButton,
-                      text: "join".tr(),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            ErrorMessage(
-              isError: isEnterGroupID,
-              message: groupIDMessage,
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.center,
-            //   children: [
-            //     Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Text(
-            //           "You can also click on the ",
-            //           style: smallMediumGreyText,
-            //         ),
-            //         Text(
-            //           "Group Invite Link ",
-            //           style: smallMediumBoldBlackText,
-            //         ),
-            //       ],
-            //     ),
-            //     SizedBox(
-            //       height: 5,
-            //     ),
-            //     Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Text(
-            //           "that you received to directly join the group.",
-            //           style: smallMediumGreyText,
-            //         ),
-            //       ],
-            //     )
-            //   ],
-            // ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                "you_can_also_click",
-                textAlign: TextAlign.center,
-                style: smallMediumGreyText.copyWith(height: 1.5),
-              ).tr(),
-            ),
-            SizedBox(
-              height: 40,
-            )
-          ]))
-    ]));
+    );
   }
 
   searchGroup(data) async {
@@ -344,38 +316,48 @@ class _UserGroupPageState extends State<UserGroupPage> {
           // mix panel
           dynamic dataPanel = {
             "phone": userSession['phone_number'],
-            "group_code": groupCodeController.text
+            "group_code": groupCodeController.text,
           };
 
           mixpanel.track(CLICK_JOIN_GROUP, properties: dataPanel);
 
           // showToast("you_have_request_to_group_successfully".tr(), context);
-          notifyAlert(context,
-              desc: "you_have_request_to_group_successfully".tr(),
-              btnTitle: "Ok", onConfirm: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => RootApp()),
-              (Route<dynamic> route) => false,
-            );
-          });
+          notifyAlert(
+            context,
+            desc: "you_have_request_to_group_successfully".tr(),
+            btnTitle: "Ok",
+            onConfirm: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => RootApp()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          );
           setState(() {
             groupCodeController.text = "";
           });
         } else {
           // showToast(response['resp_data']['message'], context);
-          notifyAlert(context,
-              desc: response['resp_data']['message'],
-              btnTitle: "Ok", onConfirm: () {
-            Navigator.pop(context);
-          });
+          notifyAlert(
+            context,
+            desc: response['resp_data']['message'],
+            btnTitle: "Ok",
+            onConfirm: () {
+              Navigator.pop(context);
+            },
+          );
         }
       }
     } else {
-      notifyAlert(context, desc: "group_not_found".tr(), btnTitle: "Ok",
-          onConfirm: () {
-        Navigator.pop(context);
-      });
+      notifyAlert(
+        context,
+        desc: "group_not_found".tr(),
+        btnTitle: "Ok",
+        onConfirm: () {
+          Navigator.pop(context);
+        },
+      );
     }
 
     setState(() {

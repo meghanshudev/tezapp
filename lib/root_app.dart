@@ -11,7 +11,9 @@ import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/pages/Account/account_page.dart';
 import 'package:tezapp/pages/Account/order_history_page.dart';
+import 'package:tezapp/pages/Cart/cart_page.dart';
 import 'package:tezapp/pages/Home/home_page.dart';
+import 'package:tezapp/pages/Location/location_picker_page.dart';
 import 'package:tezapp/provider/account_info_provider.dart';
 import 'package:tezapp/provider/cart_provider.dart';
 import 'package:tezapp/ui_elements/custom_appbar.dart';
@@ -57,39 +59,47 @@ class _RootAppState extends State<RootApp> {
     super.initState();
     print("ROOT PAGE");
 
-
-    pageIndex = !checkIsNullValue(widget.data) &&
-            widget.data.containsKey("activePageIndex")
-        ? widget.data["activePageIndex"]
-        : pageIndex;
+    pageIndex =
+        !checkIsNullValue(widget.data) &&
+                widget.data.containsKey("activePageIndex")
+            ? widget.data["activePageIndex"]
+            : pageIndex;
 
     final AppsFlyerOptions appsFlyerOptions = AppsFlyerOptions(
-        afDevKey: "NZc7Uh8aPcGiBZFoghEWSR",
-        appId: "1625884539",
-        showDebug: true,
-        timeToWaitForATTUserAuthorization: 50);
+      afDevKey: "NZc7Uh8aPcGiBZFoghEWSR",
+      appId: "1625884539",
+      showDebug: true,
+      timeToWaitForATTUserAuthorization: 50,
+    );
 
     AppsflyerSdk appsflyerSdk = AppsflyerSdk(appsFlyerOptions);
 
     appsflyerSdk.initSdk(
-        registerConversionDataCallback: true,
-        registerOnAppOpenAttributionCallback: true,
-        registerOnDeepLinkingCallback: true);
+      registerConversionDataCallback: true,
+      registerOnAppOpenAttributionCallback: true,
+      registerOnDeepLinkingCallback: true,
+    );
 
     checkInOperationCity();
 
     initPage();
     getProfileData(context);
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    deliverTo =
+        !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code'] ?? ""
+            : "";
 
     initMixpanel();
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   checkInOperationCity({lat = 0.0, lng = 0.0}) async {
@@ -131,7 +141,7 @@ class _RootAppState extends State<RootApp> {
     // mix panel
     dynamic dataPanel = {
       "phone": userSession['phone_number'],
-      "location": {"lat": newLat, "lng": newLng}
+      "location": {"lat": newLat, "lng": newLng},
     };
 
     mixpanel.track(CLICK_PERMISSION_LOCATION, properties: dataPanel);
@@ -170,14 +180,15 @@ class _RootAppState extends State<RootApp> {
 
   updateUserAddress(location, lat, lng, zipCode) async {
     var response = await netPost(
-        isUserToken: true,
-        endPoint: "me/update/address",
-        params: {
-          "lat": lat,
-          "lng": lng,
-          "address": location,
-          "zip_code": zipCode
-        });
+      isUserToken: true,
+      endPoint: "me/update/address",
+      params: {
+        "lat": lat,
+        "lng": lng,
+        "address": location,
+        "zip_code": zipCode,
+      },
+    );
 
     if (mounted) {
       if (response['resp_code'] == "200") {
@@ -227,7 +238,9 @@ class _RootAppState extends State<RootApp> {
               await getCurrentLocation(lat: result['lat'], lng: result['lng']);
 
               await checkInOperationCity(
-                  lat: result['lat'], lng: result['lng']);
+                lat: result['lat'],
+                lng: result['lng'],
+              );
             },
             subtitle:
                 zipCode + " - " + context.watch<AccountInfoProvider>().name,
@@ -250,9 +263,7 @@ class _RootAppState extends State<RootApp> {
         // Center(),
         AccountPage(),
         // Center(),
-        Center(
-          child: Text("cart").tr(),
-        ),
+        Center(child: Text("cart").tr()),
       ],
     );
   }
@@ -274,125 +285,129 @@ class _RootAppState extends State<RootApp> {
       iconPath + "home_icon.svg",
       iconPath + "orders_icon.svg",
       iconPath + "user_icon.svg",
-      iconPath + "home_icon.svg"
+      iconPath + "home_icon.svg",
     ];
     if (isLoadingScreen) {
       return Center(child: CustomCircularProgress());
     } else {
       return isInOperationCity
           ? Container(
-              width: double.infinity,
-              height: 90,
-              decoration: BoxDecoration(color: white, boxShadow: [
+            width: double.infinity,
+            height: 90,
+            decoration: BoxDecoration(
+              color: white,
+              boxShadow: [
                 BoxShadow(
-                    color: black.withOpacity(0.06),
-                    spreadRadius: 5,
-                    blurRadius: 10)
-              ]),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 20, right: 20, top: 15, bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(bottomItems.length, (index) {
-                        if (index == 3) {
-                          return context.watch<CartProvider>().isHasCart
-                              ? GestureDetector(
-                                  onTap: () async {
-                                    dynamic dataPanel = {
-                                      "phone": userSession['phone_number'],
-                                      "cart_screen": "cart_screen"
-                                    };
+                  color: black.withOpacity(0.06),
+                  spreadRadius: 5,
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    top: 15,
+                    bottom: 20,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(bottomItems.length, (index) {
+                      if (index == 3) {
+                        return context.watch<CartProvider>().isHasCart
+                            ? GestureDetector(
+                              onTap: () async {
+                                dynamic dataPanel = {
+                                  "phone": userSession['phone_number'],
+                                  "cart_screen": "cart_screen",
+                                };
 
-                                    mixpanel.track(CART_SCREEN,
-                                        properties: dataPanel);
-                                    setState(() {
-                                      HOME_PAGE_LEAVE = false;
-                                    });
-                                    await Navigator.pushNamed(
-                                        context, "/cart_page");
-                                    setState(() {
-                                      HOME_PAGE_LEAVE = true;
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 99,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: primary),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "cart",
-                                          style: normalWhiteText,
-                                        ).tr(),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 2),
-                                          child: Icon(
-                                            Icons.arrow_forward_ios,
-                                            color: white,
-                                            size: 18,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              : Container(
-                                  width: 99,
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: primary)),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "cart",
-                                        style: normalPrimaryText,
-                                      ).tr(),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 2),
-                                        child: Icon(
-                                          Icons.arrow_forward_ios,
-                                          color: primary,
-                                          size: 18,
-                                        ),
-                                      )
-                                    ],
+                                mixpanel.track(
+                                  CART_SCREEN,
+                                  properties: dataPanel,
+                                );
+                                setState(() {
+                                  HOME_PAGE_LEAVE = false;
+                                });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CartPage(),
                                   ),
                                 );
-                        }
-                        return InkWell(
-                          onTap: () {
-                            setState(() {
-                              pageIndex = index;
-                            });
-                          },
-                          child: SvgPicture.asset(
-                            bottomItems[index],
-                            width: 28,
-                            color: pageIndex == index ? black : greyLight,
-                          ),
-                        );
-                      }),
-                    ),
+                                setState(() {
+                                  HOME_PAGE_LEAVE = true;
+                                });
+                              },
+                              child: Container(
+                                width: 99,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: primary,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text("cart", style: normalWhiteText).tr(),
+                                    SizedBox(width: 5),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 2),
+                                      child: Icon(
+                                        Icons.arrow_forward_ios,
+                                        color: white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            : Container(
+                              width: 99,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: primary),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("cart", style: normalPrimaryText).tr(),
+                                  SizedBox(width: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 2),
+                                    child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: primary,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                      }
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            pageIndex = index;
+                          });
+                        },
+                        child: SvgPicture.asset(
+                          bottomItems[index],
+                          width: 28,
+                          color: pageIndex == index ? black : greyLight,
+                        ),
+                      );
+                    }),
                   ),
-                ],
-              ),
-            )
+                ),
+              ],
+            ),
+          )
           : comingLocation();
     }
   }
@@ -407,82 +422,82 @@ class _RootAppState extends State<RootApp> {
             height: 125,
             width: double.infinity,
             decoration: BoxDecoration(
-                // color: placeHolderColor,
-
-                borderRadius: BorderRadius.circular(10)),
+              // color: placeHolderColor,
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.asset(
-                  "assets/images/not_found.png",
-                  fit: BoxFit.cover,
-                )),
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                "assets/images/not_found.png",
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          SizedBox(
-            height: 15,
-          ),
+          SizedBox(height: 15),
           Container(
             width: size.width - 30,
             height: 40,
             decoration: BoxDecoration(
-                border: Border.all(color: placeHolderColor),
-                borderRadius: BorderRadius.circular(10)),
+              border: Border.all(color: placeHolderColor),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Row(
               children: [
                 Container(
                   width: 40,
                   child: Center(
-                      child: Icon(
-                    Icons.search,
-                    size: 20,
-                    color: greyLight,
-                  )),
+                    child: Icon(Icons.search, size: 20, color: greyLight),
+                  ),
                 ),
                 Flexible(
-                    child: TextField(
-                  readOnly: true,
-                  onTap: () async {
-                    dynamic result = await Navigator.pushNamed(
-                        context, "/location_picker_page");
-                    var lat = result['lat'];
-                    var lng = result['lng'];
-                    checkInOperationCity(lat: lat, lng: lng);
-                  },
-                  cursorColor: black,
-                  decoration: InputDecoration(
+                  child: TextField(
+                    readOnly: true,
+                    onTap: () async {
+                      dynamic result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LocationPickerPage(),
+                        ),
+                      );
+
+                      var lat = result['lat'];
+                      var lng = result['lng'];
+                      checkInOperationCity(lat: lat, lng: lng);
+                    },
+                    cursorColor: black,
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
-                      hintText: "choose_another_location".tr()),
-                )),
+                      hintText: "choose_another_location".tr(),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(
-            height: 15,
-          ),
+          SizedBox(height: 15),
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-                border: Border.all(color: placeHolderColor),
-                borderRadius: BorderRadius.circular(10)),
+              border: Border.all(color: placeHolderColor),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Padding(
               padding: const EdgeInsets.only(
-                  top: 20, bottom: 30, left: 20, right: 20),
+                top: 20,
+                bottom: 30,
+                left: 20,
+                right: 20,
+              ),
               child: Column(
                 children: [
                   Text(
                     "we_don't_deliver_to_your_location_yet",
                     style: meduimBoldBlackText,
                   ).tr(),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "but_we_will_soon",
-                    style: meduimBoldBlackText,
-                  ).tr(),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 5),
+                  Text("but_we_will_soon", style: meduimBoldBlackText).tr(),
+                  SizedBox(height: 20),
                   // Text(
                   //   "Wait for a while. Our team is working",
                   //   style: meduimNormalBlackText,
@@ -499,16 +514,12 @@ class _RootAppState extends State<RootApp> {
                     textAlign: TextAlign.center,
                     style: meduimNormalBlackText.copyWith(height: 1.5),
                   ).tr(),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
                   Text(
                     "follow_us_for_updates",
                     style: meduimBoldBlackText,
                   ).tr(),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -520,12 +531,11 @@ class _RootAppState extends State<RootApp> {
                           width: 40,
                           height: 40,
                           child: SvgPicture.asset(
-                              "assets/icons/instagram_icon.svg"),
+                            "assets/icons/instagram_icon.svg",
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
+                      SizedBox(width: 20),
                       InkWell(
                         onTap: () {
                           launchSocialLink(FACEBOOK);
@@ -534,12 +544,11 @@ class _RootAppState extends State<RootApp> {
                           width: 40,
                           height: 40,
                           child: SvgPicture.asset(
-                              "assets/icons/facebook_icon.svg"),
+                            "assets/icons/facebook_icon.svg",
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
+                      SizedBox(width: 20),
                       InkWell(
                         onTap: () {
                           launchSocialLink(LINKEDIN);
@@ -548,12 +557,11 @@ class _RootAppState extends State<RootApp> {
                           width: 40,
                           height: 40,
                           child: SvgPicture.asset(
-                              "assets/icons/linkedin_icon.svg"),
+                            "assets/icons/linkedin_icon.svg",
+                          ),
                         ),
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
+                      SizedBox(width: 20),
                       InkWell(
                         onTap: () {
                           launchSocialLink(TWITTER);
@@ -561,16 +569,17 @@ class _RootAppState extends State<RootApp> {
                         child: Container(
                           width: 40,
                           height: 40,
-                          child:
-                              SvgPicture.asset("assets/icons/twitter_icon.svg"),
+                          child: SvgPicture.asset(
+                            "assets/icons/twitter_icon.svg",
+                          ),
                         ),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -593,15 +602,15 @@ class _RootAppState extends State<RootApp> {
         //  set new number of cart item
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         // set price
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       } else {
         // set has cart or not
         context.read<CartProvider>().refreshCart(false);
         //  set new number of cart item
         context.read<CartProvider>().refreshCartCount(0);
-// set price
+        // set price
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
       }
     }

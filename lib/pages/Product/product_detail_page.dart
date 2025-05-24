@@ -9,6 +9,7 @@ import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Cart/cart_page.dart';
 import 'package:tezapp/ui_elements/custom_appbar.dart';
 import 'package:tezapp/ui_elements/product_detail_loading.dart';
 import 'package:tezapp/ui_elements/product_item_network.dart';
@@ -48,9 +49,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     initPage();
 
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
     initailize();
     initMixpanel();
   }
@@ -71,7 +73,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   initPage() async {
@@ -85,8 +91,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     setState(() {
       isLoading = true;
     });
-    var response =
-        await netGet(isUserToken: true, endPoint: "product/$_productId");
+    var response = await netGet(
+      isUserToken: true,
+      endPoint: "product/$_productId",
+    );
     if (response['resp_code'] == "200") {
       groupProduct = response['resp_data']['data'];
       products = groupProduct["products"];
@@ -107,10 +115,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     var response = await netPatch(
       isUserToken: true,
       endPoint: "me/cart/product",
-      params: {
-        "product_id": _productId,
-        "qty": 1,
-      },
+      params: {"product_id": _productId, "qty": 1},
     );
     if (response['resp_code'] == "200") {
       showToast("Added", context);
@@ -120,9 +125,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         List cartItems = cart['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       }
     } else {
       var ms = response["resp_data"]["message"];
@@ -144,11 +149,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       "order": "random",
       "sort": "asc",
       "sub_category_id": groupProduct['category']['id'].toString(),
-      "exclude_id": productId.toString()
+      "exclude_id": productId.toString(),
     };
 
-    var response =
-        await netGet(isUserToken: true, endPoint: "product", params: params);
+    var response = await netGet(
+      isUserToken: true,
+      endPoint: "product",
+      params: params,
+    );
 
     if (response['resp_code'] == "200") {
       if (mounted) {
@@ -202,19 +210,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         await launch(WHATSAPP_IOS_URL + "&text=${Uri.encodeFull(text)}");
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     } else {
       if (await canLaunch(WHATSAPP_ANDROID_URL)) {
         await launch(WHATSAPP_ANDROID_URL + "&text=" + Uri.encodeFull(text));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     }
     dynamic dataPanel = {
       "phone": userSession['phone_number'],
-      "share_order_whatsapp": "share_order_whatsapp"
+      "share_order_whatsapp": "share_order_whatsapp",
     };
 
     mixpanel.track(CLICK_SHARE_ORDER_WHATSAPP, properties: dataPanel);
@@ -225,170 +235,147 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         // ? Center(child: CustomCircularProgress())
         ? ProductDetailLoading()
         : products.isEmpty
-            ? Container()
-            : SingleChildScrollView(
+        ? Container()
+        : SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: displayImage(products.first["image"]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  Positioned(
+                    right: 10,
+                    child: IconButton(
+                      icon: Icon(
+                        LineIcons.whatSApp,
+                        color: Color.fromRGBO(68, 192, 82, 1),
+                      ),
+                      onPressed: () => shareOrderonWhatsapp(),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 20,
+                    Text(products.first["name"], style: normalBlackText),
+                    SizedBox(height: 5),
+                    Text(
+                      products.first["attributes"][0]["value"],
+                      style: smallBlackText,
                     ),
-                    Stack(
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Center(
-                          child: Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: displayImage(products.first["image"]),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            checkIsNullValue(products.first["percent_off"])
+                                ? Text(
+                                  CURRENCY + "${products.first["unit_price"]}",
+                                  style: normalBoldBlackTitle,
+                                )
+                                : Row(
+                                  children: [
+                                    Text(
+                                      CURRENCY +
+                                          "${products.first["sale_price"]}",
+                                      style: normalBoldBlackTitle,
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      CURRENCY +
+                                          "${products.first["unit_price"]}",
+                                      style: smallStrikeBoldBlackText,
+                                    ),
+                                  ],
+                                ),
+                            SizedBox(width: 10),
+                            (!checkIsNullValue(products.first["percent_off"]) &&
+                                    products.first["percent_off"] > 0)
+                                ? Container(
+                                  width: 80,
+                                  height: 25,
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${products.first['percent_off']}% " +
+                                          "off".tr(),
+                                      style: smallBoldWhiteText,
+                                    ),
+                                  ),
+                                )
+                                : Container(
+                                  width: 72,
+                                  height: 25,
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "popular".tr(),
+                                      style: smallBoldWhiteText,
+                                    ),
+                                  ),
+                                ),
+                          ],
                         ),
-                        Positioned(
-                            child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: black,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        )),
-                        Positioned(
-                            right: 10,
-                            child: IconButton(
-                              icon: Icon(
-                                LineIcons.whatSApp,
-                                color: Color.fromRGBO(68, 192, 82, 1),
-                              ),
-                              onPressed: () => shareOrderonWhatsapp(),
-                            )),
+                        AddToCardButtonItem(product: products.first),
                       ],
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            products.first["name"],
-                            style: normalBlackText,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            products.first["attributes"][0]["value"],
-                            style: smallBlackText,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  checkIsNullValue(products.first["percent_off"])
-                                      ? Text(
-                                          CURRENCY +
-                                              "${products.first["unit_price"]}",
-                                          style: normalBoldBlackTitle,
-                                        )
-                                      : Row(
-                                          children: [
-                                            Text(
-                                              CURRENCY +
-                                                  "${products.first["sale_price"]}",
-                                              style: normalBoldBlackTitle,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              CURRENCY +
-                                                  "${products.first["unit_price"]}",
-                                              style: smallStrikeBoldBlackText,
-                                            ),
-                                          ],
-                                        ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  (!checkIsNullValue(
-                                              products.first["percent_off"]) &&
-                                          products.first["percent_off"] > 0)
-                                      ? Container(
-                                          width: 80,
-                                          height: 25,
-                                          margin: EdgeInsets.only(bottom: 5),
-                                          decoration: BoxDecoration(
-                                              color: primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Center(
-                                            child: Text(
-                                              "${products.first['percent_off']}% " +
-                                                  "off".tr(),
-                                              style: smallBoldWhiteText,
-                                            ),
-                                          ),
-                                        )
-                                      : Container(
-                                          width: 72,
-                                          height: 25,
-                                          margin: EdgeInsets.only(bottom: 5),
-                                          decoration: BoxDecoration(
-                                              color: primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Center(
-                                            child: Text(
-                                              "popular".tr(),
-                                              style: smallBoldWhiteText,
-                                            ),
-                                          ),
-                                        ),
-                                ],
-                              ),
-                              AddToCardButtonItem(product: products.first)
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    getProductAttributes(),
-                    Divider(
-                      thickness: 0.8,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    getRelatedProducts(),
                   ],
                 ),
-              );
+              ),
+              getProductAttributes(),
+              Divider(thickness: 0.8),
+              SizedBox(height: 20),
+              getRelatedProducts(),
+            ],
+          ),
+        );
   }
 
   getProductAttributes() {
     if (checkIsNullValue(products) || products.length <= 1)
-      return SizedBox(
-        height: 25,
-      );
+      return SizedBox(height: 25);
 
     List<Widget> tempProducts = [];
     for (int i = 1; i < products.length; i++) {
-      tempProducts.add(Padding(
-        padding: const EdgeInsets.only(bottom: 20, right: 10),
-        child: getAttributeItme(products[i]),
-      ));
+      tempProducts.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20, right: 10),
+          child: getAttributeItme(products[i]),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -414,12 +401,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             color: black.withOpacity(0.06),
             spreadRadius: 5,
             blurRadius: 10,
-          )
+          ),
         ],
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+        padding: const EdgeInsets.only(
+          top: 10,
+          bottom: 10,
+          left: 15,
+          right: 15,
+        ),
         child: Row(
           children: [
             Flexible(
@@ -431,43 +422,36 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _attribute.isNotEmpty
-                          ? _attribute[0]["value"]
-                          : "N/A",
+                      _attribute.isNotEmpty ? _attribute[0]["value"] : "N/A",
                       style: meduimBlackText,
                     ),
                     checkIsNullValue(_product['percent_off'])
                         ? Text(
-                            CURRENCY + "${_product['unit_price']}",
-                            style: smallMediumBoldBlackText,
-                          )
+                          CURRENCY + "${_product['unit_price']}",
+                          style: smallMediumBoldBlackText,
+                        )
                         : Row(
-                            children: [
-                              Text(
-                                CURRENCY + "${_product['sale_price']}",
-                                style: smallMediumBoldBlackText,
+                          children: [
+                            Text(
+                              CURRENCY + "${_product['sale_price']}",
+                              style: smallMediumBoldBlackText,
+                            ),
+                            SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                CURRENCY + "${_product['unit_price']}",
+                                style: smallStrikeBoldBlackText,
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
                               ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  CURRENCY + "${_product['unit_price']}",
-                                  style: smallStrikeBoldBlackText,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
                   ],
                 ),
               ),
             ),
-            Flexible(
-              flex: 3,
-              child: AddToCardButtonItem(product: _product),
-            )
+            Flexible(flex: 3, child: AddToCardButtonItem(product: _product)),
           ],
         ),
       ),
@@ -480,12 +464,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       children: [
         recommendedProducts.length != 0
             ? Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Text(
-                  "you_might_also_like",
-                  style: normalBoldBlackTitle,
-                ).tr(),
-              )
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child:
+                  Text("you_might_also_like", style: normalBoldBlackTitle).tr(),
+            )
             : Container(),
         SingleChildScrollView(
           padding: EdgeInsets.only(left: 20),
@@ -498,42 +480,52 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   onTap: () async {
                     dynamic dataPanel = {
                       "phone": userSession['phone_number'],
-                      "product": recommendedProducts[index]['product']['name']
+                      "product": recommendedProducts[index]['product']['name'],
                     };
 
                     mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
                     setState(() {
                       isInPage = false;
                     });
-                    await Navigator.pushNamed(context, "/product_detail_page",
-                        arguments: {"product": recommendedProducts[index]});
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ProductDetailPage(
+                              data: {"product": recommendedProducts[index]},
+                            ),
+                      ),
+                    );
                     setState(() {
                       isInPage = true;
                     });
                   },
                   child: ProductItemNetwork(
-                      product: recommendedProducts[index]['product'],
-                      discountLabel: convertDouble(
-                              recommendedProducts[index]['percent_off'])
-                          .toInt(),
-                      kgLabel: recommendedProducts[index]['product']
-                                      ["attributes"]
-                                  .length ==
-                              0
-                          ? ""
-                          : recommendedProducts[index]['product']["attributes"]
-                              [0]["value"],
-                      image: recommendedProducts[index]['image'],
-                      name: recommendedProducts[index]['product']['name'],
-                      priceStrike: CURRENCY +
-                          "${recommendedProducts[index]["unit_price"]}",
-                      price: CURRENCY +
-                          "${recommendedProducts[index]["sale_price"]}"),
+                    product: recommendedProducts[index]['product'],
+                    discountLabel:
+                        convertDouble(
+                          recommendedProducts[index]['percent_off'],
+                        ).toInt(),
+                    kgLabel:
+                        recommendedProducts[index]['product']["attributes"]
+                                    .length ==
+                                0
+                            ? ""
+                            : recommendedProducts[index]['product']["attributes"][0]["value"],
+                    image: recommendedProducts[index]['image'],
+                    name: recommendedProducts[index]['product']['name'],
+                    priceStrike:
+                        CURRENCY +
+                        "${recommendedProducts[index]["unit_price"]}",
+                    price:
+                        CURRENCY +
+                        "${recommendedProducts[index]["sale_price"]}",
+                  ),
                 ),
               );
             }),
           ),
-        )
+        ),
       ],
     );
   }
@@ -546,7 +538,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         color: white,
         boxShadow: [
           BoxShadow(
-              color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
+            color: black.withOpacity(0.06),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
@@ -617,8 +612,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           // ),
           // cart section
           Padding(
-            padding:
-                const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 15,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Container(
@@ -632,7 +631,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         color: black.withOpacity(0.06),
                         spreadRadius: 5,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: InkWell(
@@ -641,102 +640,94 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5),
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: black,
-                        size: 18,
-                      ),
+                      child: Icon(Icons.arrow_back_ios, color: black, size: 18),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                SizedBox(width: 15),
                 context.watch<CartProvider>().isHasCart
                     ? Flexible(
-                        child: InkWell(
-                          onTap: () async {
-                            dynamic dataPanel = {
-                              "phone": userSession['phone_number'],
-                              "cart_screen": "cart_screen"
-                            };
+                      child: InkWell(
+                        onTap: () async {
+                          dynamic dataPanel = {
+                            "phone": userSession['phone_number'],
+                            "cart_screen": "cart_screen",
+                          };
 
-                            mixpanel.track(CART_SCREEN, properties: dataPanel);
-                            setState(() {
-                              isInPage = false;
-                            });
-                            await Navigator.pushNamed(context, "/cart_page");
-                            setState(() {
-                              isInPage = true;
-                            });
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: primary,
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 15, right: 15),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    getCartInfo(context),
-                                    style: normalWhiteText,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Cart",
-                                        style: normalWhiteText,
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: white,
-                                        size: 18,
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Flexible(
+                          mixpanel.track(CART_SCREEN, properties: dataPanel);
+                          setState(() {
+                            isInPage = false;
+                          });
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartPage()),
+                          );
+                          setState(() {
+                            isInPage = true;
+                          });
+                        },
                         child: Container(
                           width: double.infinity,
                           height: 50,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: white,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: black.withOpacity(0.06),
-                                    spreadRadius: 5,
-                                    blurRadius: 10)
-                              ]),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Center(
-                              child: Text(
-                                "Cart Empty  •  Start Shopping",
-                                style: normalGreyText,
-                              ),
+                            borderRadius: BorderRadius.circular(10),
+                            color: primary,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  getCartInfo(context),
+                                  style: normalWhiteText,
+                                ),
+                                Row(
+                                  children: [
+                                    Text("Cart", style: normalWhiteText),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: white,
+                                      size: 18,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      )
+                      ),
+                    )
+                    : Flexible(
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: black.withOpacity(0.06),
+                              spreadRadius: 5,
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap: () {},
+                          child: Center(
+                            child: Text(
+                              "Cart Empty  •  Start Shopping",
+                              style: normalGreyText,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

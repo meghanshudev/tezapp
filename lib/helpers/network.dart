@@ -8,7 +8,7 @@ netGet(
     {String endPoint = "",
     dynamic params = const {'row': "10", 'page': "1"},
     bool isUserToken = true}) async {
-  String userToken = (isUserToken) ? userSession['access_token'] : "";
+  String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
   var url = Uri.parse(API_URL + endPoint);
   final newURI = url.replace(queryParameters: params);
 
@@ -32,8 +32,8 @@ netPost({
   required Map<dynamic, dynamic> params,
   bool isUserToken = true,
 }) async {
-  String userToken = (isUserToken) ? userSession['access_token'] : "";
-  String userTokenType = (isUserToken) ? userSession['token_type'] : "";
+  String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+  String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
   var url = Uri.parse(API_URL + endPoint);
   final response = await http.post(url, body: json.encode(params), headers: {
     "Authorization": "$userTokenType $userToken",
@@ -53,8 +53,8 @@ netPatch({
   required Map<dynamic, dynamic> params,
   bool isUserToken = true,
 }) async {
-  String userToken = (isUserToken) ? userSession['access_token'] : "";
-  String userTokenType = (isUserToken) ? userSession['token_type'] : "";
+  String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+  String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
   var url = Uri.parse(API_URL + endPoint);
   final response = await http.patch(url, body: json.encode(params), headers: {
     "Authorization": "$userTokenType $userToken",
@@ -74,8 +74,8 @@ netPut({
   required Map<dynamic, dynamic> params,
   bool isUserToken = true,
 }) async {
-  String userToken = (isUserToken) ? userSession['access_token'] : "";
-  String userTokenType = (isUserToken) ? userSession['token_type'] : "";
+  String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+  String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
   var url = Uri.parse(API_URL + endPoint);
   final response = await http.put(url, body: json.encode(params), headers: {
     "Authorization": "$userTokenType $userToken",
@@ -94,8 +94,8 @@ netDelete(
     {String endPoint = "",
     required Map<dynamic, dynamic> params,
     bool isUserToken = true}) async {
-  String userToken = (isUserToken) ? userSession['access_token'] : "";
-  String userTokenType = (isUserToken) ? userSession['token_type'] : "";
+  String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+  String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
   var url = Uri.parse(API_URL + endPoint);
   final response = await http.delete(url, body: json.encode(params), headers: {
     "Authorization": "$userTokenType $userToken",

@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/pages/Cart/cart_page.dart';
+import 'package:tezapp/pages/Product/product_detail_page.dart';
 import 'package:tezapp/provider/account_info_provider.dart';
 import 'package:tezapp/ui_elements/category_loading.dart';
 import 'package:tezapp/ui_elements/custom_appbar.dart';
@@ -18,7 +20,7 @@ import '../../ui_elements/circle_category_loading.dart';
 
 class CategoryPage extends StatefulWidget {
   CategoryPage({Key? key, required this.data, this.isParent = true})
-      : super(key: key);
+    : super(key: key);
   final data;
   final bool isParent;
 
@@ -39,7 +41,7 @@ class _CategoryPageState extends State<CategoryPage> {
     "id": 0,
     "name": "All",
     "image": NETWORK_DEFAULT_IMAGE,
-    "is_sub_category": false
+    "is_sub_category": false,
   };
 
   int activeItem = 0;
@@ -55,14 +57,19 @@ class _CategoryPageState extends State<CategoryPage> {
     initPage();
 
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
     initMixpanel();
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   @override
@@ -128,11 +135,14 @@ class _CategoryPageState extends State<CategoryPage> {
       var data = response["resp_data"]["data"];
       List tempCategories = data["list"];
 
-      subCategories = tempCategories
-          .where((element) =>
-              element["is_sub_category"] == true &&
-              element["parent"]["id"] == _categoryId)
-          .toList();
+      subCategories =
+          tempCategories
+              .where(
+                (element) =>
+                    element["is_sub_category"] == true &&
+                    element["parent"]["id"] == _categoryId,
+              )
+              .toList();
       subCategories.insert(0, allSubCategory);
     } else {
       var ms = response["resp_data"]["message"];
@@ -156,7 +166,7 @@ class _CategoryPageState extends State<CategoryPage> {
       "page": "$pageIndex",
       "limit": "10",
       "order": "name",
-      "sort": "asc"
+      "sort": "asc",
     };
     if (!widget.isParent) {
       params["sub_category_id"] = categoryId.toString();
@@ -217,13 +227,14 @@ class _CategoryPageState extends State<CategoryPage> {
   getSubCategory() {
     if (isLoading)
       return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          padding: EdgeInsets.only(top: 20),
-          itemBuilder: (context, index) {
-            return CircleCategoryLoading();
-          });
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: 10,
+        padding: EdgeInsets.only(top: 20),
+        itemBuilder: (context, index) {
+          return CircleCategoryLoading();
+        },
+      );
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(top: 25),
@@ -240,7 +251,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
                   dynamic dataPanel = {
                     "phone": userSession['phone_number'],
-                    "sub_category": subCategories[index]['name']
+                    "sub_category": subCategories[index]['name'],
                   };
 
                   mixpanel.track(CLICK_SUB_CATEGORY, properties: dataPanel);
@@ -268,61 +279,63 @@ class _CategoryPageState extends State<CategoryPage> {
       //   ),
       // );
       return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          padding: EdgeInsets.only(top: 20, left: 10),
-          itemBuilder: (context, index) {
-            return CategoryLoading();
-          });
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: 10,
+        padding: EdgeInsets.only(top: 20, left: 10),
+        itemBuilder: (context, index) {
+          return CategoryLoading();
+        },
+      );
     return (checkIsNullValue(products) || products.length == 0)
-        ? Container(
-            child: Center(
-              child: Text("no_data").tr(),
-            ),
-          )
+        ? Container(child: Center(child: Text("no_data").tr()))
         : SingleChildScrollView(
-            controller: scollController,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(products.length, (index) {
-                      var _product = products[index]["product"];
+          controller: scollController,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: List.generate(products.length, (index) {
+                    var _product = products[index]["product"];
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20, right: 10),
-                        child: ProductCategoryItem(
-                          data: _product,
-                          onTap: () async {
-                            dynamic dataPanel = {
-                              "phone": userSession['phone_number'],
-                              "product": products[index]['product']['name']
-                            };
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20, right: 10),
+                      child: ProductCategoryItem(
+                        data: _product,
+                        onTap: () async {
+                          dynamic dataPanel = {
+                            "phone": userSession['phone_number'],
+                            "product": products[index]['product']['name'],
+                          };
 
-                            mixpanel.track(CLICK_PRODUCT,
-                                properties: dataPanel);
-                            setState(() {
-                              isInPage = false;
-                            });
-                            await Navigator.pushNamed(
-                                context, "/product_detail_page",
-                                arguments: {"product": products[index]});
+                          mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
+                          setState(() {
+                            isInPage = false;
+                          });
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => ProductDetailPage(
+                                    data: {"product": products[index]},
+                                  ),
+                            ),
+                          );
 
-                            setState(() {
-                              isInPage = true;
-                            });
-                          },
-                        ),
-                      );
-                    }),
-                  ),
+                          setState(() {
+                            isInPage = true;
+                          });
+                        },
+                      ),
+                    );
+                  }),
                 ),
-              ],
-            ),
-          );
+              ),
+            ],
+          ),
+        );
   }
 
   Widget getBody() {
@@ -332,10 +345,16 @@ class _CategoryPageState extends State<CategoryPage> {
       children: [
         Container(
           width: size.width * 0.23,
-          decoration: BoxDecoration(color: white, boxShadow: [
-            BoxShadow(
-                color: black.withOpacity(0.06), spreadRadius: 2, blurRadius: 5)
-          ]),
+          decoration: BoxDecoration(
+            color: white,
+            boxShadow: [
+              BoxShadow(
+                color: black.withOpacity(0.06),
+                spreadRadius: 2,
+                blurRadius: 5,
+              ),
+            ],
+          ),
           child: getSubCategory(),
         ),
         Flexible(
@@ -346,7 +365,7 @@ class _CategoryPageState extends State<CategoryPage> {
                   color: black.withOpacity(0.02),
                   spreadRadius: 2,
                   blurRadius: 5,
-                )
+                ),
               ],
             ),
             child: getProducts(),
@@ -364,15 +383,22 @@ class _CategoryPageState extends State<CategoryPage> {
         color: white,
         boxShadow: [
           BoxShadow(
-              color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
+            color: black.withOpacity(0.06),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
         children: [
           // cart section
           Padding(
-            padding:
-                const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 15,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Container(
@@ -386,7 +412,7 @@ class _CategoryPageState extends State<CategoryPage> {
                         color: black.withOpacity(0.06),
                         spreadRadius: 5,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: InkWell(
@@ -395,103 +421,96 @@ class _CategoryPageState extends State<CategoryPage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5),
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: black,
-                        size: 18,
-                      ),
+                      child: Icon(Icons.arrow_back_ios, color: black, size: 18),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                SizedBox(width: 15),
                 context.watch<CartProvider>().isHasCart
                     ? Flexible(
-                        child: InkWell(
-                          onTap: () async {
-                            dynamic dataPanel = {
-                              "phone": userSession['phone_number'],
-                              "cart_screen": "cart_screen"
-                            };
+                      child: InkWell(
+                        onTap: () async {
+                          dynamic dataPanel = {
+                            "phone": userSession['phone_number'],
+                            "cart_screen": "cart_screen",
+                          };
 
-                            mixpanel.track(CART_SCREEN, properties: dataPanel);
+                          mixpanel.track(CART_SCREEN, properties: dataPanel);
 
-                            setState(() {
-                              isInPage = false;
-                            });
-                            await Navigator.pushNamed(context, "/cart_page");
-                            setState(() {
-                              isInPage = true;
-                            });
-                          },
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: primary,
-                            ),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 15, right: 15),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    getCartInfo(context),
-                                    style: normalWhiteText,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "cart".tr(),
-                                        style: normalWhiteText,
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: white,
-                                        size: 18,
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Flexible(
+                          setState(() {
+                            isInPage = false;
+                          });
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CartPage()),
+                          );
+                          setState(() {
+                            isInPage = true;
+                          });
+                        },
                         child: Container(
                           width: double.infinity,
                           height: 50,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: white,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: black.withOpacity(0.06),
-                                    spreadRadius: 5,
-                                    blurRadius: 10)
-                              ]),
-                          child: InkWell(
-                            onTap: () {},
-                            child: Center(
-                              child: Text(
-                                "cart_empty_start_shopping",
-                                style: normalGreyText,
-                              ).tr(),
+                            borderRadius: BorderRadius.circular(10),
+                            color: primary,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  getCartInfo(context),
+                                  style: normalWhiteText,
+                                ),
+                                Row(
+                                  children: [
+                                    Text("cart".tr(), style: normalWhiteText),
+                                    SizedBox(width: 5),
+                                    Icon(
+                                      Icons.arrow_forward_ios,
+                                      color: white,
+                                      size: 18,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                      )
+                      ),
+                    )
+                    : Flexible(
+                      child: Container(
+                        width: double.infinity,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: black.withOpacity(0.06),
+                              spreadRadius: 5,
+                              blurRadius: 10,
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap: () {},
+                          child: Center(
+                            child:
+                                Text(
+                                  "cart_empty_start_shopping",
+                                  style: normalGreyText,
+                                ).tr(),
+                          ),
+                        ),
+                      ),
+                    ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -503,10 +522,7 @@ class _CategoryPageState extends State<CategoryPage> {
     isAddingCart = true;
     var response = await netPatch(
       endPoint: "me/cart/product",
-      params: {
-        "product_id": _productId,
-        "qty": 1,
-      },
+      params: {"product_id": _productId, "qty": 1},
     );
     if (response['resp_code'] == "200") {
       var temp = response["resp_data"]["data"];
@@ -516,9 +532,9 @@ class _CategoryPageState extends State<CategoryPage> {
         List cartItems = cart['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       }
     } else {}
     if (mounted)

@@ -34,7 +34,7 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
     super.initState();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
+        ? userSession['zip_code'] ?? ""
         : "";
     phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
   }

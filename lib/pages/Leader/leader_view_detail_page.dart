@@ -4,13 +4,15 @@ import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Leader/leader_all_order_page.dart';
+import 'package:tezapp/pages/Leader/member_request_page.dart';
+import 'package:tezapp/pages/Leader/memeber_profile_page.dart';
 import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
 import 'package:tezapp/ui_elements/custom_button.dart';
 import 'package:tezapp/ui_elements/custom_sub_header.dart';
 import 'package:tezapp/ui_elements/icon_box.dart';
 import 'package:tezapp/ui_elements/item_button.dart';
 import 'package:tezapp/ui_elements/leader_view_detail_loading.dart';
-
 
 class LeaderViewDetailPage extends StatefulWidget {
   const LeaderViewDetailPage({Key? key}) : super(key: key);
@@ -33,15 +35,15 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
     super.initState();
     getMember();
   }
+
   getMember() async {
     setState(() {
       isLoading = true;
     });
-    if(!checkIsNullValue(userSession['group'])){
+    if (!checkIsNullValue(userSession['group'])) {
       var groupId = userSession['group']['id'];
       var response = await netGet(endPoint: "group/$groupId");
       if (response["resp_code"] == "200") {
-        
         List members = response['resp_data']['data']['members'] ?? [];
         List requests = response['resp_data']['data']['requests'] ?? [];
         setState(() {
@@ -50,48 +52,49 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
           orderTotal = response['resp_data']['data']['total_group_orders'];
           groupData = response['resp_data']['data'];
         });
-        if(groupMember.length ==1){
+        if (groupMember.length == 1) {
           setState(() {
-            groupDatMember =  groupMember.length.toString()+" " + "member".tr();
+            groupDatMember =
+                groupMember.length.toString() + " " + "member".tr();
           });
-        }else {
-           setState(() { 
-            groupDatMember =  groupMember.length.toString()+" " + "members".tr();
+        } else {
+          setState(() {
+            groupDatMember =
+                groupMember.length.toString() + " " + "members".tr();
           });
         }
       }
-      
     }
-     setState(() {
+    setState(() {
       isLoading = false;
     });
-  
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomAppBarDynamic(
-              actionChild: Container(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: CustomAppBarDynamic(
+          actionChild: Container(
             height: 40,
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-                color: cardColor, borderRadius: BorderRadius.circular(10)),
-            child: Text(
-              userSession['group']['name'],
-              style: meduimGreyText,
+              color: cardColor,
+              borderRadius: BorderRadius.circular(10),
             ),
-          )),
+            child: Text(userSession['group']['name'], style: meduimGreyText),
+          ),
         ),
-        body: buildBody(),
-        bottomNavigationBar: getFooter());
+      ),
+      body: buildBody(),
+      bottomNavigationBar: getFooter(),
+    );
   }
 
   Widget buildBody() {
-    if(isLoading) {
+    if (isLoading) {
       // return Center(child: CustomCircularProgress(
       //   strokeWidth: 3,
       // ));
@@ -103,21 +106,19 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
         children: [
           CustomSubHeader(
             title: "view_details".tr(),
-            subtitle: userSession['group']['name']+"  •  "+groupDatMember+"  •  $orderTotal " + "orders".tr(),
+            subtitle:
+                userSession['group']['name'] +
+                "  •  " +
+                groupDatMember +
+                "  •  $orderTotal " +
+                "orders".tr(),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Text(
-              "group_orders",
-              style: normalBlackText,
-            ).tr(),
+            child: Text("group_orders", style: normalBlackText).tr(),
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           // Padding(
           //     padding: const EdgeInsets.only(left: 15, right: 15),
           //     child: RichText(
@@ -137,82 +138,92 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
           //       TextSpan(text: "delivery_scheduled_on".tr(), style: smallBlackText),
           //       TextSpan(text: "Tuesday, Feb 15", style: smallBoldBlackText),
           //     ]))),
-          SizedBox(
-            height: 15,
-          ),
+          SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
             child: ItemButton(
               title: "view_all_orders".tr(),
               onTap: () {
-                Navigator.of(context).pushNamed("/leader_all_order_page");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LeaderAllOrderPage()),
+                );
               },
             ),
           ),
-          SizedBox(
-            height: 30,
-          ),
+          SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Text(
-              "requests",
-              style: normalBlackText,
-            ).tr(),
+            child: Text("requests", style: normalBlackText).tr(),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          requestMember.length != 0 ?
-          Column(
-            children: List.generate(requestMember.length, (index) {
-            
-              return Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15,bottom: 10),
-            child: ItemButton(
-              title: checkIsNullValue(requestMember[index]['member']['name']) ? "N/A" : requestMember[index]['member']['name'],
-              onTap: () async {
-                var result = await Navigator.of(context).pushNamed("/member_request_page",arguments: requestMember[index]);
-                getMember();
-              },
-            ),
-          );
-            }),
-          ) : Center(
-            child: Text(
-              "no_request_member",
-              style: smallMediumGreyText,
-            ).tr(),
-          ),
-          SizedBox(
-            height: 30,
-          ),
+          SizedBox(height: 20),
+          requestMember.length != 0
+              ? Column(
+                children: List.generate(requestMember.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                      bottom: 10,
+                    ),
+                    child: ItemButton(
+                      title:
+                          checkIsNullValue(
+                                requestMember[index]['member']['name'],
+                              )
+                              ? "N/A"
+                              : requestMember[index]['member']['name'],
+                      onTap: () async {
+                        var result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => MemberRequestPage(
+                                  data: requestMember[index],
+                                ),
+                          ),
+                        );
+                        getMember();
+                      },
+                    ),
+                  );
+                }),
+              )
+              : Center(
+                child:
+                    Text("no_request_member", style: smallMediumGreyText).tr(),
+              ),
+          SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Text(
-              "group_members",
-              style: normalBlackText,
-            ).tr(),
+            child: Text("group_members", style: normalBlackText).tr(),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Column(
             children: List.generate(groupMember.length, (index) {
               return Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15,bottom: 10),
-            child: ItemButton(
-              title: checkIsNullValue(groupMember[index]['name']) ? "N/A" : groupMember[index]['name'],
-              onTap: () async {
-                 var result = await Navigator.of(context).pushNamed("/member_profile_page",arguments: groupMember[index]);
-                 getMember();
-              },
-            ),
-          );
+                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+                child: ItemButton(
+                  title:
+                      checkIsNullValue(groupMember[index]['name'])
+                          ? "N/A"
+                          : groupMember[index]['name'],
+                  onTap: () async {
+                    var result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                MemberProfilePage(data: groupMember[index]),
+                      ),
+                    );
+                    getMember();
+                  },
+                ),
+              );
             }),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
         ],
       ),
     );
@@ -222,18 +233,20 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(15, 23, 15, 33),
       decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+        color: cardColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            spreadRadius: 1,
+            blurRadius: 1,
+            offset: Offset(0, 0),
           ),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor,
-                spreadRadius: 1,
-                blurRadius: 1,
-                offset: Offset(0, 0))
-          ]),
+        ],
+      ),
       child: Row(
         children: [
           IconBox(
@@ -245,9 +258,7 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
               Navigator.of(context).pop();
             },
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           Expanded(
             child: CustomButton(
               height: 55,
@@ -256,20 +267,19 @@ class _LeaderViewDetailPageState extends State<LeaderViewDetailPage> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 35),
-                    child: Text(
-                      "back_to_group",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ).tr(),
+                    child:
+                        Text(
+                          "back_to_group",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ).tr(),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15),
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.arrow_forward_ios, color: Colors.white),
                   ),
                 ],
               ),

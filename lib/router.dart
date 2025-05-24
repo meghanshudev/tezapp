@@ -39,145 +39,175 @@ import 'package:tezapp/root_app.dart';
 import 'pages/Leader/leader_all_order_page.dart';
 import 'pages/Leader/memeber_profile_page.dart';
 import 'pages/UserGroup/create_user_group_name_page.dart';
+import 'package:flutter/material.dart';
 
-Route<dynamic> generateRoute(RouteSettings setting) {
-  final Map<String, dynamic> args = checkIsNullValue(setting.arguments)
-      ? new Map<String, dynamic>()
-      : setting.arguments as Map<String, dynamic>;
-  switch (setting.name) {
-    case "/root_app":
+// Import your pages
+
+Route<dynamic> generateRoute(RouteSettings settings) {
+  final Map<String, dynamic> args = (settings.arguments is Map<String, dynamic>)
+      ? settings.arguments as Map<String, dynamic>
+      : <String, dynamic>{};
+
+  switch (settings.name) {
+    case '/root_app':
       return MaterialPageRoute(
-        builder: (context) => RootApp(
+        builder: (context) => RootApp(data: args),
+      );
+
+    case '/guest_root_app':
+      return MaterialPageRoute(
+        builder: (context) => GuestRootApp(data: args),
+      );
+
+    case '/login_page':
+      return MaterialPageRoute(builder: (_) => const LoginPage());
+
+    case '/enter_otp_page':
+      return MaterialPageRoute(
+        builder: (_) => EnterOTPPage(data: args['data'] ?? {}),
+      );
+
+    case '/add_name_page':
+      return MaterialPageRoute(builder: (_) => AddNamePage());
+
+    case '/edit_profile_page':
+      return MaterialPageRoute(builder: (_) => EditProfile());
+
+    case '/order_history_page':
+      return MaterialPageRoute(builder: (_) => OrderHistoryPage());
+
+    case '/order_detail_page':
+      return MaterialPageRoute(
+        builder: (_) => OrderDetailPage(id: args['id']),
+      );
+
+    case '/wallet_page':
+      return MaterialPageRoute(builder: (_) => WalletPage());
+
+    case '/cart_page':
+      return MaterialPageRoute(builder: (_) => CartPage());
+
+    case '/category_page':
+      return MaterialPageRoute(
+        builder: (_) => CategoryPage(
           data: args,
+          isParent: args['isParent'] ?? false,
         ),
       );
-    case "/login_page":
-      return MaterialPageRoute(builder: (context) => LoginPage());
-    case "/enter_otp_page":
+
+    case '/product_detail_page':
       return MaterialPageRoute(
-        builder: (context) =>
-            EnterOTPPage(data: args["data"] as Map<String, dynamic>),
+        builder: (_) => ProductDetailPage(data: args),
       );
-    case "/add_name_page":
-      return MaterialPageRoute(builder: (context) => AddNamePage());
-    case "/edit_profile_page":
-      return MaterialPageRoute(builder: (context) => EditProfile());
-    case "/order_history_page":
-      return MaterialPageRoute(builder: (context) => OrderHistoryPage());
-    case "/order_detail_page":
+
+    case '/customer_support_page':
+      return MaterialPageRoute(builder: (_) => CustomerSupportPage());
+
+    case '/suggest_page':
+      return MaterialPageRoute(builder: (_) => SuggestPage());
+
+    case '/general_info_page':
+      return MaterialPageRoute(builder: (_) => GeneralInfoPage());
+
+    case '/leader_view_detail_page':
+      return MaterialPageRoute(builder: (_) => LeaderViewDetailPage());
+
+    case '/add_coupon_page':
       return MaterialPageRoute(
-          builder: (context) => OrderDetailPage(id: args['id']));
-    case "/wallet_page":
-      return MaterialPageRoute(builder: (context) => WalletPage());
-    case "/category_page":
-      return MaterialPageRoute(
-        builder: (context) =>
-            CategoryPage(data: args, isParent: args['isParent']),
+        builder: (_) => AddCouponPage(schedule: args['schedule']),
       );
-    case "/product_detail_page":
+
+    case '/order_confirmed_page':
       return MaterialPageRoute(
-        builder: (context) => ProductDetailPage(data: args),
+        builder: (_) => OrderConfirmedPage(data: args),
       );
-    case "/cart_page":
-      return MaterialPageRoute(builder: (context) => CartPage());
-    case "/customer_support_page":
-      return MaterialPageRoute(builder: (context) => CustomerSupportPage());
-    case "/suggest_page":
-      return MaterialPageRoute(builder: (context) => SuggestPage());
-    case "/general_info_page":
-      return MaterialPageRoute(builder: (context) => GeneralInfoPage());
-    case "/leader_view_detail_page":
+
+    case '/member_profile_page':
       return MaterialPageRoute(
-          settings: RouteSettings(name: "/leader_view_detail_page"),
-          builder: (context) => LeaderViewDetailPage());
-    case "/add_coupon_page":
+        builder: (_) => MemberProfilePage(data: args),
+      );
+
+    case '/member_request_page':
       return MaterialPageRoute(
-          builder: (context) => AddCouponPage(
-                schedule: args['schedule'],
-              ));
-    case "/order_confirmed_page":
+        builder: (_) => MemberRequestPage(data: args),
+      );
+
+    case '/leader_all_order_page':
+      return MaterialPageRoute(builder: (_) => LeaderAllOrderPage());
+
+    case '/leader_order_detail_page':
       return MaterialPageRoute(
-          builder: (context) => OrderConfirmedPage(
-                data: args,
-              ));
-    case "/member_profile_page":
+        builder: (_) => LeaderOrderDetailPage(data: args),
+      );
+
+    case '/product_search_page':
+      return MaterialPageRoute(builder: (_) => ProductSearchPage());
+
+    case '/create_user_group_page':
       return MaterialPageRoute(
-          builder: (context) => MemberProfilePage(
-                data: args,
-              ));
-    case "/member_request_page":
+        builder: (_) => CreateUserGroupPage(data: args),
+      );
+
+    case '/create_user_group_name_page':
+      return MaterialPageRoute(builder: (_) => CreateUserGroupNamePage());
+
+    case '/user_group_view_page':
+      return MaterialPageRoute(builder: (_) => UserGroupViewPage());
+
+    case '/user_group_page':
+      return MaterialPageRoute(builder: (_) => UserGroupPage());
+
+    case '/edit_user_group_page':
+      return MaterialPageRoute(builder: (_) => EditUserGroupPage());
+
+    case '/choose_location_page':
+      return MaterialPageRoute(builder: (_) => ChoooseLocationPage());
+
+    case '/location_picker_page':
+      return MaterialPageRoute(builder: (_) => LocationPickerPage());
+
+    case '/privacy_page':
+      return MaterialPageRoute(builder: (_) => PrivacyPage());
+
+    case '/term_condition_page':
+      return MaterialPageRoute(builder: (_) => TermConditionPage());
+
+    case '/transaction_page':
+      return MaterialPageRoute(builder: (_) => TransactionPage());
+
+    case '/term_condition_login_page':
+      return MaterialPageRoute(builder: (_) => TermConditionLoginPage());
+
+    case '/privacy_policy_login_page':
+      return MaterialPageRoute(builder: (_) => PrivacyPolicyLoginPage());
+
+    case '/guest_category_page':
       return MaterialPageRoute(
-          builder: (context) => MemberRequestPage(
-                data: args,
-              ));
-    case "/leader_all_order_page":
-      return MaterialPageRoute(builder: (context) => LeaderAllOrderPage());
-    case "/leader_order_detail_page":
-      return MaterialPageRoute(
-          builder: (context) => LeaderOrderDetailPage(
-                data: args,
-              ));
-    case "/product_search_page":
-      return MaterialPageRoute(builder: (context) => ProductSearchPage());
-    case "/create_user_group_page":
-      return MaterialPageRoute(
-        builder: (context) => CreateUserGroupPage(
+        builder: (_) => GuestCategoryPage(
           data: args,
+          isParent: args['isParent'] ?? false,
         ),
       );
-    case "/create_user_group_name_page":
-      return MaterialPageRoute(builder: (context) => CreateUserGroupNamePage());
-    case "/user_group_view_page":
+
+    case '/guest_product_detail_page':
       return MaterialPageRoute(
-        builder: (context) => UserGroupViewPage(),
+        builder: (_) => GuestProductDetailPage(data: args),
       );
-    case "/user_group_page":
+
+    case '/open_source_page':
+      return MaterialPageRoute(builder: (_) => OpenSourcePage());
+
+    case 'youtube_link_page':
       return MaterialPageRoute(
-        builder: (context) => UserGroupPage(),
-      );
-    case "/edit_user_group_page":
-      return MaterialPageRoute(builder: (context) => EditUserGroupPage());
-    case "/choose_location_page":
-      return MaterialPageRoute(builder: (context) => ChoooseLocationPage());
-    case "/location_picker_page":
-      return MaterialPageRoute(builder: (context) => LocationPickerPage());
-    case "/privacy_page":
-      return MaterialPageRoute(builder: (context) => PrivacyPage());
-    case "/transaction_page":
-      return MaterialPageRoute(builder: (context) => TransactionPage());
-    case "/term_condition_page":
-      return MaterialPageRoute(builder: (context) => TermConditionPage());
-    case "youtube_link_page":
-      // return MaterialPageRoute(
-      //   builder: (context) => YoutubeLinkPage(
-      //     link: args['link'],
-      //     title: args['title'],
-      //   ),
-      // );
-    case "/open_source_page":
-      return MaterialPageRoute(builder: (context) => OpenSourcePage());
-    case "/term_condition_login_page":
-      return MaterialPageRoute(builder: (context) => TermConditionLoginPage());
-    case "/privacy_policy_login_page":
-      return MaterialPageRoute(builder: (context) => PrivacyPolicyLoginPage());
-    case "/guest_category_page":
-      return MaterialPageRoute(
-          builder: (context) =>
-              GuestCategoryPage(data: args, isParent: args['isParent']));
-    case "/guest_root_app":
-      return MaterialPageRoute(
-        builder: (context) => GuestRootApp(
-          data: args,
+        builder: (_) => Scaffold(
+          body: Center(child: Text('YouTube link page coming soon')),
         ),
       );
-    case "/guest_product_detail_page":
-      return MaterialPageRoute(
-        builder: (context) => GuestProductDetailPage(data: args),
-      );
+
     default:
       return MaterialPageRoute(
-        builder: (context) => Scaffold(
-          body: Text("No Page"),
+        builder: (_) => Scaffold(
+          body: Center(child: Text("No Page Found")),
         ),
       );
   }

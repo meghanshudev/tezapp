@@ -33,7 +33,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     super.initState();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
+        ? userSession['zip_code'] ?? ""
         : "";
     fetchPrivacyPolicy();
   }

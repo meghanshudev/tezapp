@@ -8,6 +8,8 @@ import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Guest/guest_category_page.dart';
+import 'package:tezapp/pages/Guest/guest_product_detail_page.dart';
 import 'package:tezapp/ui_elements/category_item.dart';
 import 'package:tezapp/ui_elements/custom_circular_progress.dart';
 import 'package:tezapp/ui_elements/loading_widget.dart';
@@ -72,10 +74,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      body: getBody(),
-    );
+    return Scaffold(backgroundColor: white, body: getBody());
   }
 
   fetchAds() async {
@@ -113,9 +112,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
       List tempCategories = data["list"];
       if (mounted) {
         setState(() {
-          categories = tempCategories
-              .where((element) => element["is_sub_category"] == false)
-              .toList();
+          categories =
+              tempCategories
+                  .where((element) => element["is_sub_category"] == false)
+                  .toList();
         });
       }
     }
@@ -131,7 +131,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
       "limit": "5",
       "order": "feature_order",
       "sort": "asc",
-      "feature": "1"
+      "feature": "1",
     };
     //  var params = {"page": "1", "limit": "0", "order": "rgt", "sort": "asc"};
     //  var params = {"page": "1", "limit": "5", "order": "rgt", "sort": "asc"};
@@ -145,7 +145,9 @@ class _GuestHomePageState extends State<GuestHomePage> {
 
         for (var item in tempCategories) {
           List products = await loadProductFeature(
-              item['id'].toString(), item['is_sub_category']);
+            item['id'].toString(),
+            item['is_sub_category'],
+          );
 
           item["products"] = products;
         }
@@ -189,9 +191,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
       padding: EdgeInsets.fromLTRB(15, 0, 15, 15),
       child: Column(
         children: [
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.only(left: 5),
             child: Wrap(
@@ -203,26 +203,28 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     setState(() {
                       isInPage = false;
                     });
-                    await Navigator.pushNamed(
+                    await Navigator.push(
                       context,
-                      "/guest_category_page",
-                      arguments: {
-                        "category": categories[index],
-                        "allCategories": categories,
-                        "isParent": true
-                      },
+                      MaterialPageRoute(
+                        builder:
+                            (context) => GuestCategoryPage(
+                              data: {
+                                "category": categories[index],
+                                "allCategories": categories,
+                                "isParent": true,
+                              },
+                            ),
+                      ),
                     );
                     setState(() {
                       isInPage = true;
                     });
                   },
-                  child: CategoryItem(
-                    data: categories[index],
-                  ),
+                  child: CategoryItem(data: categories[index]),
                 );
               }),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -235,14 +237,16 @@ class _GuestHomePageState extends State<GuestHomePage> {
         await launch(WHATSAPP_IOS_URL + WHATSAPP + "&text=${Uri.parse(text)}");
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     } else {
       if (await canLaunch(WHATSAPP_ANDROID_URL + WHATSAPP)) {
         await launch(WHATSAPP_ANDROID_URL + WHATSAPP + "&text=" + text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("whatsapp_not_installed".tr())));
+          SnackBar(content: new Text("whatsapp_not_installed".tr())),
+        );
       }
     }
   }
@@ -305,9 +309,7 @@ class _GuestHomePageState extends State<GuestHomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.only(right: 20, left: 20),
           child: GestureDetector(
@@ -322,76 +324,50 @@ class _GuestHomePageState extends State<GuestHomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(
-                    LineIcons.whatSApp,
-                    color: white,
-                    size: 25,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    "Whatsapp Kirana List",
-                    style: normalWhiteText,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Icon(
-                    LineIcons.camera,
-                    color: white,
-                    size: 25,
-                  )
+                  Icon(LineIcons.whatSApp, color: white, size: 25),
+                  SizedBox(width: 5),
+                  Text("Whatsapp Kirana List", style: normalWhiteText),
+                  SizedBox(width: 5),
+                  Icon(LineIcons.camera, color: white, size: 25),
                 ],
               ),
             ),
           ),
         ),
-        SizedBox(
-          height: 15,
-        ),
+        SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
-          child: SliderWidget(
-            items: ads,
-          ),
+          child: SliderWidget(items: ads),
         ),
         getCategories(),
-        SizedBox(
-          height: 5,
-        ),
-        Divider(
-          thickness: 0.8,
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 5),
+        Divider(thickness: 0.8),
+        SizedBox(height: 10),
         (isLoading && page == 1 && !isPulling)
             ? SizedBox(
-                height: 150, child: Center(child: CustomCircularProgress()))
+              height: 150,
+              child: Center(child: CustomCircularProgress()),
+            )
             : Column(
-                children: List.generate(categoryFeatures.length, (index) {
-                  List products = categoryFeatures[index]['products'];
+              children: List.generate(categoryFeatures.length, (index) {
+                List products = categoryFeatures[index]['products'];
 
-                  return products.length > 0
-                      ? Padding(
-                          padding: const EdgeInsets.only(bottom: 25),
-                          child: getProductByCagories(
-                              index,
-                              categoryFeatures[index]['name'] ?? "",
-                              categoryFeatures[index]['description'] ?? "",
-                              categoryFeatures[index]['products'] ?? []),
-                        )
-                      : Container();
-                }),
-              ),
-        SizedBox(
-          height: 20,
-        ),
+                return products.length > 0
+                    ? Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: getProductByCagories(
+                        index,
+                        categoryFeatures[index]['name'] ?? "",
+                        categoryFeatures[index]['description'] ?? "",
+                        categoryFeatures[index]['products'] ?? [],
+                      ),
+                    )
+                    : Container();
+              }),
+            ),
+        SizedBox(height: 20),
         (isLoading && page > 1) ? LoadingData() : Container(),
-        SizedBox(
-          height: 40,
-        ),
+        SizedBox(height: 40),
       ],
     );
   }
@@ -422,18 +398,18 @@ class _GuestHomePageState extends State<GuestHomePage> {
                   children: [
                     Text(
                       title,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    SizedBox(
-                      height: 3,
+                    SizedBox(height: 3),
+                    Text(
+                      subTitle,
+                      style: TextStyle(fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(subTitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -442,14 +418,19 @@ class _GuestHomePageState extends State<GuestHomePage> {
                   setState(() {
                     isInPage = false;
                   });
-                  await Navigator.pushNamed(
+                  await Navigator.push(
                     context,
-                    "/guest_category_page",
-                    arguments: {
-                      "category": categoryFeatures[index],
-                      "allCategories": categoryFeatures,
-                      "isParent": !categoryFeatures[index]["is_sub_category"]
-                    },
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GuestCategoryPage(
+                            data: {
+                              "category": categoryFeatures[index],
+                              "allCategories": categoryFeatures,
+                              "isParent":
+                                  !categoryFeatures[index]["is_sub_category"],
+                            },
+                          ),
+                    ),
                   );
                   setState(() {
                     isInPage = true;
@@ -457,15 +438,8 @@ class _GuestHomePageState extends State<GuestHomePage> {
                 },
                 child: Row(
                   children: [
-                    Text(
-                      "see_more",
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    ).tr(),
-                    SizedBox(
-                      width: 3,
-                    ),
+                    Text("see_more", style: TextStyle(fontSize: 16)).tr(),
+                    SizedBox(width: 3),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: Icon(
@@ -473,10 +447,10 @@ class _GuestHomePageState extends State<GuestHomePage> {
                         color: black,
                         size: 18,
                       ),
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -493,29 +467,37 @@ class _GuestHomePageState extends State<GuestHomePage> {
                     setState(() {
                       isInPage = false;
                     });
-                    await Navigator.pushNamed(
-                        context, "/guest_product_detail_page",
-                        arguments: {"product": products[index]});
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => GuestProductDetailPage(
+                              data: {"product": products[index]},
+                            ),
+                      ),
+                    );
                     setState(() {
                       isInPage = true;
                     });
                   },
                   child: GuestProductItemNetwork(
-                      product: product,
-                      discountLabel:
-                          convertDouble(product['percent_off']).toInt(),
-                      kgLabel: product["attributes"].length == 0
-                          ? ""
-                          : product["attributes"][0]["value"],
-                      image: product['image'],
-                      name: product['name'],
-                      priceStrike: CURRENCY + "${product["unit_price"]}",
-                      price: CURRENCY + "${product["sale_price"]}"),
+                    product: product,
+                    discountLabel:
+                        convertDouble(product['percent_off']).toInt(),
+                    kgLabel:
+                        product["attributes"].length == 0
+                            ? ""
+                            : product["attributes"][0]["value"],
+                    image: product['image'],
+                    name: product['name'],
+                    priceStrike: CURRENCY + "${product["unit_price"]}",
+                    price: CURRENCY + "${product["sale_price"]}",
+                  ),
                 ),
               );
             }),
           ),
-        )
+        ),
       ],
     );
   }

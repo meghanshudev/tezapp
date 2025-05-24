@@ -10,6 +10,9 @@ import 'package:tezapp/event/ProductListEvent.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/models/cart.dart';
+import 'package:tezapp/pages/Cart/add_coupon_page.dart';
+import 'package:tezapp/pages/Cart/order_confirmed_page.dart';
+import 'package:tezapp/pages/Product/product_detail_page.dart';
 import 'package:tezapp/provider/cart_provider.dart';
 import 'package:tezapp/provider/has_group.dart';
 import 'package:tezapp/respositories/cart/cart_repository.dart';
@@ -62,7 +65,11 @@ class _CartPageState extends State<CartPage> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   initPage() async {
@@ -84,16 +91,17 @@ class _CartPageState extends State<CartPage> {
 
         List cartItems = cart['lines'];
         couponData = cart.containsKey('coupon') ? cart['coupon'] : null;
-        paymentMethodId = checkIsNullValue(cart['payment_type'])
-            ? 0
-            : cart['payment_type']['id'];
+        paymentMethodId =
+            checkIsNullValue(cart['payment_type'])
+                ? 0
+                : cart['payment_type']['id'];
         schedules = cart.containsKey('schedules') ? cart['schedules'] : [];
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       }
     }
     if (mounted)
@@ -120,14 +128,18 @@ class _CartPageState extends State<CartPage> {
                   : DEFAULT_GROUP_IMAGE;
         });
 
-        var zipCode = !checkIsNullValue(
-                response['resp_data']['data']['leader']['zip_code'])
-            ? response['resp_data']['data']['leader']['zip_code']
-            : "";
+        var zipCode =
+            !checkIsNullValue(
+                  response['resp_data']['data']['leader']['zip_code'],
+                )
+                ? response['resp_data']['data']['leader']['zip_code']
+                : "";
         if (!checkIsNullValue(
-            response['resp_data']['data']['leader']['name'])) {
+          response['resp_data']['data']['leader']['name'],
+        )) {
           setState(() {
-            byLeader = "by".tr() +
+            byLeader =
+                "by".tr() +
                 " " +
                 response['resp_data']['data']['leader']['name'];
             leaderzipCode = "";
@@ -194,14 +206,18 @@ class _CartPageState extends State<CartPage> {
     });
     var pId = product["id"];
     var response = await netDelete(
-        isUserToken: true, params: {}, endPoint: "me/cart/product/$pId");
+      isUserToken: true,
+      params: {},
+      endPoint: "me/cart/product/$pId",
+    );
 
     if (response['resp_code'] == "200") {
-      eventBus
-          .fire(ProductListEvent(id: pId.toString(), quantity: int.parse(qty)));
+      eventBus.fire(
+        ProductListEvent(id: pId.toString(), quantity: int.parse(qty)),
+      );
       dynamic dataPanel = {
         "phone": userSession['phone_number'],
-        "product": product['name']
+        "product": product['name'],
       };
 
       mixpanel.track(REMOVE_PRODUCT_FROM_CART, properties: dataPanel);
@@ -216,9 +232,9 @@ class _CartPageState extends State<CartPage> {
         List cartItems = cart['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
         if (cartItems.length == 0) {
           context.read<CartProvider>().refreshCart(false);
           //  set new number of cart item
@@ -249,9 +265,7 @@ class _CartPageState extends State<CartPage> {
         backgroundColor: white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120),
-          child: CustomAppBar(
-            subtitle: "your_cart".tr(),
-          ),
+          child: CustomAppBar(subtitle: "your_cart".tr()),
         ),
         bottomNavigationBar: getFooter(),
         body: getBody(),
@@ -279,9 +293,9 @@ class _CartPageState extends State<CartPage> {
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       }
     } else {
       var ms = response["resp_data"]["message"];
@@ -300,10 +314,12 @@ class _CartPageState extends State<CartPage> {
         children: [
           GestureDetector(
             onTap: () async {
-              var res = await Navigator.pushNamed(context, "/add_coupon_page",
-                  arguments: {
-                    "schedule": schedules,
-                  });
+              var res = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddCouponPage(schedule: schedules),
+                ),
+              );
               if (!checkIsNullValue(res)) {
                 applyCoupon((res as Map)["id"]);
               }
@@ -323,24 +339,12 @@ class _CartPageState extends State<CartPage> {
                   children: [
                     Row(
                       children: [
-                        Icon(
-                          MaterialCommunityIcons.tag,
-                          color: primary,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "use_coupons",
-                          style: meduimBlackText,
-                        ).tr()
+                        Icon(MaterialCommunityIcons.tag, color: primary),
+                        SizedBox(width: 10),
+                        Text("use_coupons", style: meduimBlackText).tr(),
                       ],
                     ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: black,
-                      size: 18,
-                    )
+                    Icon(Icons.arrow_forward_ios, color: black, size: 18),
                   ],
                 ),
               ),
@@ -352,10 +356,7 @@ class _CartPageState extends State<CartPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    couponData["name"],
-                    style: meduimBlackText,
-                  ),
+                  Text(couponData["name"], style: meduimBlackText),
                   IconButton(
                     onPressed: () {
                       removeCoupon();
@@ -364,10 +365,10 @@ class _CartPageState extends State<CartPage> {
                       Icons.cancel_outlined,
                       color: removingCoupon ? greyLight70 : primary,
                     ),
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
         ],
       ),
     );
@@ -380,7 +381,10 @@ class _CartPageState extends State<CartPage> {
       removingCoupon = true;
     });
     var response = await netDelete(
-        isUserToken: true, params: {}, endPoint: "me/cart/coupon");
+      isUserToken: true,
+      params: {},
+      endPoint: "me/cart/coupon",
+    );
 
     if (response['resp_code'] == "200") {
       showToast("Removed", context);
@@ -391,9 +395,9 @@ class _CartPageState extends State<CartPage> {
         List cartItems = cart['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+        context.read<CartProvider>().refreshCartGrandTotal(
+          double.parse(cart['total'].toString()),
+        );
       } else {
         cart = null;
 
@@ -432,20 +436,10 @@ class _CartPageState extends State<CartPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "payment_method",
-            style: meduimBlackText,
-          ).tr(),
-          SizedBox(
-            height: 5,
-          ),
-          Text(
-            "choose_the_payment_method",
-            style: smallBlackText,
-          ).tr(),
-          SizedBox(
-            height: 25,
-          ),
+          Text("payment_method", style: meduimBlackText).tr(),
+          SizedBox(height: 5),
+          Text("choose_the_payment_method", style: smallBlackText).tr(),
+          SizedBox(height: 25),
           Column(
             children: List.generate(paymentMethod.length, (index) {
               return GestureDetector(
@@ -462,11 +456,14 @@ class _CartPageState extends State<CartPage> {
                     height: 60,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: paymentMethodId == paymentMethod[index]['id']
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color:
+                            paymentMethodId == paymentMethod[index]['id']
                                 ? primary
-                                : black.withOpacity(0.5))),
+                                : black.withOpacity(0.5),
+                      ),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 25, right: 15),
                       child: Row(
@@ -477,21 +474,23 @@ class _CartPageState extends State<CartPage> {
                               Container(
                                 width: 25,
                                 height: 25,
-                                decoration:
-                                    BoxDecoration(shape: BoxShape.circle),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
                                   child: Image.network(
-                                      paymentMethod[index]['image']),
+                                    paymentMethod[index]['image'],
+                                  ),
                                 ),
                               ),
-                              SizedBox(
-                                width: 15,
-                              ),
+                              SizedBox(width: 15),
                               Text(
                                 paymentMethod[index]['name'],
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -518,9 +517,7 @@ class _CartPageState extends State<CartPage> {
           Center(
             child: Container(
               width: double.infinity * 0.6,
-              child: Divider(
-                thickness: 0.8,
-              ),
+              child: Divider(thickness: 0.8),
             ),
           ),
         ],
@@ -531,9 +528,7 @@ class _CartPageState extends State<CartPage> {
   Widget getAds() {
     return Padding(
       padding: const EdgeInsets.only(left: 15, right: 15),
-      child: SliderWidget(
-        items: ads,
-      ),
+      child: SliderWidget(items: ads),
     );
   }
 
@@ -547,67 +542,55 @@ class _CartPageState extends State<CartPage> {
     //   return getEmptyCart();
     return context.watch<CartProvider>().isHasCart
         ? SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // checkIsNullValue(userSession['group'])
-                //     ? Column(
-                //         children: [
-                //           SizedBox(
-                //             height: 15,
-                //           ),
-                //           getAds(),
-                //         ],
-                //       )
-                //     : Container(),
-                if (!checkIsNullValue(cart["amount_off"]))
-                  Container(
-                    width: double.infinity,
-                    height: 70,
-                    decoration: BoxDecoration(color: black),
-                    child: Center(
-                      child: Text("$CURRENCY ${cart["amount_off"]} saved!",
-                          style: normalBoldWhiteTitle),
-                    ),
-                  ),
-                SizedBox(
-                  height: 20,
-                ),
-                getSavedItemsAndEmptyCart(),
-                Center(
-                  child: Container(
-                    width: double.infinity,
-                    child: Divider(
-                      thickness: 0.8,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // checkIsNullValue(userSession['group'])
+              //     ? Column(
+              //         children: [
+              //           SizedBox(
+              //             height: 15,
+              //           ),
+              //           getAds(),
+              //         ],
+              //       )
+              //     : Container(),
+              if (!checkIsNullValue(cart["amount_off"]))
+                Container(
+                  width: double.infinity,
+                  height: 70,
+                  decoration: BoxDecoration(color: black),
+                  child: Center(
+                    child: Text(
+                      "$CURRENCY ${cart["amount_off"]} saved!",
+                      style: normalBoldWhiteTitle,
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
+              SizedBox(height: 20),
+              getSavedItemsAndEmptyCart(),
+              Center(
+                child: Container(
+                  width: double.infinity,
+                  child: Divider(thickness: 0.8),
                 ),
-                getCartItems(),
+              ),
+              SizedBox(height: 20),
+              getCartItems(),
 
-                SizedBox(
-                  height: 10,
-                ),
-                Divider(
-                  thickness: 0.8,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                getPaymentMethod(),
-                SizedBox(
-                  height: 10,
-                ),
-                // getDeliveryParter(),
-                // SizedBox(
-                //   height: 15,
-                // ),
-                getTotalBlock(),
-              ],
-            ),
-          )
+              SizedBox(height: 10),
+              Divider(thickness: 0.8),
+              SizedBox(height: 10),
+              getPaymentMethod(),
+              SizedBox(height: 10),
+              // getDeliveryParter(),
+              // SizedBox(
+              //   height: 15,
+              // ),
+              getTotalBlock(),
+            ],
+          ),
+        )
         : getEmptyCart();
   }
 
@@ -616,52 +599,43 @@ class _CartPageState extends State<CartPage> {
       padding: const EdgeInsets.only(left: 15, right: 15),
       child: Column(
         children: [
-          SizedBox(
-            height: 0,
-          ),
+          SizedBox(height: 0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               cart["discount"].toString() == "0"
                   ? Container()
                   : Row(
-                      children: [
-                        Text(
-                          "$CURRENCY ${cart["discount"]}",
-                          style: meduimBoldPrimaryText,
-                        ),
-                        Text("saved".tr(), style: meduimPrimaryText)
-                      ],
-                    ),
+                    children: [
+                      Text(
+                        "$CURRENCY ${cart["discount"]}",
+                        style: meduimBoldPrimaryText,
+                      ),
+                      Text("saved".tr(), style: meduimPrimaryText),
+                    ],
+                  ),
               InkWell(
-                  onTap: () {
-                    setEmptyCart();
-                  },
-                  child: Text(
-                    "Empty Cart".toUpperCase(),
-                    style: meduimBlackText,
-                  ))
+                onTap: () {
+                  setEmptyCart();
+                },
+                child: Text("Empty Cart".toUpperCase(), style: meduimBlackText),
+              ),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
         ],
       ),
     );
   }
 
   setEmptyCart() async {
-    var response = await netDelete(
-      endPoint: "me/cart/product",
-      params: {},
-    );
+    var response = await netDelete(endPoint: "me/cart/product", params: {});
 
     if (response['resp_code'] == "200") {
       dynamic dataPanel = {
         "phone": userSession['phone_number'],
         "product": cart["lines"],
-        "empty_cart": "empty_cart"
+        "empty_cart": "empty_cart",
       };
 
       mixpanel.track(CLICK_EMPTY_CART, properties: dataPanel);
@@ -683,10 +657,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget getCartItems() {
-    if (isLoadingCart)
-      return Center(
-        child: CustomCircularProgress(),
-      );
+    if (isLoadingCart) return Center(child: CustomCircularProgress());
     if (checkIsNullValue(cart) || checkIsNullValue(cart["lines"]))
       return SizedBox();
 
@@ -705,16 +676,20 @@ class _CartPageState extends State<CartPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           Flexible(
             child: Container(
               width: double.infinity,
               child: GestureDetector(
                 onTap: () async {
-                  await Navigator.pushNamed(context, "/product_detail_page",
-                      arguments: {"product": _product});
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) =>
+                              ProductDetailPage(data: {'product': _product}),
+                    ),
+                  );
                 },
                 child: Row(
                   children: [
@@ -723,9 +698,7 @@ class _CartPageState extends State<CartPage> {
                       width: 70,
                       fit: BoxFit.cover,
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                    SizedBox(width: 5),
                     Flexible(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -736,55 +709,42 @@ class _CartPageState extends State<CartPage> {
                             maxLines: 2,
                             style: smallMediumBlackText,
                           ),
-                          SizedBox(
-                            height: 2,
-                          ),
+                          SizedBox(height: 2),
                           Text(
                             _product["attributes"][0]["value"],
                             style: smallBlackText,
                           ),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Text(
-                            "x" + qty,
-                            style: smallBoldPrimaryText,
-                          ),
+                          SizedBox(height: 2),
+                          Text("x" + qty, style: smallBoldPrimaryText),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          SizedBox(
-            width: 20,
-          ),
+          SizedBox(width: 20),
           checkIsNullValue(_product['percent_off'])
               ? Text(
-                  "$CURRENCY ${_product["unit_price"]}",
-                  style: meduimBoldBlackText,
-                )
+                "$CURRENCY ${_product["unit_price"]}",
+                style: meduimBoldBlackText,
+              )
               : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "$CURRENCY ${_product["sale_price"]}",
-                      style: meduimBoldBlackText,
-                    ),
-                    SizedBox(
-                      height: 2,
-                    ),
-                    Text(
-                      "$CURRENCY ${_product["unit_price"]}",
-                      style: smallStrikeBoldPrimaryText,
-                    )
-                  ],
-                ),
-          SizedBox(
-            width: 10,
-          ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "$CURRENCY ${_product["sale_price"]}",
+                    style: meduimBoldBlackText,
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "$CURRENCY ${_product["unit_price"]}",
+                    style: smallStrikeBoldPrimaryText,
+                  ),
+                ],
+              ),
+          SizedBox(width: 10),
         ],
       ),
     );
@@ -798,10 +758,7 @@ class _CartPageState extends State<CartPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "mrp_total",
-                style: smallMediumGreyText,
-              ).tr(),
+              Text("mrp_total", style: smallMediumGreyText).tr(),
               Row(
                 children: [
                   Text(
@@ -809,19 +766,14 @@ class _CartPageState extends State<CartPage> {
                     style: smallMediumGreyText,
                   ),
                 ],
-              )
+              ),
             ],
           ),
-          SizedBox(
-            height: 8,
-          ),
+          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "discount",
-                style: smallMediumPrimaryText,
-              ).tr(),
+              Text("discount", style: smallMediumPrimaryText).tr(),
               Row(
                 children: [
                   Text(
@@ -829,7 +781,7 @@ class _CartPageState extends State<CartPage> {
                     style: smallMediumPrimaryText,
                   ),
                 ],
-              )
+              ),
             ],
           ),
           if (!checkIsNullValue(couponData))
@@ -838,10 +790,7 @@ class _CartPageState extends State<CartPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "coupon_discount",
-                    style: smallMediumGreyText,
-                  ).tr(),
+                  Text("coupon_discount", style: smallMediumGreyText).tr(),
                   Text(
                     "$CURRENCY ${couponData['amount_off']}",
                     style: smallMediumGreyText,
@@ -849,88 +798,53 @@ class _CartPageState extends State<CartPage> {
                 ],
               ),
             ),
-          SizedBox(
-            height: 8,
-          ),
+          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "delivery_fee",
-                style: smallMediumGreyText,
-              ).tr(),
-              Text(
-                "$CURRENCY ${cart["delivery"]}",
-                style: smallMediumGreyText,
-              ),
+              Text("delivery_fee", style: smallMediumGreyText).tr(),
+              Text("$CURRENCY ${cart["delivery"]}", style: smallMediumGreyText),
             ],
           ),
-          SizedBox(
-            height: 8,
-          ),
+          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "taxed_and_charges",
-                style: smallMediumGreyText,
-              ).tr(),
-              Text(
-                "$CURRENCY ${cart["vat"]}",
-                style: smallMediumGreyText,
-              ),
+              Text("taxed_and_charges", style: smallMediumGreyText).tr(),
+              Text("$CURRENCY ${cart["vat"]}", style: smallMediumGreyText),
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "to_pay",
-                style: meduimBoldBlackText,
-              ).tr(),
-              Text(
-                "$CURRENCY ${cart["total"]}",
-                style: meduimBoldBlackText,
-              ),
+              Text("to_pay", style: meduimBoldBlackText).tr(),
+              Text("$CURRENCY ${cart["total"]}", style: meduimBoldBlackText),
             ],
           ),
-          SizedBox(
-            height: 10,
-          ),
-          Divider(
-            thickness: 0.8,
-          ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
+          Divider(thickness: 0.8),
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "FREE Delivery above ₹500!",
-                style: smallMediumPrimaryText,
-              )
+              Text("FREE Delivery above ₹500!", style: smallMediumPrimaryText),
             ],
           ),
-          SizedBox(
-            height: 10,
-          ),
-          Divider(
-            thickness: 0.8,
-          ),
+          SizedBox(height: 10),
+          Divider(thickness: 0.8),
         ],
       ),
     );
   }
 
   Widget getFooter() {
-    String byDate = !checkIsNullValue(schedules.length)
-        ? DateFormat("d MMM")
-            .format(DateTime.parse(schedules[schedules.length - 1]["date"]))
-        : "N/A";
+    String byDate =
+        !checkIsNullValue(schedules.length)
+            ? DateFormat(
+              "d MMM",
+            ).format(DateTime.parse(schedules[schedules.length - 1]["date"]))
+            : "N/A";
 
     var size = MediaQuery.of(context).size;
     return Container(
@@ -943,7 +857,7 @@ class _CartPageState extends State<CartPage> {
             color: black.withOpacity(0.06),
             spreadRadius: 5,
             blurRadius: 10,
-          )
+          ),
         ],
       ),
       child: Padding(
@@ -1051,9 +965,10 @@ class _CartPageState extends State<CartPage> {
                       color: white,
                       boxShadow: [
                         BoxShadow(
-                            color: black.withOpacity(0.06),
-                            spreadRadius: 5,
-                            blurRadius: 10)
+                          color: black.withOpacity(0.06),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                        ),
                       ],
                     ),
                     child: InkWell(
@@ -1070,20 +985,21 @@ class _CartPageState extends State<CartPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                  SizedBox(width: 15),
                   context.watch<CartProvider>().isHasCart
                       ? Flexible(
-                          child: InkWell(
+                        child: InkWell(
                           onTap: () {
-                            confirmAlert(context,
-                                des: "Confirm Order on Tez?".tr(),
-                                onCancel: () {
-                              Navigator.pop(context);
-                            }, onConfirm: () async {
-                              await confirmCheckout();
-                            });
+                            confirmAlert(
+                              context,
+                              des: "Confirm Order on Tez?".tr(),
+                              onCancel: () {
+                                Navigator.pop(context);
+                              },
+                              onConfirm: () async {
+                                await confirmCheckout();
+                              },
+                            );
                           },
                           child: Container(
                             width: double.infinity,
@@ -1093,8 +1009,10 @@ class _CartPageState extends State<CartPage> {
                               color: primary,
                             ),
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 15, right: 15),
+                              padding: const EdgeInsets.only(
+                                left: 15,
+                                right: 15,
+                              ),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -1108,11 +1026,12 @@ class _CartPageState extends State<CartPage> {
                                             " " +
                                             "items".tr() +
                                             " • $CURRENCY" +
-                                            double.parse(context
-                                                    .watch<CartProvider>()
-                                                    .cartGrandTotal
-                                                    .toString())
-                                                .toStringAsFixed(0)
+                                            double.parse(
+                                              context
+                                                  .watch<CartProvider>()
+                                                  .cartGrandTotal
+                                                  .toString(),
+                                            ).toStringAsFixed(0)
                                         : context
                                                 .watch<CartProvider>()
                                                 .cartCount
@@ -1120,69 +1039,70 @@ class _CartPageState extends State<CartPage> {
                                             " " +
                                             "item".tr() +
                                             " • $CURRENCY" +
-                                            double.parse(context
-                                                    .watch<CartProvider>()
-                                                    .cartGrandTotal
-                                                    .toString())
-                                                .toStringAsFixed(0),
+                                            double.parse(
+                                              context
+                                                  .watch<CartProvider>()
+                                                  .cartGrandTotal
+                                                  .toString(),
+                                            ).toStringAsFixed(0),
                                     style: smallMediumWhiteText,
                                   ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
+                                  SizedBox(width: 5),
                                   Row(
                                     children: [
                                       Text(
                                         "Place Order",
                                         style: smallMediumWhiteText,
                                       ).tr(),
-                                      SizedBox(
-                                        width: 8,
-                                      ),
+                                      SizedBox(width: 8),
                                       confirmingCheckout
                                           ? SizedBox(
-                                              width: 15,
-                                              height: 15,
-                                              child: CustomCircularProgress(
-                                                color: white,
-                                              ),
-                                            )
-                                          : Icon(
-                                              Icons.arrow_forward_ios,
+                                            width: 15,
+                                            height: 15,
+                                            child: CustomCircularProgress(
                                               color: white,
-                                              size: 15,
-                                            )
+                                            ),
+                                          )
+                                          : Icon(
+                                            Icons.arrow_forward_ios,
+                                            color: white,
+                                            size: 15,
+                                          ),
                                     ],
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
                           ),
-                        ))
+                        ),
+                      )
                       : Flexible(
-                          child: Container(
-                            width: double.infinity,
-                            height: 50,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: white,
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: black.withOpacity(0.06),
-                                      spreadRadius: 5,
-                                      blurRadius: 10)
-                                ]),
-                            child: Center(
-                              child: Text(
-                                "cart_empty_start_shopping",
-                                style: normalGreyText,
-                              ).tr(),
-                            ),
+                        child: Container(
+                          width: double.infinity,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: black.withOpacity(0.06),
+                                spreadRadius: 5,
+                                blurRadius: 10,
+                              ),
+                            ],
                           ),
-                        )
+                          child: Center(
+                            child:
+                                Text(
+                                  "cart_empty_start_shopping",
+                                  style: normalGreyText,
+                                ).tr(),
+                          ),
+                        ),
+                      ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -1195,10 +1115,7 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       confirmingCheckout = true;
     });
-    var response = await netPost(
-      endPoint: "me/cart/confirm",
-      params: {},
-    );
+    var response = await netPost(endPoint: "me/cart/confirm", params: {});
 
     if (response['resp_code'] == "200") {
       print(cart["lines"]);
@@ -1206,7 +1123,7 @@ class _CartPageState extends State<CartPage> {
       dynamic dataPanel = {
         "phone": userSession['phone_number'],
         "total": cart["total"].toString(),
-        "order_confirm": "order_confirm"
+        "order_confirm": "order_confirm",
       };
 
       mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
@@ -1214,8 +1131,15 @@ class _CartPageState extends State<CartPage> {
       await CartRepository().removeAll();
       var temp = response["resp_data"]["data"];
       showToast("your_order_is_completed".tr(), context);
-      Navigator.pushNamed(context, "/order_confirmed_page",
-          arguments: {"schedules": schedules, "orderData": temp});
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => OrderConfirmedPage(
+                data: {"schedules": schedules, "orderData": temp},
+              ),
+        ),
+      );
     } else {
       var ms = response["resp_data"]["message"];
       showToast(ms.toString(), context);
@@ -1231,34 +1155,35 @@ class _CartPageState extends State<CartPage> {
     String res = "";
     List _cartItems = cart["lines"];
     var _total = cart["total"];
-    res = "${_cartItems.length} " +
+    res =
+        "${_cartItems.length} " +
         ((_cartItems.isNotEmpty && _cartItems.length > 1) ? "items" : "item");
     res = res + "  •  " + "$CURRENCY $_total";
     return res;
   }
 
-Widget getSlidable(Widget child, product, qty) {
-  return Slidable(
-    // Each Slidable must have a key
-    key: ValueKey(product.id), // or any unique identifier
-    endActionPane: ActionPane(
-      motion: const DrawerMotion(),
-      extentRatio: 0.2,
-      children: [
-        SlidableAction(
-          onPressed: (_) async {
-            await removeItem(product, qty);
-          },
-          backgroundColor: removingItem ? greyLight70 : Colors.red,
-          foregroundColor: removingItem ? greyLight80 : null,
-          icon: Icons.delete,
-          label: 'remove'.tr(),
-        ),
-      ],
-    ),
-    child: child,
-  );
-}
+  Widget getSlidable(Widget child, product, qty) {
+    return Slidable(
+      // Each Slidable must have a key
+      key: ValueKey(product.id), // or any unique identifier
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.2,
+        children: [
+          SlidableAction(
+            onPressed: (_) async {
+              await removeItem(product, qty);
+            },
+            backgroundColor: removingItem ? greyLight70 : Colors.red,
+            foregroundColor: removingItem ? greyLight80 : null,
+            icon: Icons.delete,
+            label: 'remove'.tr(),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 
   Widget getEmptyCart() {
     return Column(
@@ -1268,7 +1193,8 @@ Widget getSlidable(Widget child, product, qty) {
         Center(
           child: Card(
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(200 / 2)),
+              borderRadius: BorderRadius.circular(200 / 2),
+            ),
             child: Container(
               width: 200,
               height: 200,
@@ -1288,24 +1214,19 @@ Widget getSlidable(Widget child, product, qty) {
             Text(
               "empty_cart",
               style: TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.w500,
-                  color: black.withOpacity(0.5)),
-            ).tr(),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              "go_to_product_list_to_explore_product",
-              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w500,
                 color: black.withOpacity(0.5),
               ),
             ).tr(),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
+            Text(
+              "go_to_product_list_to_explore_product",
+              style: TextStyle(color: black.withOpacity(0.5)),
+            ).tr(),
+            SizedBox(height: 10),
           ],
-        )
+        ),
       ],
     );
   }

@@ -129,7 +129,7 @@ class _EditProfileState extends State<EditProfile> {
           "email": response['resp_data']['data']['email'],
           "balance": response['resp_data']['data']['balance'],
           "group": response['resp_data']['data']['group'],
-          "access_token": userSession['access_token'],
+          "access_token": userSession['access_token'] ?? "",
           "is_first_time_login": userSession['is_first_time_login'],
           "token_type": userSession['token_type']
         };

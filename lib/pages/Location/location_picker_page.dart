@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_places_flutter/model/prediction.dart';
+import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
-
 import 'package:tezapp/helpers/utils.dart';
 import 'package:tezapp/provider/credit_provider.dart';
 import 'package:tezapp/ui_elements/custom_search_button.dart';
@@ -26,22 +25,24 @@ class LocationPickerPage extends StatefulWidget {
 
 class _LocationPickerPageState extends State<LocationPickerPage> {
   bool isGetAddress = false;
+  bool isLoading = false;
   double markerLatPosition = 21.131780;
   double markerLngPosition = 79.119420;
-  Completer<GoogleMapController> googleController = Completer();
+  final Completer<GoogleMapController> googleController = Completer();
 
-  TextEditingController addressController = new TextEditingController();
+  final TextEditingController addressController = TextEditingController();
   late GoogleMapController mapController;
 
-  CameraPosition kGooglePlex = CameraPosition(
+  CameraPosition kGooglePlex = const CameraPosition(
     target: LatLng(21.131780, 79.119420),
     zoom: 17.5,
   );
 
   String addressLocation = '';
+  String errorMessage = '';
 
-  List<AutocompletePrediction> predictions = [];
-  GooglePlace? googlePlace;
+  List predictions = [];
+  // GoogleMapsPlaces? googlePlace;
 
   double lat = 0.0, lng = 0.0;
 
@@ -50,29 +51,56 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
   @override
   void initState() {
     super.initState();
-
-    getCurrentLocation();
-    // init google place
-    googlePlace = GooglePlace(googleKeyApi);
-
-    initMixpanel();
+    
+    try {
+      // googlePlace = GoogleMapsPlaces(apiKey: googleKeyApi);
+      getCurrentLocation();
+      initMixpanel();
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Failed to initialize location services';
+      });
+    }
   }
 
   Future<void> initMixpanel() async {
     mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
-  void autoCompleteSearch(String value) async {
-    var result = await googlePlace?.autocomplete.get(value);
-    if (result != null && result.predictions != null && mounted) {
+  Future<void> autoCompleteSearch(String value) async {
+    if (value.isEmpty) {
       setState(() {
-        predictions = result.predictions!;
+        // predictions = [];
       });
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      // var result = await googlePlace?.autocomplete.get(value);
+      // if (result != null && result.predictions != null && mounted) {
+      //   setState(() {
+      //     predictions = result.predictions!;
+      //     isLoading = false;
+      //   });
+      // }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to fetch location suggestions';
+          isLoading = false;
+        });
+      }
     }
   }
 
   @override
   void dispose() {
+    addressController.dispose();
     super.dispose();
   }
 
@@ -92,58 +120,65 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
 
   Widget getBody() {
     var size = MediaQuery.of(context).size;
-    return Stack(
-      children: [
-        Container(
-          height: size.height,
-        ),
-        Container(
-          height: size.height,
-          child: Stack(
-            children: [
-              Container(
-                height: size.height,
-                child: GoogleMap(
-                  zoomControlsEnabled: false,
-                  mapType: MapType.normal,
-                  myLocationButtonEnabled: false,
-                  initialCameraPosition: kGooglePlex,
-                  onCameraMoveStarted: () {
-                    setState(() {
-                      isGetAddress = false;
-                    });
-                  },
-                  onCameraMove: (cameraPosition) {
-                    LatLng latlng = cameraPosition.target;
-                    setState(() {
-                      markerLatPosition = latlng.latitude;
-                      markerLngPosition = latlng.longitude;
-                    });
-                    FocusScope.of(context).unfocus();
-                  },
-                  onMapCreated: (GoogleMapController controller) {
-                    if (!googleController.isCompleted)
-                      googleController.complete(controller);
-                    mapController = controller;
-                  },
-                ),
+    return KeyboardAvoider(
+      child: Stack(
+        children: [
+          if (errorMessage.isNotEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(8),
+              color: Colors.red[100],
+              child: Text(
+                errorMessage,
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
               ),
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  height: 120.0,
-                  width: 120.0,
-                  alignment: Alignment.center,
-                  child: Container(
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: Icon(Entypo.location_pin, size: 50, color: primary),
-                  ),
-                ),
-              ),
-            ],
+            ),
+          SizedBox(
+            height: size.height,
+            child: GoogleMap(
+              zoomControlsEnabled: false,
+              mapType: MapType.normal,
+              myLocationButtonEnabled: false,
+              initialCameraPosition: kGooglePlex,
+              onCameraMoveStarted: () {
+                setState(() {
+                  isGetAddress = false;
+                });
+              },
+              onCameraMove: (cameraPosition) {
+                LatLng latlng = cameraPosition.target;
+                setState(() {
+                  markerLatPosition = latlng.latitude;
+                  markerLngPosition = latlng.longitude;
+                });
+                FocusScope.of(context).unfocus();
+              },
+              onMapCreated: (GoogleMapController controller) {
+                if (!googleController.isCompleted) {
+                  googleController.complete(controller);
+                }
+                mapController = controller;
+              },
+            ),
           ),
-        ),
-      ],
+          const Align(
+            alignment: Alignment.center,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 20),
+              child: Icon(Entypo.location_pin, size: 50, color: primary),
+            ),
+          ),
+          if (isLoading)
+            const Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: 100),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -156,11 +191,12 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
           BoxShadow(
               color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
         ]),
-        padding: EdgeInsets.only(top: 20),
+        padding: const EdgeInsets.only(top: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Expanded(child: GooglePlaceAutoCompleteTextField(googleAPIKey: googleKeyApi, textEditingController: addressController,)),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Container(
@@ -171,7 +207,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                     borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   children: [
-                    Container(
+                    SizedBox(
                       width: 40,
                       child: Center(
                           child: Icon(
@@ -182,16 +218,17 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                     ),
                     Flexible(
                         child: TextField(
+                      controller: addressController,
                       onChanged: (value) {
-                        if (value.isNotEmpty) {
-                          autoCompleteSearch(value);
-                        } else {
-                          if (predictions.length > 0 && mounted) {
-                            setState(() {
-                              predictions = [];
-                            });
-                          }
-                        }
+                        // if (value.isNotEmpty) {
+                        //   autoCompleteSearch(value);
+                        // } else {
+                        //   if (predictions.isNotEmpty && mounted) {
+                        //     setState(() {
+                        //       predictions = [];
+                        //     });
+                        //   }
+                        // }
                       },
                       cursorColor: black,
                       decoration: InputDecoration(
@@ -203,16 +240,11 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            // list of location
+            const SizedBox(height: 10),
             Container(
               width: size.width,
               height: 320,
-              decoration: BoxDecoration(
-                  // color: primary
-                  ),
+              decoration: const BoxDecoration(),
               child: SingleChildScrollView(
                 child: Column(
                   children: [
@@ -233,9 +265,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                             children: [
                               Icon(MaterialIcons.my_location,
                                   size: 25, color: primary),
-                              SizedBox(
-                                width: 10,
-                              ),
+                              const SizedBox(width: 10),
                               Flexible(
                                   child: Text(
                                 "use_my_current_location",
@@ -251,41 +281,50 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                       children: List.generate(predictions.length, (index) {
                         return InkWell(
                           onTap: () async {
-                            var result = await this
-                                .googlePlace
-                                ?.details
-                                .get(predictions[index].placeId.toString());
-                            var latitude =
-                                result?.result?.geometry?.location?.lat;
-                            var longtitude =
-                                result?.result?.geometry?.location?.lng;
-                            setState(() {
-                              lat = latitude!;
-                              lng = longtitude!;
-                            });
-
-                            Navigator.pop(context, {"lat": lat, "lng": lng});
+                            // try {
+                            //   setState(() => isLoading = true);
+                            //   var result = await googlePlace?.details
+                            //       .get(predictions[index].placeId ?? '');
+                            //   var latitude = result?.result?.geometry?.location?.lat;
+                            //   var longitude = result?.result?.geometry?.location?.lng;
+                              
+                            //   if (latitude != null && longitude != null) {
+                            //     setState(() {
+                            //       lat = latitude;
+                            //       lng = longitude;
+                            //     });
+                            //     Navigator.pop(context, {"lat": lat, "lng": lng});
+                            //   } else {
+                            //     setState(() {
+                            //       errorMessage = 'Failed to get location details';
+                            //     });
+                            //   }
+                            // } catch (e) {
+                            //   setState(() {
+                            //     errorMessage = 'Failed to process location';
+                            //   });
+                            // } finally {
+                            //   if (mounted) {
+                            //     setState(() => isLoading = false);
+                            //   }
+                            // }
                           },
                           child: Container(
                             height: 60,
                             width: size.width,
                             decoration: BoxDecoration(
                                 border: Border(
-                                    bottom:
-                                        BorderSide(color: placeHolderColor))),
+                                    bottom: BorderSide(color: placeHolderColor))),
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
+                              padding: const EdgeInsets.only(left: 20, right: 20),
                               child: Row(
                                 children: [
                                   Icon(Entypo.location_pin,
                                       size: 25, color: black),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                                  const SizedBox(width: 10),
                                   Flexible(
                                       child: Text(
-                                    predictions[index].description.toString(),
+                                    predictions[index].description ?? '',
                                     style: meduimGreyText,
                                   ))
                                 ],
@@ -299,9 +338,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Row(
@@ -319,11 +356,9 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                               blurRadius: 10)
                         ]),
                     child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context, {"lat": lat, "lng": lng});
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 5),
+                      onTap: () => Navigator.pop(context),
+                      child: const Padding(
+                        padding: EdgeInsets.only(left: 5),
                         child: Icon(
                           Icons.arrow_back_ios,
                           color: black,
@@ -332,9 +367,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    width: 15,
-                  ),
+                  const SizedBox(width: 15),
                   Flexible(
                       child: InkWell(
                     onTap: () {
@@ -356,10 +389,8 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                               "confirm_&_continue",
                               style: normalWhiteText,
                             ).tr(),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Icon(
+                            const SizedBox(width: 5),
+                            const Icon(
                               Icons.arrow_forward_ios,
                               color: white,
                               size: 18,
@@ -376,32 +407,44 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
         ));
   }
 
-  Future<void> moveMapPin(lat, lng) async {
+  Future<void> moveMapPin(double lat, double lng) async {
     final CameraPosition address =
         CameraPosition(target: LatLng(lat, lng), zoom: 19.151926040649414);
     final GoogleMapController controller = await googleController.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(address));
   }
 
-  getCurrentLocation() async {
-    // get current lat and lng
-    var currentLocation = await determineUserLocationPosition(context);
+  Future<void> getCurrentLocation() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
 
-    if (mounted) {
-      setState(() {
-        lat = currentLocation.latitude;
-        lng = currentLocation.longitude;
-      });
+    try {
+      final currentLocation = await determineUserLocationPosition(context);
+
+      if (mounted) {
+        setState(() {
+          lat = currentLocation.latitude;
+          lng = currentLocation.longitude;
+          isLoading = false;
+        });
+
+        final dataPanel = {
+          "phone": userSession['phone_number'],
+          "location": {"lat": lat, "lng": lng}
+        };
+
+        await mixpanel.track(CLICK_PERMISSION_LOCATION, properties: dataPanel);
+        await moveMapPin(lat, lng);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Failed to get current location';
+          isLoading = false;
+        });
+      }
     }
-
-    // mix panel
-    dynamic dataPanel = {
-      "phone": userSession['phone_number'],
-      "location": {"lat": lat, "lng": lng}
-    };
-
-    mixpanel.track(CLICK_PERMISSION_LOCATION, properties: dataPanel);
-
-    moveMapPin(lat, lng);
   }
 }

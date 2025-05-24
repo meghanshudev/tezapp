@@ -6,6 +6,7 @@ import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/UserGroup/create_user_group_page.dart';
 import 'package:tezapp/provider/account_info_provider.dart';
 import 'package:tezapp/ui_elements/custom_appbar.dart';
 import 'package:tezapp/ui_elements/custom_textfield.dart';
@@ -36,9 +37,10 @@ class _CreateUserGroupNamePageState extends State<CreateUserGroupNamePage> {
     super.initState();
     initPage();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
   }
 
   initPage() async {
@@ -112,8 +114,15 @@ class _CreateUserGroupNamePageState extends State<CreateUserGroupNamePage> {
       titlePadding: EdgeInsets.zero,
       onTapProceed: () {
         if (validateForm())
-          Navigator.pushNamed(context, "/create_user_group_page",
-              arguments: {"name": nameController.text, "join": true});
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => CreateUserGroupPage(
+                    data: {"name": nameController.text, "join": true},
+                  ),
+            ),
+          );
       },
       onTapBack: () {
         Navigator.of(context).pop();
@@ -127,34 +136,18 @@ class _CreateUserGroupNamePageState extends State<CreateUserGroupNamePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Padding(
             padding: const EdgeInsets.all(15),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "create_your_tez_group",
-                  style: normalBoldBlackTitle,
-                ).tr(),
-                SizedBox(
-                  height: 2,
-                ),
-                Text(
-                  "5%_commission",
-                  style: smallMediumGreyText,
-                ).tr(),
-                SizedBox(
-                  height: 20,
-                ),
-                SliderWidget(
-                  items: ads,
-                ),
-                SizedBox(
-                  height: 20,
-                ),
+                Text("create_your_tez_group", style: normalBoldBlackTitle).tr(),
+                SizedBox(height: 2),
+                Text("5%_commission", style: smallMediumGreyText).tr(),
+                SizedBox(height: 20),
+                SliderWidget(items: ads),
+                SizedBox(height: 20),
                 Container(
                   width: size.width,
                   child: CustomTextField(

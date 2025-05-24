@@ -3,6 +3,7 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Authentication/login_page.dart';
 import 'package:tezapp/pages/Guest/guest_custom_appbar.dart';
 import 'package:tezapp/pages/Guest/guest_home_page.dart';
 
@@ -33,10 +34,11 @@ class _GuestRootAppState extends State<GuestRootApp> {
     super.initState();
     print("GUEST PAGE");
 
-    pageIndex = !checkIsNullValue(widget.data) &&
-            widget.data.containsKey("activePageIndex")
-        ? widget.data["activePageIndex"]
-        : pageIndex;
+    pageIndex =
+        !checkIsNullValue(widget.data) &&
+                widget.data.containsKey("activePageIndex")
+            ? widget.data["activePageIndex"]
+            : pageIndex;
     initPage();
   }
 
@@ -72,9 +74,7 @@ class _GuestRootAppState extends State<GuestRootApp> {
       index: pageIndex,
       children: [
         GuestHomePage(),
-        Center(
-          child: Text("Login to Start Shopping"),
-        ),
+        Center(child: Text("Login to Start Shopping")),
       ],
     );
   }
@@ -87,15 +87,22 @@ class _GuestRootAppState extends State<GuestRootApp> {
         color: white,
         boxShadow: [
           BoxShadow(
-              color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
+            color: black.withOpacity(0.06),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
         children: [
           // cart section
           Padding(
-            padding:
-                const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 15,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Container(
@@ -109,66 +116,64 @@ class _GuestRootAppState extends State<GuestRootApp> {
                         color: black.withOpacity(0.06),
                         spreadRadius: 5,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: InkWell(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5),
-                      child: Icon(
-                        Icons.home,
-                        color: black,
-                        size: 20,
-                      ),
+                      child: Icon(Icons.home, color: black, size: 20),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                SizedBox(width: 15),
                 Flexible(
                   child: Container(
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: primary,
-                        boxShadow: [
-                          BoxShadow(
-                              color: black.withOpacity(0.06),
-                              spreadRadius: 5,
-                              blurRadius: 10)
-                        ]),
+                      borderRadius: BorderRadius.circular(10),
+                      color: primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: black.withOpacity(0.06),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
                     child: InkWell(
-                        onTap: () async {
-                          await Navigator.pushNamed(context, "/login_page");
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Login to Start Shopping",
-                                  style: meduimWhiteText,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: white,
-                                  size: 18,
-                                )
-                              ],
-                            )
-                          ],
-                        )),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Login to Start Shopping",
+                                style: meduimWhiteText,
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: white,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

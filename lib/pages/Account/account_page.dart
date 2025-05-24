@@ -9,6 +9,14 @@ import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Account/customer_support_page.dart';
+import 'package:tezapp/pages/Account/edit_profile_page.dart';
+import 'package:tezapp/pages/Account/general_info_page.dart';
+import 'package:tezapp/pages/Account/suggest_page.dart';
+import 'package:tezapp/pages/Account/wallet_page.dart';
+import 'package:tezapp/pages/Location/choose_location_page.dart';
+import 'package:tezapp/pages/UserGroup/user_group_page.dart';
+import 'package:tezapp/pages/UserGroup/user_group_view_page.dart';
 import 'package:tezapp/provider/has_group.dart';
 import 'package:tezapp/ui_elements/card_item.dart';
 import '../../ui_elements/slider_widget.dart';
@@ -41,18 +49,19 @@ class _AccountPageState extends State<AccountPage> {
     fetchAds();
     getMember();
 
-    name = !checkIsNullValue(userSession['name'] ?? "") ? userSession['name'] ?? "" : "N/A";
-    phoneNumber = !checkIsNullValue(userSession['phone_number'])
-        ? userSession['phone_number']
-        : "N/A";
+    name =
+        !checkIsNullValue(userSession['name'] ?? "")
+            ? userSession['name'] ?? ""
+            : "N/A";
+    phoneNumber =
+        !checkIsNullValue(userSession['phone_number'])
+            ? userSession['phone_number']
+            : "N/A";
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: white,
-      body: getBody(),
-    );
+    return Scaffold(backgroundColor: white, body: getBody());
   }
 
   fetchAds() async {
@@ -98,7 +107,8 @@ class _AccountPageState extends State<AccountPage> {
                   : DEFAULT_GROUP_IMAGE;
         });
         if (!checkIsNullValue(
-            response['resp_data']['data']['leader']['name'])) {
+          response['resp_data']['data']['leader']['name'],
+        )) {
           setState(() {
             byLeader = response['resp_data']['data']['leader']['name'];
           });
@@ -154,32 +164,24 @@ class _AccountPageState extends State<AccountPage> {
       padding: EdgeInsets.all(15),
       child: Column(
         children: [
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    name,
-                    style: normalBoldBlackTitle,
-                  ),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    phoneNumber,
-                    style: smallMediumGreyText,
-                  )
+                  Text(name, style: normalBoldBlackTitle),
+                  SizedBox(height: 2),
+                  Text(phoneNumber, style: smallMediumGreyText),
                 ],
               ),
               TextButton(
                 onPressed: () async {
-                  dynamic result = await Navigator.of(context)
-                      .pushNamed('/edit_profile_page');
+                  dynamic result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => EditProfile()),
+                  );
                   setState(() {
                     name = result;
                   });
@@ -188,24 +190,16 @@ class _AccountPageState extends State<AccountPage> {
                   "edit_profile".tr().toUpperCase(),
                   style: meduimBoldPrimaryText,
                 ),
-              )
+              ),
             ],
           ),
-          SizedBox(
-            height: 25,
-          ),
+          SizedBox(height: 25),
           getAccountSection(),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           getHelpAndFeedbackSection(),
-          SizedBox(
-            height: 25,
-          ),
+          SizedBox(height: 25),
           getLogoutSection(),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
         ],
       ),
     );
@@ -216,39 +210,51 @@ class _AccountPageState extends State<AccountPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CardItem(
-          onTap: () => Navigator.pushNamed(context, '/wallet_page'),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WalletPage()),
+              ),
           icon: MaterialCommunityIcons.wallet,
           title: "tez_cash".tr(),
           subTitle: "view_your_wallet".tr(),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         context.watch<HasGroupProvider>().hasGroup
             ? CardItem(
-                onTap: () =>
-                    Navigator.pushNamed(context, '/user_group_view_page'),
-                icon: MaterialCommunityIcons.account_group,
-                title: "Tez Group",
-                subTitle: "Join or start your Tez group",
-              )
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UserGroupViewPage(),
+                    ),
+                  ),
+              icon: MaterialCommunityIcons.account_group,
+              title: "Tez Group",
+              subTitle: "Join or start your Tez group",
+            )
             : CardItem(
-                onTap: () => Navigator.pushNamed(context, '/user_group_page'),
-                icon: MaterialCommunityIcons.account_group,
-                title: "Tez Group",
-                subTitle: "Join or start your Tez group"),
-        SizedBox(
-          height: 10,
-        ),
+              onTap:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserGroupPage()),
+                  ),
+              icon: MaterialCommunityIcons.account_group,
+              title: "Tez Group",
+              subTitle: "Join or start your Tez group",
+            ),
+        SizedBox(height: 10),
         CardItem(
-          onTap: () => Navigator.pushNamed(context, '/choose_location_page'),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChoooseLocationPage()),
+              ),
           icon: MaterialCommunityIcons.crosshairs_gps,
           title: "change_location".tr(),
           subTitle: "set_or_change_your_delivery_location".tr(),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         CardItem(
           onTap: () => onChangedLang(),
           icon: MaterialIcons.language,
@@ -263,33 +269,36 @@ class _AccountPageState extends State<AccountPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "help_&_feedback",
-          style: normalBoldBlackTitle,
-        ).tr(),
-        SizedBox(
-          height: 20,
-        ),
+        Text("help_&_feedback", style: normalBoldBlackTitle).tr(),
+        SizedBox(height: 20),
         CardItem(
-          onTap: () => Navigator.pushNamed(context, '/customer_support_page'),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CustomerSupportPage()),
+              ),
           icon: MaterialIcons.chat,
           title: "customer_support".tr(),
           subTitle: "have_an_issue_chat_with_us".tr(),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         CardItem(
-          onTap: () => Navigator.pushNamed(context, '/suggest_page'),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SuggestPage()),
+              ),
           icon: MaterialIcons.tag_faces,
           title: "suggest_us".tr(),
           subTitle: "tell_us_what_you_want_on_tez".tr(),
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         CardItem(
-          onTap: () => Navigator.pushNamed(context, '/general_info_page'),
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GeneralInfoPage()),
+              ),
           icon: MaterialIcons.info,
           title: "general_information".tr(),
           subTitle: "privacy_policy_terms_&_about_tez".tr(),
@@ -306,10 +315,7 @@ class _AccountPageState extends State<AccountPage> {
           onPressed: () {
             onSignOut(context);
           },
-          child: Text(
-            "logout",
-            style: normalBoldPrimaryTitle,
-          ).tr(),
+          child: Text("logout", style: normalBoldPrimaryTitle).tr(),
         ),
       ],
     );
@@ -318,67 +324,72 @@ class _AccountPageState extends State<AccountPage> {
   onChangedLang() async {
     int tempIndex = 0;
     await showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Container(
-            height: 230.0,
-            child: Column(
-              children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.only(left: 10, right: 10),
-                  height: 40,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("cancel",
-                                style: TextStyle(color: primary, fontSize: 16))
-                            .tr(),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            langIndex = tempIndex;
-                          });
-                          setLang(langIndex);
-                          Navigator.of(context).pop();
-                        },
-                        child: Text("done",
-                                style: TextStyle(color: primary, fontSize: 16))
-                            .tr(),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: CupertinoPicker(
-                    scrollController: new FixedExtentScrollController(
-                      initialItem: langIndex,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 230.0,
+          child: Column(
+            children: <Widget>[
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(left: 10, right: 10),
+                height: 40,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child:
+                          Text(
+                            "cancel",
+                            style: TextStyle(color: primary, fontSize: 16),
+                          ).tr(),
                     ),
-                    itemExtent: 32.0,
-                    onSelectedItemChanged: (int index) {
-                      setState(() {
-                        tempIndex = index;
-                      });
-                      setLang(langIndex);
-                    },
-                    children: List.generate(languages.length, (index) {
-                      return new Center(
-                        child: new Text(
-                          languages[index],
-                          style: TextStyle(color: black),
-                        ),
-                      );
-                    }),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          langIndex = tempIndex;
+                        });
+                        setLang(langIndex);
+                        Navigator.of(context).pop();
+                      },
+                      child:
+                          Text(
+                            "done",
+                            style: TextStyle(color: primary, fontSize: 16),
+                          ).tr(),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: new FixedExtentScrollController(
+                    initialItem: langIndex,
                   ),
-                )
-              ],
-            ),
-          );
-        });
+                  itemExtent: 32.0,
+                  onSelectedItemChanged: (int index) {
+                    setState(() {
+                      tempIndex = index;
+                    });
+                    setLang(langIndex);
+                  },
+                  children: List.generate(languages.length, (index) {
+                    return new Center(
+                      child: new Text(
+                        languages[index],
+                        style: TextStyle(color: black),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

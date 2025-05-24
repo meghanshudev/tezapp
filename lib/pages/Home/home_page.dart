@@ -10,6 +10,10 @@ import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Account/order_detail_page.dart';
+import 'package:tezapp/pages/Account/order_history_page.dart';
+import 'package:tezapp/pages/Category/category_page.dart';
+import 'package:tezapp/pages/Product/product_detail_page.dart';
 import 'package:tezapp/ui_elements/category_item.dart';
 import 'package:tezapp/ui_elements/custom_circular_progress.dart';
 import 'package:tezapp/ui_elements/loading_widget.dart';
@@ -86,15 +90,21 @@ class _HomePageState extends State<HomePage> {
 
       if (!checkIsNullValue(resultNotification['id'])) {
         HOME_PAGE_LEAVE = false;
-        await Navigator.pushNamed(
+        await Navigator.push(
           context,
-          "/order_detail_page",
-          arguments: {"id": resultNotification['id'].toString()},
+          MaterialPageRoute(
+            builder:
+                (context) =>
+                    OrderDetailPage(id: resultNotification['id'].toString()),
+          ),
         );
         HOME_PAGE_LEAVE = true;
       } else {
         HOME_PAGE_LEAVE = false;
-        await Navigator.pushNamed(context, "/order_history_page");
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => OrderHistoryPage()),
+        );
         HOME_PAGE_LEAVE = true;
       }
     });
@@ -112,7 +122,6 @@ class _HomePageState extends State<HomePage> {
 
     // Grant consent (if required)
     // OneSignal.consentGranted(true);
-
 
     // Request push notification permission from the user
     final accepted = await OneSignal.Notifications.requestPermission(true);
@@ -269,14 +278,18 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       HOME_PAGE_LEAVE = false;
                     });
-                    await Navigator.pushNamed(
+                    await Navigator.push(
                       context,
-                      "/category_page",
-                      arguments: {
-                        "category": categories[index],
-                        "allCategories": categories,
-                        "isParent": true,
-                      },
+                      MaterialPageRoute(
+                        builder:
+                            (context) => CategoryPage(
+                              data: {
+                                "category": categories[index],
+                                "allCategories": categories,
+                                "isParent": true,
+                              },
+                            ),
+                      ),
                     );
                     setState(() {
                       HOME_PAGE_LEAVE = true;
@@ -484,14 +497,19 @@ class _HomePageState extends State<HomePage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  await Navigator.pushNamed(
+                  await Navigator.push(
                     context,
-                    "/category_page",
-                    arguments: {
-                      "category": categoryFeatures[index],
-                      "allCategories": categoryFeatures,
-                      "isParent": !categoryFeatures[index]["is_sub_category"],
-                    },
+                    MaterialPageRoute(
+                      builder:
+                          (context) => CategoryPage(
+                            data: {
+                              "category": categoryFeatures[index],
+                              "allCategories": categoryFeatures,
+                              "isParent":
+                                  !categoryFeatures[index]["is_sub_category"],
+                            },
+                          ),
+                    ),
                   );
                   setState(() {
                     HOME_PAGE_LEAVE = true;
@@ -542,10 +560,14 @@ class _HomePageState extends State<HomePage> {
                     setState(() {
                       HOME_PAGE_LEAVE = false;
                     });
-                    await Navigator.pushNamed(
+                    await Navigator.push(
                       context,
-                      "/product_detail_page",
-                      arguments: {"product": products[index]},
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ProductDetailPage(
+                              data: {"product": products[index]},
+                            ),
+                      ),
                     );
                     setState(() {
                       HOME_PAGE_LEAVE = true;

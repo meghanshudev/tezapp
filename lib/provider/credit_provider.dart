@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-class CreditProvider with ChangeNotifier, DiagnosticableTreeMixin {
+class CreditProvider with ChangeNotifier {
   
 
   double balance = 0;

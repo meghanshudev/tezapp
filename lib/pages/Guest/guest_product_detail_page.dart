@@ -5,6 +5,7 @@ import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Authentication/login_page.dart';
 import 'package:tezapp/pages/guest/guest_custom_appbar.dart';
 import 'package:tezapp/ui_elements/product_detail_loading.dart';
 import 'package:tezapp/pages/Guest/guest_product_item_network.dart';
@@ -40,9 +41,10 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
     initPage();
 
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
     initailize();
   }
 
@@ -73,8 +75,10 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
     setState(() {
       isLoading = true;
     });
-    var response =
-        await netGet(isUserToken: true, endPoint: "product/$_productId");
+    var response = await netGet(
+      isUserToken: true,
+      endPoint: "product/$_productId",
+    );
     if (response['resp_code'] == "200") {
       groupProduct = response['resp_data']['data'];
       products = groupProduct["products"];
@@ -97,11 +101,14 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
       "order": "random",
       "sort": "asc",
       "sub_category_id": groupProduct['category']['id'].toString(),
-      "exclude_id": productId.toString()
+      "exclude_id": productId.toString(),
     };
 
-    var response =
-        await netGet(isUserToken: true, endPoint: "product", params: params);
+    var response = await netGet(
+      isUserToken: true,
+      endPoint: "product",
+      params: params,
+    );
 
     if (response['resp_code'] == "200") {
       if (mounted) {
@@ -154,161 +161,137 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
         // ? Center(child: CustomCircularProgress())
         ? ProductDetailLoading()
         : products.isEmpty
-            ? Container()
-            : SingleChildScrollView(
+        ? Container()
+        : SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              Stack(
+                children: [
+                  Center(
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: displayImage(products.first["image"]),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 20,
+                    Text(products.first["name"], style: normalBlackText),
+                    SizedBox(height: 5),
+                    Text(
+                      products.first["attributes"][0]["value"],
+                      style: smallBlackText,
                     ),
-                    Stack(
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Center(
-                          child: Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: displayImage(products.first["image"]),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            checkIsNullValue(products.first["percent_off"])
+                                ? Text(
+                                  CURRENCY + "${products.first["unit_price"]}",
+                                  style: normalBoldBlackTitle,
+                                )
+                                : Row(
+                                  children: [
+                                    Text(
+                                      CURRENCY +
+                                          "${products.first["sale_price"]}",
+                                      style: normalBoldBlackTitle,
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      CURRENCY +
+                                          "${products.first["unit_price"]}",
+                                      style: smallStrikeBoldBlackText,
+                                    ),
+                                  ],
+                                ),
+                            SizedBox(width: 10),
+                            (!checkIsNullValue(products.first["percent_off"]) &&
+                                    products.first["percent_off"] > 0)
+                                ? Container(
+                                  width: 80,
+                                  height: 25,
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "${products.first['percent_off']}% " +
+                                          "off".tr(),
+                                      style: smallBoldWhiteText,
+                                    ),
+                                  ),
+                                )
+                                : Container(
+                                  width: 72,
+                                  height: 25,
+                                  margin: EdgeInsets.only(bottom: 5),
+                                  decoration: BoxDecoration(
+                                    color: primary,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "popular".tr(),
+                                      style: smallBoldWhiteText,
+                                    ),
+                                  ),
+                                ),
+                          ],
                         ),
-                        Positioned(
-                            child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: black,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        )),
+                        GuestAddToCardButtonItem(product: products[0]),
                       ],
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            products.first["name"],
-                            style: normalBlackText,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            products.first["attributes"][0]["value"],
-                            style: smallBlackText,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                // crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  checkIsNullValue(products.first["percent_off"])
-                                      ? Text(
-                                          CURRENCY +
-                                              "${products.first["unit_price"]}",
-                                          style: normalBoldBlackTitle,
-                                        )
-                                      : Row(
-                                          children: [
-                                            Text(
-                                              CURRENCY +
-                                                  "${products.first["sale_price"]}",
-                                              style: normalBoldBlackTitle,
-                                            ),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                              CURRENCY +
-                                                  "${products.first["unit_price"]}",
-                                              style: smallStrikeBoldBlackText,
-                                            ),
-                                          ],
-                                        ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  (!checkIsNullValue(
-                                              products.first["percent_off"]) &&
-                                          products.first["percent_off"] > 0)
-                                      ? Container(
-                                          width: 80,
-                                          height: 25,
-                                          margin: EdgeInsets.only(bottom: 5),
-                                          decoration: BoxDecoration(
-                                              color: primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Center(
-                                            child: Text(
-                                              "${products.first['percent_off']}% " +
-                                                  "off".tr(),
-                                              style: smallBoldWhiteText,
-                                            ),
-                                          ),
-                                        )
-                                      : Container(
-                                          width: 72,
-                                          height: 25,
-                                          margin: EdgeInsets.only(bottom: 5),
-                                          decoration: BoxDecoration(
-                                              color: primary,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Center(
-                                            child: Text(
-                                              "popular".tr(),
-                                              style: smallBoldWhiteText,
-                                            ),
-                                          ),
-                                        ),
-                                ],
-                              ),
-                              GuestAddToCardButtonItem(product: products[0])
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    getProductAttributes(),
-                    Divider(
-                      thickness: 0.8,
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    // getRelatedProducts(),
                   ],
                 ),
-              );
+              ),
+              getProductAttributes(),
+              Divider(thickness: 0.8),
+              SizedBox(height: 20),
+              // getRelatedProducts(),
+            ],
+          ),
+        );
   }
 
   getProductAttributes() {
     if (checkIsNullValue(products) || products.length <= 1)
-      return SizedBox(
-        height: 25,
-      );
+      return SizedBox(height: 25);
 
     List<Widget> tempProducts = [];
     for (int i = 1; i < products.length; i++) {
-      tempProducts.add(Padding(
-        padding: const EdgeInsets.only(bottom: 20, right: 10),
-        child: getAttributeItme(products[i]),
-      ));
+      tempProducts.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 20, right: 10),
+          child: getAttributeItme(products[i]),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -334,12 +317,16 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
             color: black.withOpacity(0.06),
             spreadRadius: 5,
             blurRadius: 10,
-          )
+          ),
         ],
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+        padding: const EdgeInsets.only(
+          top: 10,
+          bottom: 10,
+          left: 15,
+          right: 15,
+        ),
         child: Row(
           children: [
             Flexible(
@@ -351,35 +338,31 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _attribute.isNotEmpty
-                          ? _attribute.first["value"]
-                          : "N/A",
+                      _attribute.isNotEmpty ? _attribute.first["value"] : "N/A",
                       style: meduimBlackText,
                     ),
                     checkIsNullValue(_product['percent_off'])
                         ? Text(
-                            CURRENCY + "${_product['unit_price']}",
-                            style: smallMediumBoldBlackText,
-                          )
+                          CURRENCY + "${_product['unit_price']}",
+                          style: smallMediumBoldBlackText,
+                        )
                         : Row(
-                            children: [
-                              Text(
-                                CURRENCY + "${_product['sale_price']}",
-                                style: smallMediumBoldBlackText,
+                          children: [
+                            Text(
+                              CURRENCY + "${_product['sale_price']}",
+                              style: smallMediumBoldBlackText,
+                            ),
+                            SizedBox(width: 5),
+                            Expanded(
+                              child: Text(
+                                CURRENCY + "${_product['unit_price']}",
+                                style: smallStrikeBoldBlackText,
+                                maxLines: 1,
+                                overflow: TextOverflow.fade,
                               ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                child: Text(
-                                  CURRENCY + "${_product['unit_price']}",
-                                  style: smallStrikeBoldBlackText,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.fade,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
+                        ),
                   ],
                 ),
               ),
@@ -387,7 +370,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
             Flexible(
               flex: 3,
               child: GuestAddToCardButtonItem(product: _product),
-            )
+            ),
           ],
         ),
       ),
@@ -400,12 +383,10 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
       children: [
         recommendedProducts.length != 0
             ? Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Text(
-                  "you_might_also_like",
-                  style: normalBoldBlackTitle,
-                ).tr(),
-              )
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child:
+                  Text("you_might_also_like", style: normalBoldBlackTitle).tr(),
+            )
             : Container(),
         SingleChildScrollView(
           padding: EdgeInsets.only(left: 20),
@@ -419,36 +400,45 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                     setState(() {
                       isInPage = false;
                     });
-                    await Navigator.pushNamed(
-                        context, "/guest_product_detail_page",
-                        arguments: {"product": recommendedProducts[index]});
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => GuestProductDetailPage(
+                              data: {"product": recommendedProducts[index]},
+                            ),
+                      ),
+                    );
                     setState(() {
                       isInPage = true;
                     });
                   },
                   child: GuestProductItemNetwork(
-                      product: recommendedProducts[index]['product'],
-                      discountLabel: convertDouble(
-                              recommendedProducts[index]['percent_off'])
-                          .toInt(),
-                      kgLabel: recommendedProducts[index]['product']
-                                      ["attributes"]
-                                  .length ==
-                              0
-                          ? ""
-                          : recommendedProducts[index]['product']["attributes"]
-                              [0]["value"],
-                      image: recommendedProducts[index]['image'],
-                      name: recommendedProducts[index]['product']['name'],
-                      priceStrike: CURRENCY +
-                          "${recommendedProducts[index]["unit_price"]}",
-                      price: CURRENCY +
-                          "${recommendedProducts[index]["sale_price"]}"),
+                    product: recommendedProducts[index]['product'],
+                    discountLabel:
+                        convertDouble(
+                          recommendedProducts[index]['percent_off'],
+                        ).toInt(),
+                    kgLabel:
+                        recommendedProducts[index]['product']["attributes"]
+                                    .length ==
+                                0
+                            ? ""
+                            : recommendedProducts[index]['product']["attributes"][0]["value"],
+                    image: recommendedProducts[index]['image'],
+                    name: recommendedProducts[index]['product']['name'],
+                    priceStrike:
+                        CURRENCY +
+                        "${recommendedProducts[index]["unit_price"]}",
+                    price:
+                        CURRENCY +
+                        "${recommendedProducts[index]["sale_price"]}",
+                  ),
                 ),
               );
             }),
           ),
-        )
+        ),
       ],
     );
   }
@@ -461,15 +451,22 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
         color: white,
         boxShadow: [
           BoxShadow(
-              color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
+            color: black.withOpacity(0.06),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
         children: [
           // cart section
           Padding(
-            padding:
-                const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 15,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Container(
@@ -483,7 +480,7 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                         color: black.withOpacity(0.06),
                         spreadRadius: 5,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: InkWell(
@@ -492,60 +489,58 @@ class _GuestProductDetailPageState extends State<GuestProductDetailPage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5),
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: black,
-                        size: 20,
-                      ),
+                      child: Icon(Icons.arrow_back_ios, color: black, size: 20),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                SizedBox(width: 15),
                 Flexible(
                   child: Container(
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: primary,
-                        boxShadow: [
-                          BoxShadow(
-                              color: black.withOpacity(0.06),
-                              spreadRadius: 5,
-                              blurRadius: 10)
-                        ]),
+                      borderRadius: BorderRadius.circular(10),
+                      color: primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: black.withOpacity(0.06),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
                     child: InkWell(
-                        onTap: () async {
-                          await Navigator.pushNamed(context, "/login_page");
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Login to Start Shopping",
-                                  style: meduimWhiteText,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: white,
-                                  size: 18,
-                                )
-                              ],
-                            )
-                          ],
-                        )),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Login to Start Shopping",
+                                style: meduimWhiteText,
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: white,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

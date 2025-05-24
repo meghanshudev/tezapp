@@ -4,14 +4,21 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Location/choose_location_page.dart';
 import 'package:tezapp/provider/credit_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tezapp/ui_elements/custom_search_button.dart';
 
 class CustomAppBar extends StatefulWidget {
-  const CustomAppBar(
-      {Key? key, this.subtitle = "", this.subtitleIcon, this.onCallBack,this.isClick = false, this.onOpenSearch,this.onCloseSearch})
-      : super(key: key);
+  const CustomAppBar({
+    Key? key,
+    this.subtitle = "",
+    this.subtitleIcon,
+    this.onCallBack,
+    this.isClick = false,
+    this.onOpenSearch,
+    this.onCloseSearch,
+  }) : super(key: key);
   final String subtitle;
   final IconData? subtitleIcon;
   final bool isClick;
@@ -49,19 +56,23 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "tez",
-                        style: appBarText,
+                      Text("tez", style: appBarText),
+                      SizedBox(width: 40),
+                      Flexible(
+                        child: getSearchButton(
+                          context,
+                          () {
+                            if (widget.onOpenSearch != null) {
+                              widget.onOpenSearch!();
+                            }
+                          },
+                          () {
+                            if (widget.onCloseSearch != null) {
+                              widget.onCloseSearch!();
+                            }
+                          },
+                        ),
                       ),
-                      SizedBox(width: 40,),
-                      Flexible(child: getSearchButton(context , 
-                        (){ 
-                          if(widget.onOpenSearch != null) { widget.onOpenSearch!(); } 
-                        } , 
-                        (){ 
-                           if(widget.onCloseSearch != null) { widget.onCloseSearch!(); } 
-                        }) 
-                      )
                       // checkIsNullValue(userSession['group'])
                       //     ? Container(
                       //         width: 145,
@@ -132,67 +143,72 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      widget.isClick ? 
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: GestureDetector(
-                          onTap: () async {
-                            var result = await Navigator.pushNamed(
-                                context, "/choose_location_page");
-                            widget.onCallBack!(result);
-                          },
-                          child: Row(
-                            children: [
-                              if (widget.subtitleIcon != null)
-                                Icon(
-                                  widget.subtitleIcon,
-                                  size: 28,
-                                  color: primary.withOpacity(0.5),
-                                ),
-                              SizedBox(
-                                width: 5,
+                      widget.isClick
+                          ? Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            child: GestureDetector(
+                              onTap: () async {
+                                var result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChoooseLocationPage(),
+                                  ),
+                                );
+                                widget.onCallBack!(result);
+                              },
+                              child: Row(
+                                children: [
+                                  if (widget.subtitleIcon != null)
+                                    Icon(
+                                      widget.subtitleIcon,
+                                      size: 28,
+                                      color: primary.withOpacity(0.5),
+                                    ),
+                                  SizedBox(width: 5),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.6,
+                                    child: Text(
+                                      widget.subtitle,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: black.withOpacity(0.5),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.6,
-                                child: Text(
-                                  widget.subtitle,
-                                  maxLines: 1,
-                                  style: TextStyle(
+                            ),
+                          )
+                          : Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            child: Row(
+                              children: [
+                                if (widget.subtitleIcon != null)
+                                  Icon(
+                                    widget.subtitleIcon,
+                                    size: 28,
+                                    color: primary.withOpacity(0.5),
+                                  ),
+                                SizedBox(width: 5),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  child: Text(
+                                    widget.subtitle,
+                                    maxLines: 1,
+                                    style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
-                                      color: black.withOpacity(0.5)),
+                                      color: black.withOpacity(0.5),
+                                    ),
+                                  ),
                                 ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ) : Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: Row(
-                          children: [
-                            if (widget.subtitleIcon != null)
-                              Icon(
-                                widget.subtitleIcon,
-                                size: 28,
-                                color: primary.withOpacity(0.5),
-                              ),
-                            SizedBox(
-                              width: 5,
+                              ],
                             ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.6,
-                              child: Text(
-                                widget.subtitle,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: black.withOpacity(0.5)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                          ),
                       Flexible(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -202,26 +218,30 @@ class _CustomAppBarState extends State<CustomAppBar> {
                               size: 25,
                               color: primary.withOpacity(0.5),
                             ),
-                           
+
                             Text(
-                              "₹"+ context.watch<CreditProvider>().balance.toString(),
+                              "₹" +
+                                  context
+                                      .watch<CreditProvider>()
+                                      .balance
+                                      .toString(),
                               style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: black.withOpacity(0.5)),
-                            )
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: black.withOpacity(0.5),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
       ),
     );
   }
- 
 }

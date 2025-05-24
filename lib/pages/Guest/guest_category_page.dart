@@ -4,6 +4,8 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:tezapp/helpers/constant.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
+import 'package:tezapp/pages/Authentication/login_page.dart';
+import 'package:tezapp/pages/Guest/guest_product_detail_page.dart';
 import 'package:tezapp/ui_elements/category_loading.dart';
 import 'package:tezapp/pages/guest/guest_custom_appbar.dart';
 import 'package:tezapp/pages/Guest/guest_product_category_item.dart';
@@ -14,7 +16,7 @@ import '../../ui_elements/circle_category_loading.dart';
 
 class GuestCategoryPage extends StatefulWidget {
   GuestCategoryPage({Key? key, required this.data, this.isParent = true})
-      : super(key: key);
+    : super(key: key);
   final data;
   final bool isParent;
 
@@ -35,7 +37,7 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
     "id": 0,
     "name": "All",
     "image": NETWORK_DEFAULT_IMAGE,
-    "is_sub_category": false
+    "is_sub_category": false,
   };
 
   int activeItem = 0;
@@ -49,9 +51,10 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
     initPage();
 
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
   }
 
   @override
@@ -117,11 +120,14 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
       var data = response["resp_data"]["data"];
       List tempCategories = data["list"];
 
-      subCategories = tempCategories
-          .where((element) =>
-              element["is_sub_category"] == true &&
-              element["parent"]["id"] == _categoryId)
-          .toList();
+      subCategories =
+          tempCategories
+              .where(
+                (element) =>
+                    element["is_sub_category"] == true &&
+                    element["parent"]["id"] == _categoryId,
+              )
+              .toList();
       subCategories.insert(0, allSubCategory);
     } else {
       var ms = response["resp_data"]["message"];
@@ -145,7 +151,7 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
       "page": "$pageIndex",
       "limit": "10",
       "order": "name",
-      "sort": "asc"
+      "sort": "asc",
     };
     if (!widget.isParent) {
       params["sub_category_id"] = categoryId.toString();
@@ -205,13 +211,14 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
   getSubCategory() {
     if (isLoading)
       return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          padding: EdgeInsets.only(top: 20),
-          itemBuilder: (context, index) {
-            return CircleCategoryLoading();
-          });
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: 10,
+        padding: EdgeInsets.only(top: 20),
+        itemBuilder: (context, index) {
+          return CircleCategoryLoading();
+        },
+      );
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(top: 25),
@@ -247,54 +254,56 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
       //   ),
       // );
       return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          padding: EdgeInsets.only(top: 20, left: 10),
-          itemBuilder: (context, index) {
-            return CategoryLoading();
-          });
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: 10,
+        padding: EdgeInsets.only(top: 20, left: 10),
+        itemBuilder: (context, index) {
+          return CategoryLoading();
+        },
+      );
     return (checkIsNullValue(products) || products.length == 0)
-        ? Container(
-            child: Center(
-              child: Text("no_data").tr(),
-            ),
-          )
+        ? Container(child: Center(child: Text("no_data").tr()))
         : SingleChildScrollView(
-            controller: scollController,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(products.length, (index) {
-                      var _product = products[index]["product"];
+          controller: scollController,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: List.generate(products.length, (index) {
+                    var _product = products[index]["product"];
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20, right: 10),
-                        child: GuestProductCategoryItem(
-                          data: _product,
-                          onTap: () async {
-                            setState(() {
-                              isInPage = false;
-                            });
-                            await Navigator.pushNamed(
-                                context, "/guest_product_detail_page",
-                                arguments: {"product": products[index]});
-
-                            setState(() {
-                              isInPage = true;
-                            });
-                          },
-                        ),
-                      );
-                    }),
-                  ),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 20, right: 10),
+                      child: GuestProductCategoryItem(
+                        data: _product,
+                        onTap: () async {
+                          setState(() {
+                            isInPage = false;
+                          });
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => GuestProductDetailPage(
+                                    data: {"product": products[index]},
+                                  ),
+                            ),
+                          );
+                          setState(() {
+                            isInPage = true;
+                          });
+                        },
+                      ),
+                    );
+                  }),
                 ),
-              ],
-            ),
-          );
+              ),
+            ],
+          ),
+        );
   }
 
   Widget getBody() {
@@ -304,10 +313,16 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
       children: [
         Container(
           width: size.width * 0.23,
-          decoration: BoxDecoration(color: white, boxShadow: [
-            BoxShadow(
-                color: black.withOpacity(0.06), spreadRadius: 2, blurRadius: 5)
-          ]),
+          decoration: BoxDecoration(
+            color: white,
+            boxShadow: [
+              BoxShadow(
+                color: black.withOpacity(0.06),
+                spreadRadius: 2,
+                blurRadius: 5,
+              ),
+            ],
+          ),
           child: getSubCategory(),
         ),
         Flexible(
@@ -318,7 +333,7 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
                   color: black.withOpacity(0.02),
                   spreadRadius: 2,
                   blurRadius: 5,
-                )
+                ),
               ],
             ),
             child: getProducts(),
@@ -336,15 +351,22 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
         color: white,
         boxShadow: [
           BoxShadow(
-              color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
+            color: black.withOpacity(0.06),
+            spreadRadius: 5,
+            blurRadius: 10,
+          ),
         ],
       ),
       child: Column(
         children: [
           // cart section
           Padding(
-            padding:
-                const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 15,
+              right: 15,
+              top: 15,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Container(
@@ -358,7 +380,7 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
                         color: black.withOpacity(0.06),
                         spreadRadius: 5,
                         blurRadius: 10,
-                      )
+                      ),
                     ],
                   ),
                   child: InkWell(
@@ -367,60 +389,58 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5),
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        color: black,
-                        size: 20,
-                      ),
+                      child: Icon(Icons.arrow_back_ios, color: black, size: 20),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 15,
-                ),
+                SizedBox(width: 15),
                 Flexible(
                   child: Container(
                     width: double.infinity,
                     height: 50,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: primary,
-                        boxShadow: [
-                          BoxShadow(
-                              color: black.withOpacity(0.06),
-                              spreadRadius: 5,
-                              blurRadius: 10)
-                        ]),
+                      borderRadius: BorderRadius.circular(10),
+                      color: primary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: black.withOpacity(0.06),
+                          spreadRadius: 5,
+                          blurRadius: 10,
+                        ),
+                      ],
+                    ),
                     child: InkWell(
-                        onTap: () async {
-                          await Navigator.pushNamed(context, "/login_page");
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Login to Start Shopping",
-                                  style: meduimWhiteText,
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: white,
-                                  size: 18,
-                                )
-                              ],
-                            )
-                          ],
-                        )),
+                      onTap: () async {
+                        await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+    );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Login to Start Shopping",
+                                style: meduimWhiteText,
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: white,
+                                size: 18,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

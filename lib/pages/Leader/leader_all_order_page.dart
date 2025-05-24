@@ -4,6 +4,7 @@ import 'package:tezapp/helpers/network.dart';
 import 'package:tezapp/helpers/styles.dart';
 import 'package:tezapp/helpers/theme.dart';
 import 'package:tezapp/helpers/utils.dart';
+import 'package:tezapp/pages/Leader/leader_order_detail_page.dart';
 import 'package:tezapp/ui_elements/border_button.dart';
 import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
 import 'package:tezapp/ui_elements/custom_button.dart';
@@ -85,7 +86,7 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
         "limit": "0",
         "order": "id",
         "sort": "asc",
-        "type": 'active'
+        "type": 'active',
       };
       var response = await netGet(endPoint: "group/order", params: params);
       if (mounted) {
@@ -132,25 +133,27 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomAppBarDynamic(
-              actionChild: Container(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: CustomAppBarDynamic(
+          actionChild: Container(
             height: 40,
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 15),
             decoration: BoxDecoration(
-                color: cardColor, borderRadius: BorderRadius.circular(10)),
-            child: Text(
-              userSession['group']['name'],
-              style: meduimGreyText,
+              color: cardColor,
+              borderRadius: BorderRadius.circular(10),
             ),
-          )),
+            child: Text(userSession['group']['name'], style: meduimGreyText),
+          ),
         ),
-        body: isLoading && isLoadingActive && isLoadingPast
-            ? LeaderAllOrderLoading()
-            : buildBody(),
-        bottomNavigationBar: getFooter());
+      ),
+      body:
+          isLoading && isLoadingActive && isLoadingPast
+              ? LeaderAllOrderLoading()
+              : buildBody(),
+      bottomNavigationBar: getFooter(),
+    );
   }
 
   Widget buildBody() {
@@ -160,111 +163,111 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
         children: [
           CustomSubHeader(
             title: "view_all_orders".tr(),
-            subtitle: isLoading
-                ? ""
-                : userSession['group']['name'] +
-                    "  •  " +
-                    groupDatMember +
-                    "  •  $orderTotal " +
-                    "orders".tr(),
+            subtitle:
+                isLoading
+                    ? ""
+                    : userSession['group']['name'] +
+                        "  •  " +
+                        groupDatMember +
+                        "  •  $orderTotal " +
+                        "orders".tr(),
           ),
-          SizedBox(
-            height: 10,
-          ),
-         
+          SizedBox(height: 10),
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
-                child: Text(
-                  "new_orders",
-                  style: meduimBlackText,
-                ).tr(),
+                child: Text("new_orders", style: meduimBlackText).tr(),
               ),
-              SizedBox(
-                height: 15,
-              ),
+              SizedBox(height: 15),
               checkIsNullValue(activeItems.length)
-              ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                child: Center(
-                  child: Text(
-                      "no_order".tr(),
-                      style: meduimGreyText,
+                  ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(
+                      child: Text("no_order".tr(), style: meduimGreyText),
                     ),
-                ),
-              )
-              : Column(
-                children: List.generate(activeItems.length, (index) {
-                  var date =
-                      formatDateOne(activeItems[index]['confirmed_date']);
-                  var day = formatDay(activeItems[index]['confirmed_date']);
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 15, right: 15, bottom: 15),
-                    child: BorderButton(
-                      width: double.infinity,
-                      alignment: MainAxisAlignment.spaceBetween,
-                      padding: EdgeInsets.only(left: 25, right: 18),
-                      title: "$day  •  $date",
-                      suffixIcon: Icon(
-                        Icons.arrow_forward_ios,
-                        color: primary,
-                      ),
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed("/leader_order_detail_page", arguments: {
-                          "id": activeItems[index]['id'].toString()
-                        });
-                      },
-                    ),
-                  );
-                }),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+                  )
+                  : Column(
+                    children: List.generate(activeItems.length, (index) {
+                      var date = formatDateOne(
+                        activeItems[index]['confirmed_date'],
+                      );
+                      var day = formatDay(activeItems[index]['confirmed_date']);
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          left: 15,
+                          right: 15,
+                          bottom: 15,
+                        ),
+                        child: BorderButton(
+                          width: double.infinity,
+                          alignment: MainAxisAlignment.spaceBetween,
+                          padding: EdgeInsets.only(left: 25, right: 18),
+                          title: "$day  •  $date",
+                          suffixIcon: Icon(
+                            Icons.arrow_forward_ios,
+                            color: primary,
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => LeaderOrderDetailPage(
+                                      data: {
+                                        "id":
+                                            activeItems[index]['id'].toString(),
+                                      },
+                                    ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                  ),
+              SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
-                child: Text(
-                  "past_orders",
-                  style: meduimBlackText,
-                ).tr(),
+                child: Text("past_orders", style: meduimBlackText).tr(),
               ),
-              SizedBox(
-                height: 15,
-              ),
+              SizedBox(height: 15),
               checkIsNullValue(pastItems.length)
-              ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                child: Center(
-                  child: Text(
-                      "no_order".tr(),
-                      style: meduimGreyText,
+                  ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(
+                      child: Text("no_order".tr(), style: meduimGreyText),
                     ),
-                ),
-              )
-              : Column(
-                children: List.generate(pastItems.length, (index) {
-                  var date = formatDateOne(pastItems[index]['confirmed_date']);
-                  var day = formatDay(pastItems[index]['confirmed_date']);
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context)
-                            .pushNamed("/leader_order_detail_page", arguments: {
-                          "id": pastItems[index]['id'].toString()
-                        });
-                      },
-                      child: orderItemButton(
-                        "$day  •  $date",
-                      ),
-                    ),
-                  );
-                }),
-              )
+                  )
+                  : Column(
+                    children: List.generate(pastItems.length, (index) {
+                      var date = formatDateOne(
+                        pastItems[index]['confirmed_date'],
+                      );
+                      var day = formatDay(pastItems[index]['confirmed_date']);
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => LeaderOrderDetailPage(
+                                      data: {
+                                        "id": pastItems[index]['id'].toString(),
+                                      },
+                                    ),
+                              ),
+                            );
+                          },
+                          child: orderItemButton("$day  •  $date"),
+                        ),
+                      );
+                    }),
+                  ),
             ],
           ),
         ],
@@ -282,10 +285,7 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
         borderColor: darker,
         title: title,
         textStyle: normalBlackText,
-        suffixIcon: Icon(
-          Icons.arrow_forward_ios,
-          color: darker,
-        ),
+        suffixIcon: Icon(Icons.arrow_forward_ios, color: darker),
       ),
     );
   }
@@ -294,18 +294,20 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
     return Container(
       padding: EdgeInsets.fromLTRB(15, 23, 15, 33),
       decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(10),
+        color: cardColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            spreadRadius: 1,
+            blurRadius: 1,
+            offset: Offset(0, 0),
           ),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor,
-                spreadRadius: 1,
-                blurRadius: 1,
-                offset: Offset(0, 0))
-          ]),
+        ],
+      ),
       child: Row(
         children: [
           IconBox(
@@ -317,9 +319,7 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
               Navigator.of(context).pop();
             },
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10),
           Expanded(
             child: CustomButton(
               height: 55,
@@ -328,20 +328,19 @@ class _LeaderAllOrderPageState extends State<LeaderAllOrderPage> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: 35),
-                    child: Text(
-                      "back_to_group_details",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ).tr(),
+                    child:
+                        Text(
+                          "back_to_group_details",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ).tr(),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(right: 15),
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.arrow_forward_ios, color: Colors.white),
                   ),
                 ],
               ),

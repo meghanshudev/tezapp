@@ -52,7 +52,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
-    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
+    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] ?? "" : "";
   }
 
   initPage() async {

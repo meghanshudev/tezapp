@@ -21,8 +21,8 @@ class NetworkV2{
     this.params = const {"page" : "1"},
   }){
 
-    String userToken = (isUserToken) ? userSession['access_token'] : "";
-    String userTokenType = (isUserToken) ? userSession['token_type'] : "";
+    String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+    String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
     headers = {
       "Authorization": "$userTokenType $userToken",
       "Accept": "application/json",

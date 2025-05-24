@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:geolocator/geolocator.dart';
@@ -185,11 +184,11 @@ getProfileData(BuildContext context) async {
       "lat": response['resp_data']['data']['lat'],
       "lng": response['resp_data']['data']['lng'],
       "address": response['resp_data']['data']['address'],
-      "zip_code": response['resp_data']['data']['zip_code'],
+      "zip_code": response['resp_data']['data']['zip_code'] ?? "",
       "email": response['resp_data']['data']['email'],
       "balance": response['resp_data']['data']['balance'],
       "group": response['resp_data']['data']['group'],
-      "access_token": userSession['access_token'],
+      "access_token": userSession['access_token'] ?? "",
       "is_first_time_login": userSession['is_first_time_login'],
       "token_type": userSession['token_type'],
     };

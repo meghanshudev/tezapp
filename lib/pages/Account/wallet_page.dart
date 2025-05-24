@@ -9,6 +9,7 @@ import 'package:tezapp/helpers/utils.dart';
 import 'package:tezapp/models/transaction.dart';
 import 'package:tezapp/pages/Transaction/components/transaction_item.dart';
 import 'package:tezapp/pages/Transaction/components/transaction_loading.dart';
+import 'package:tezapp/pages/Transaction/transaction_page.dart';
 import 'package:tezapp/provider/account_info_provider.dart';
 import 'package:tezapp/respositories/transactions/transaction_repository.dart';
 import 'package:tezapp/ui_elements/border_button.dart';
@@ -38,9 +39,10 @@ class _WalletPageState extends State<WalletPage> {
     initialize();
     super.initState();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code']
+            : "";
     phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
   }
 
@@ -52,20 +54,20 @@ class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: CustomAppBar(
+          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
+          subtitleIcon: Entypo.location_pin,
         ),
-        body: buildBody(),
-        bottomNavigationBar: CustomFooter(
-          onTapBack: () {
-            Navigator.of(context).pop();
-          },
-        ));
+      ),
+      body: buildBody(),
+      bottomNavigationBar: CustomFooter(
+        onTapBack: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 
   Widget buildBody() {
@@ -77,30 +79,29 @@ class _WalletPageState extends State<WalletPage> {
             title: "tez_cash".tr(),
             subtitle: "$deliverTo • $phone",
           ),
-          SizedBox(
-            height: 23,
-          ),
+          SizedBox(height: 23),
           getBalanceCard(),
           // SizedBox(
           //   height: 10,
           // ),
           // getOptionButtons(),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    "recent_activity",
-                    style: normalBoldBlackTitle,
-                  ).tr(),
+                  child:
+                      Text("recent_activity", style: normalBoldBlackTitle).tr(),
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, "/transaction_page");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransactionPage(),
+                      ),
+                    );
                   },
                   borderRadius: BorderRadius.circular(4),
                   child: Container(
@@ -110,17 +111,11 @@ class _WalletPageState extends State<WalletPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          "see_all",
-                          style: meduimGreyText,
-                        ).tr(),
+                        Text("see_all", style: meduimGreyText).tr(),
                         // SizedBox(
                         //   width: 6,
                         // ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          size: 14,
-                        )
+                        Icon(Icons.arrow_forward_ios, size: 14),
                       ],
                     ),
                   ),
@@ -128,30 +123,30 @@ class _WalletPageState extends State<WalletPage> {
               ],
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           getTransactions(),
           checkIsNullValue(transactions.length)
               ? SizedBox()
               : Padding(
-                  padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, "/transaction_page");
-                    },
-                    borderRadius: BorderRadius.circular(10),
-                    child: BorderButton(
-                      width: double.infinity,
-                      height: 55,
-                      title: "view_all_activities".tr(),
-                      suffixIcon: Icon(
-                        Icons.arrow_forward_ios,
-                        color: primary,
+                padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TransactionPage(),
                       ),
-                    ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: BorderButton(
+                    width: double.infinity,
+                    height: 55,
+                    title: "view_all_activities".tr(),
+                    suffixIcon: Icon(Icons.arrow_forward_ios, color: primary),
                   ),
-                )
+                ),
+              ),
         ],
       ),
     );
@@ -160,22 +155,24 @@ class _WalletPageState extends State<WalletPage> {
   Widget getTransactions() {
     if (isLoading) return transactionLoading();
     return ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: transactions.length,
-        itemBuilder: (context, index) {
-          return TransactionItem(item: transactions[index]);
-        });
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: transactions.length,
+      itemBuilder: (context, index) {
+        return TransactionItem(item: transactions[index]);
+      },
+    );
   }
 
   Widget transactionLoading() {
     return ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: 5,
-        itemBuilder: (context, index) {
-          return TransactionLoading();
-        });
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return TransactionLoading();
+      },
+    );
   }
 
   Widget getOptionButtons() {
@@ -185,16 +182,10 @@ class _WalletPageState extends State<WalletPage> {
         Column(
           children: [
             IconBox(
-              child: Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 30,
-              ),
+              child: Icon(Icons.add, color: Colors.white, size: 30),
               padding: 30,
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Text(
               "add tez \ncash",
               textAlign: TextAlign.center,
@@ -202,22 +193,14 @@ class _WalletPageState extends State<WalletPage> {
             ),
           ],
         ),
-        SizedBox(
-          width: 40,
-        ),
+        SizedBox(width: 40),
         Column(
           children: [
             IconBox(
-              child: Icon(
-                Icons.star,
-                color: Colors.white,
-                size: 30,
-              ),
+              child: Icon(Icons.star, color: Colors.white, size: 30),
               padding: 30,
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             Text(
               "redeem \nvoucher",
               textAlign: TextAlign.center,
@@ -236,35 +219,28 @@ class _WalletPageState extends State<WalletPage> {
       padding: EdgeInsets.fromLTRB(20, 0, 20, 15),
       margin: EdgeInsets.fromLTRB(15, 0, 15, 20),
       decoration: BoxDecoration(
-          color: primary,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor,
-                blurRadius: 1,
-                spreadRadius: 1,
-                offset: Offset(0, 0))
-          ]),
+        color: primary,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            blurRadius: 1,
+            spreadRadius: 1,
+            offset: Offset(0, 0),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "your_balance",
-                style: normalBoldWhiteTitle,
-              ).tr(),
-              Text(
-                "tez",
-                style: titleBoldWhiteTitle,
-              ),
+              Text("your_balance", style: normalBoldWhiteTitle).tr(),
+              Text("tez", style: titleBoldWhiteTitle),
             ],
           ),
-          Text(
-            "₹$balance",
-            style: titleBoldWhiteTitle,
-          ),
+          Text("₹$balance", style: titleBoldWhiteTitle),
         ],
       ),
     );
@@ -284,10 +260,9 @@ class _WalletPageState extends State<WalletPage> {
         isLoading = true;
       });
 
-    Map<dynamic, dynamic> data = await TransactionRepository().index(params: {
-      "page": "1",
-      "row": "5",
-    });
+    Map<dynamic, dynamic> data = await TransactionRepository().index(
+      params: {"page": "1", "row": "5"},
+    );
     List<Transaction> items = data["list"] as List<Transaction>;
 
     if (mounted)
