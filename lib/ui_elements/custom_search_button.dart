@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/pages/Product/product_search_page.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/pages/Product/product_search_page.dart';
 
 Widget getSearchButton(context, Function onOpenSearch, Function onCloseSearch) {
   return Container(

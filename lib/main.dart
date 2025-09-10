@@ -7,15 +7,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Authentication/login_page.dart';
-import 'package:tezapp/pages/Guest/guest_root_app.dart';
-import 'package:tezapp/provider/account_info_provider.dart';
-import 'package:tezapp/provider/cart_provider.dart';
-import 'package:tezapp/provider/credit_provider.dart';
-import 'package:tezapp/provider/has_group.dart';
-import 'package:tezapp/root_app.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Authentication/login_page.dart';
+import 'package:tezchal/pages/Guest/guest_root_app.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/provider/cart_provider.dart';
+import 'package:tezchal/provider/credit_provider.dart';
+import 'package:tezchal/provider/has_group.dart';
+import 'package:tezchal/root_app.dart';
 
 import 'firebase_options.dart';
 

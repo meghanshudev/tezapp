@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Location/choose_location_page.dart';
-import 'package:tezapp/provider/credit_provider.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Location/choose_location_page.dart';
+import 'package:tezchal/provider/credit_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/ui_elements/custom_search_button.dart';
+import 'package:tezchal/ui_elements/custom_search_button.dart';
 
 class CustomAppBar extends StatefulWidget {
   const CustomAppBar({
@@ -56,7 +56,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("tez", style: appBarText),
+                      Text("tez chall", style: appBarText),
                       SizedBox(width: 40),
                       Flexible(
                         child: getSearchButton(

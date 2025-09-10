@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/response.dart';
-import 'package:tezapp/helpers/utils.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/response.dart';
+import 'package:tezchal/helpers/utils.dart';
 
 class NetworkV2{
 

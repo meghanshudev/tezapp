@@ -1,4 +1,4 @@
-import 'package:tezapp/helpers/utils.dart';
+import 'package:tezchal/helpers/utils.dart';
 
 class Transaction{
 

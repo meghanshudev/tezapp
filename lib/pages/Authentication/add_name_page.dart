@@ -4,16 +4,16 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/provider/account_info_provider.dart';
-import 'package:tezapp/ui_elements/custom_primary_button.dart';
-import 'package:tezapp/ui_elements/custom_primary_button_suffix.dart';
-import 'package:tezapp/ui_elements/custom_textfield.dart';
-import 'package:tezapp/ui_elements/error_message.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/ui_elements/custom_primary_button.dart';
+import 'package:tezchal/ui_elements/custom_primary_button_suffix.dart';
+import 'package:tezchal/ui_elements/custom_textfield.dart';
+import 'package:tezchal/ui_elements/error_message.dart';
 
 class AddNamePage extends StatefulWidget {
   const AddNamePage({Key? key}) : super(key: key);
@@ -74,7 +74,7 @@ class _AddNamePageState extends State<AddNamePage> {
                   decoration: BoxDecoration(color: primary),
                   child: Center(
                       child: Text(
-                    "tez",
+                    "tez chall",
                     style: logoText,
                   )),
                 ),

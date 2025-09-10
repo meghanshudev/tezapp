@@ -1,17 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/provider/has_group.dart';
-import 'package:tezapp/ui_elements/border_button.dart';
-import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
-import 'package:tezapp/ui_elements/custom_button.dart';
-import 'package:tezapp/ui_elements/custom_circular_progress.dart';
-import 'package:tezapp/ui_elements/custom_sub_header.dart';
-import 'package:tezapp/ui_elements/icon_box.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/provider/has_group.dart';
+import 'package:tezchal/ui_elements/border_button.dart';
+import 'package:tezchal/ui_elements/custom_appbar_dynamic.dart';
+import 'package:tezchal/ui_elements/custom_button.dart';
+import 'package:tezchal/ui_elements/custom_circular_progress.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
+import 'package:tezchal/ui_elements/icon_box.dart';
 
 class MemberRequestPage extends StatefulWidget {
   MemberRequestPage({Key? key, required this.data}) : super(key: key);

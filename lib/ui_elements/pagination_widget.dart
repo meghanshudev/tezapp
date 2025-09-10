@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:tezapp/ui_elements/loading_widget.dart';
+import 'package:tezchal/ui_elements/loading_widget.dart';
 
 class PaginationWidget extends StatefulWidget {
   final RefreshController refreshController;

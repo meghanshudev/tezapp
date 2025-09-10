@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/pages/Authentication/login_page.dart';
+import 'package:tezchal/pages/Authentication/login_page.dart';
 
 import '../../helpers/styles.dart';
 import '../../helpers/theme.dart';

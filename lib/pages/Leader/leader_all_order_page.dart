@@ -1,16 +1,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Leader/leader_order_detail_page.dart';
-import 'package:tezapp/ui_elements/border_button.dart';
-import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
-import 'package:tezapp/ui_elements/custom_button.dart';
-import 'package:tezapp/ui_elements/custom_sub_header.dart';
-import 'package:tezapp/ui_elements/icon_box.dart';
-import 'package:tezapp/ui_elements/leader_all_order_loading.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Leader/leader_order_detail_page.dart';
+import 'package:tezchal/ui_elements/border_button.dart';
+import 'package:tezchal/ui_elements/custom_appbar_dynamic.dart';
+import 'package:tezchal/ui_elements/custom_button.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
+import 'package:tezchal/ui_elements/icon_box.dart';
+import 'package:tezchal/ui_elements/leader_all_order_loading.dart';
 
 class LeaderAllOrderPage extends StatefulWidget {
   const LeaderAllOrderPage({Key? key}) : super(key: key);

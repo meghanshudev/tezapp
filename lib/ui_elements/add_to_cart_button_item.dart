@@ -4,15 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/event/ProductListEvent.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/models/cart.dart';
-import 'package:tezapp/provider/cart_provider.dart';
-import 'package:tezapp/respositories/cart/cart_repository.dart';
+import 'package:tezchal/event/ProductListEvent.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/models/cart.dart';
+import 'package:tezchal/provider/cart_provider.dart';
+import 'package:tezchal/respositories/cart/cart_repository.dart';
 
 class AddToCardButtonItem extends StatefulWidget {
   final product;

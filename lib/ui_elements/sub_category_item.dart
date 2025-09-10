@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/utils.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/utils.dart';
 
 import '../helpers/styles.dart';
 import '../helpers/theme.dart';

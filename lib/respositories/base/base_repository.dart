@@ -1,7 +1,7 @@
-import 'package:tezapp/helpers/network_V2.dart';
-import 'package:tezapp/helpers/response.dart';
-import 'package:tezapp/models/transaction.dart';
-import 'package:tezapp/respositories/base/base_factory.dart';
+import 'package:tezchal/helpers/network_V2.dart';
+import 'package:tezchal/helpers/response.dart';
+import 'package:tezchal/models/transaction.dart';
+import 'package:tezchal/respositories/base/base_factory.dart';
 
 class BaseRepository implements BaseFactory{
 

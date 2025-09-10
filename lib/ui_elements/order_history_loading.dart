@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/ui_elements/content_placeholder.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/ui_elements/content_placeholder.dart';
 
 class OrderHistoryLoading extends StatelessWidget {
   const OrderHistoryLoading({ Key? key }) : super(key: key);

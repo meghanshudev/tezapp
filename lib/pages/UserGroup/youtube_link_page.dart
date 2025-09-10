@@ -1,9 +1,9 @@
 // import 'dart:io';
 
 // import 'package:flutter/material.dart';
-// import 'package:tezapp/helpers/styles.dart';
-// import 'package:tezapp/helpers/theme.dart';
-// import 'package:tezapp/ui_elements/custom_footer.dart';
+// import 'package:tezchal/helpers/styles.dart';
+// import 'package:tezchal/helpers/theme.dart';
+// import 'package:tezchal/ui_elements/custom_footer.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 
 // class YoutubeLinkPage extends StatefulWidget {

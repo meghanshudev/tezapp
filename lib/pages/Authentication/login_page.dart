@@ -6,20 +6,20 @@ import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/crypto.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Authentication/enter_otp_page.dart';
-import 'package:tezapp/pages/Authentication/privacy_policy_login_page.dart';
-import 'package:tezapp/pages/Authentication/term_condition_login_page.dart';
-import 'package:tezapp/pages/Guest/guest_root_app.dart';
-import 'package:tezapp/provider/credit_provider.dart';
-import 'package:tezapp/ui_elements/custom_primary_button.dart';
-import 'package:tezapp/ui_elements/custom_textfield_phone.dart';
-import 'package:tezapp/ui_elements/error_message.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/crypto.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Authentication/enter_otp_page.dart';
+import 'package:tezchal/pages/Authentication/privacy_policy_login_page.dart';
+import 'package:tezchal/pages/Authentication/term_condition_login_page.dart';
+import 'package:tezchal/pages/Guest/guest_root_app.dart';
+import 'package:tezchal/provider/credit_provider.dart';
+import 'package:tezchal/ui_elements/custom_primary_button.dart';
+import 'package:tezchal/ui_elements/custom_textfield_phone.dart';
+import 'package:tezchal/ui_elements/error_message.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
               width: size.width,
               height: size.height * 0.40,
               decoration: BoxDecoration(color: primary),
-              child: Center(child: Text("tez", style: logoText)),
+              child: Center(child: Image.asset("assets/images/logo.png")),
             ),
             Container(
               width: size.width,

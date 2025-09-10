@@ -1,4 +1,4 @@
-# tezapp
+# tezchal
 
 A new Flutter project.
 

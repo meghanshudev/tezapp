@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/models/product.dart';
-import 'package:tezapp/pages/Cart/cart_page.dart';
-import 'package:tezapp/pages/Product/product_detail_page.dart';
-import 'package:tezapp/provider/cart_provider.dart';
-import 'package:tezapp/provider/credit_provider.dart';
-import 'package:tezapp/ui_elements/custom_appbar.dart';
-import 'package:tezapp/ui_elements/loading_widget.dart';
-import 'package:tezapp/ui_elements/product_search_loading.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/models/product.dart';
+import 'package:tezchal/pages/Cart/cart_page.dart';
+import 'package:tezchal/pages/Product/product_detail_page.dart';
+import 'package:tezchal/provider/cart_provider.dart';
+import 'package:tezchal/provider/credit_provider.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
+import 'package:tezchal/ui_elements/loading_widget.dart';
+import 'package:tezchal/ui_elements/product_search_loading.dart';
 
 import '../../helpers/constant.dart';
 import '../../models/category.dart';
@@ -237,7 +237,7 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("tez", style: appBarText),
+                      Image.asset("assets/images/logo-bg.png"),
                       SizedBox(width: 40),
                     ],
                   ),

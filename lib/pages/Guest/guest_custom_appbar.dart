@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/provider/credit_provider.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/provider/credit_provider.dart';
 import 'package:provider/provider.dart';
 
 class GuestCustomAppBar extends StatefulWidget {
@@ -52,10 +52,7 @@ class _GuestCustomAppBarState extends State<GuestCustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "tez",
-                        style: appBarText,
-                      ),
+                      Image.asset("assets/images/logo-bg.png"),
                       SizedBox(
                         width: 40,
                       ),

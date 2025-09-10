@@ -6,19 +6,19 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geocode/geocode.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/network.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/network.dart';
 import 'dart:async';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/ui_elements/custom_appbar.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
 
 import '../../ui_elements/custom_footer_buttons.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:provider/provider.dart';
-import 'package:tezapp/provider/has_group.dart';
+import 'package:tezchal/provider/has_group.dart';
 import 'package:http/http.dart' as http;
 
 class CreateUserGroupPage extends StatefulWidget {

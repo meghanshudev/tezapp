@@ -5,16 +5,16 @@ import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/crypto.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Authentication/add_name_page.dart';
-import 'package:tezapp/provider/account_info_provider.dart';
-import 'package:tezapp/ui_elements/custom_button_loading.dart';
-import 'package:tezapp/ui_elements/error_message.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/crypto.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Authentication/add_name_page.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/ui_elements/custom_button_loading.dart';
+import 'package:tezchal/ui_elements/error_message.dart';
 
 class EnterOTPPage extends StatefulWidget {
   final data;
@@ -147,7 +147,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
               width: size.width,
               height: size.height * 0.4,
               decoration: BoxDecoration(color: primary),
-              child: Center(child: Text("tez", style: logoText)),
+              child: Center(child: Image.asset("assets/images/logo-bg.png")),
             ),
             Container(
               width: size.width,

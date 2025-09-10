@@ -8,14 +8,14 @@ import 'package:geocode/geocode.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
 import 'package:http/http.dart' as http;
-import 'package:tezapp/pages/Location/location_picker_page.dart';
-import 'package:tezapp/provider/credit_provider.dart';
-import 'package:tezapp/ui_elements/custom_search_button.dart';
+import 'package:tezchal/pages/Location/location_picker_page.dart';
+import 'package:tezchal/provider/credit_provider.dart';
+import 'package:tezchal/ui_elements/custom_search_button.dart';
 
 class ChoooseLocationPage extends StatefulWidget {
   const ChoooseLocationPage({Key? key}) : super(key: key);
@@ -131,7 +131,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("tez", style: appBarText),
+                      Image.asset("assets/images/logo-bg.png"),
                       SizedBox(width: 40),
                       Flexible(child: getSearchButton(context, () {}, () {})),
                       // Container(

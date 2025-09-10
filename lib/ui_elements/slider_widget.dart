@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/utils.dart';
+import 'package:tezchal/helpers/utils.dart';
 import '../helpers/theme.dart';
 
 class ActiveDot extends StatelessWidget {

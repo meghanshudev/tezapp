@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
-import 'package:tezapp/ui_elements/custom_button.dart';
-import 'package:tezapp/ui_elements/custom_sub_header.dart';
-import 'package:tezapp/ui_elements/icon_box.dart';
-import 'package:tezapp/ui_elements/leader_order_detail_item.dart';
-import 'package:tezapp/ui_elements/leader_order_detail_loading.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/ui_elements/custom_appbar_dynamic.dart';
+import 'package:tezchal/ui_elements/custom_button.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
+import 'package:tezchal/ui_elements/icon_box.dart';
+import 'package:tezchal/ui_elements/leader_order_detail_item.dart';
+import 'package:tezchal/ui_elements/leader_order_detail_loading.dart';
 
 class LeaderOrderDetailPage extends StatefulWidget {
   final data;

@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/models/transaction.dart';
-import 'package:tezapp/pages/Transaction/components/transaction_item.dart';
-import 'package:tezapp/provider/account_info_provider.dart';
-import 'package:tezapp/respositories/transactions/transaction_repository.dart';
-import 'package:tezapp/ui_elements/custom_appbar.dart';
-import 'package:tezapp/ui_elements/loading_widget.dart';
-import 'package:tezapp/ui_elements/pagination_widget.dart';
-import 'package:tezapp/ui_elements/custom_footer.dart' as footer;
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/models/transaction.dart';
+import 'package:tezchal/pages/Transaction/components/transaction_item.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/respositories/transactions/transaction_repository.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
+import 'package:tezchal/ui_elements/loading_widget.dart';
+import 'package:tezchal/ui_elements/pagination_widget.dart';
+import 'package:tezchal/ui_elements/custom_footer.dart' as footer;
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({Key? key}) : super(key: key);

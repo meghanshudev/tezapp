@@ -2,15 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Account/open_source_page.dart';
-import 'package:tezapp/pages/Account/privacy_page.dart';
-import 'package:tezapp/pages/Account/term_condition_page.dart';
-import 'package:tezapp/provider/account_info_provider.dart';
-import 'package:tezapp/ui_elements/custom_appbar.dart';
-import 'package:tezapp/ui_elements/custom_button.dart';
-import 'package:tezapp/ui_elements/custom_footer.dart';
-import 'package:tezapp/ui_elements/custom_sub_header.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Account/open_source_page.dart';
+import 'package:tezchal/pages/Account/privacy_page.dart';
+import 'package:tezchal/pages/Account/term_condition_page.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
+import 'package:tezchal/ui_elements/custom_button.dart';
+import 'package:tezchal/ui_elements/custom_footer.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
 
 class GeneralInfoPage extends StatefulWidget {
   const GeneralInfoPage({Key? key}) : super(key: key);

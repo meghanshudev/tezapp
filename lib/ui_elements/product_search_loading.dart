@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tezapp/ui_elements/content_placeholder.dart';
+import 'package:tezchal/ui_elements/content_placeholder.dart';
 
 class ProductSearchLoading extends StatelessWidget {
   const ProductSearchLoading({ Key? key }) : super(key: key);

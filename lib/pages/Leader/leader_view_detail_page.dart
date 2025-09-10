@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Leader/leader_all_order_page.dart';
-import 'package:tezapp/pages/Leader/member_request_page.dart';
-import 'package:tezapp/pages/Leader/memeber_profile_page.dart';
-import 'package:tezapp/ui_elements/custom_appbar_dynamic.dart';
-import 'package:tezapp/ui_elements/custom_button.dart';
-import 'package:tezapp/ui_elements/custom_sub_header.dart';
-import 'package:tezapp/ui_elements/icon_box.dart';
-import 'package:tezapp/ui_elements/item_button.dart';
-import 'package:tezapp/ui_elements/leader_view_detail_loading.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Leader/leader_all_order_page.dart';
+import 'package:tezchal/pages/Leader/member_request_page.dart';
+import 'package:tezchal/pages/Leader/memeber_profile_page.dart';
+import 'package:tezchal/ui_elements/custom_appbar_dynamic.dart';
+import 'package:tezchal/ui_elements/custom_button.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
+import 'package:tezchal/ui_elements/icon_box.dart';
+import 'package:tezchal/ui_elements/item_button.dart';
+import 'package:tezchal/ui_elements/leader_view_detail_loading.dart';
 
 class LeaderViewDetailPage extends StatefulWidget {
   const LeaderViewDetailPage({Key? key}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/theme.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/theme.dart';
 
 import 'border_button.dart';
 

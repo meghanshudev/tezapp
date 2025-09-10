@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tezapp"
+    namespace = "com.example.tezchal"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -21,8 +21,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.tezapp"
-        minSdk = 23
+        applicationId = "com.example.tezchal"
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

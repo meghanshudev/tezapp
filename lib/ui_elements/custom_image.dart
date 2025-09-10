@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/theme.dart';
+import 'package:tezchal/helpers/theme.dart';
 
 class CustomImage extends StatelessWidget {
   CustomImage(this.image,

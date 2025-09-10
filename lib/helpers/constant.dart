@@ -15,7 +15,7 @@ const ONE_SIGNAL_ID = (ENV == "production")
 const iconPath = "assets/icons/";
 const imagePath = "assets/images/";
 
-const String APP_PREFIX = "Tez";
+const String APP_PREFIX = "TezChal";
 const String STORAGE_USER = "user_object";
 const String LANGUAGE = "LANGUAGE";
 const APP_LOCALES = [Locale('en', 'US'), Locale('hi', 'IN')];

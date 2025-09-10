@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tezapp/dummy_data/category_json.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/ui_elements/custom_image.dart';
+import 'package:tezchal/dummy_data/category_json.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/ui_elements/custom_image.dart';
 
 class CategoryItem extends StatelessWidget {
   final data;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tezapp/helpers/theme.dart';
+import 'package:tezchal/helpers/theme.dart';
 
 class CustomCircularProgress extends StatelessWidget {
   const CustomCircularProgress(

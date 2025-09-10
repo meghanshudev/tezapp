@@ -1,6 +1,6 @@
 {
-    "name": "tezapp",
-    "short_name": "tezapp",
+    "name": "tezchal",
+    "short_name": "tezchal",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

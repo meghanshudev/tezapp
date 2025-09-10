@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Authentication/login_page.dart';
-import 'package:tezapp/pages/Guest/guest_custom_appbar.dart';
-import 'package:tezapp/pages/Guest/guest_home_page.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Authentication/login_page.dart';
+import 'package:tezchal/pages/Guest/guest_custom_appbar.dart';
+import 'package:tezchal/pages/Guest/guest_home_page.dart';
 
 class GuestRootApp extends StatefulWidget {
   GuestRootApp({Key? key, this.data}) : super(key: key);

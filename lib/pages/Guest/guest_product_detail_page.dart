@@ -1,14 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:tezapp/helpers/constant.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
-import 'package:tezapp/helpers/utils.dart';
-import 'package:tezapp/pages/Authentication/login_page.dart';
-import 'package:tezapp/pages/guest/guest_custom_appbar.dart';
-import 'package:tezapp/ui_elements/product_detail_loading.dart';
-import 'package:tezapp/pages/Guest/guest_product_item_network.dart';
+import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/pages/Authentication/login_page.dart';
+import 'package:tezchal/pages/guest/guest_custom_appbar.dart';
+import 'package:tezchal/ui_elements/product_detail_loading.dart';
+import 'package:tezchal/pages/Guest/guest_product_item_network.dart';
 
 import '../../helpers/network.dart';
 import '../../pages/Guest/guest_add_to_cart_button_item.dart';

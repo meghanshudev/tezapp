@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:tezapp/helpers/network.dart';
-import 'package:tezapp/helpers/styles.dart';
-import 'package:tezapp/helpers/theme.dart';
+import 'package:tezchal/helpers/network.dart';
+import 'package:tezchal/helpers/styles.dart';
+import 'package:tezchal/helpers/theme.dart';
 
 import '../../ui_elements/loading_widget.dart';
 
@@ -64,10 +64,7 @@ class _TermConditionLoginPageState extends State<TermConditionLoginPage> {
       elevation: 0,
       centerTitle: false,
       toolbarHeight: 61,
-      title: Text(
-        "tez",
-        style: appBarText,
-      ),
+      title: Image.asset("assets/images/logo.png", height: 100,)
     );
   }
 
