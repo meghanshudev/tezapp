@@ -33,6 +33,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   bool isResend = false;
   bool isCode = false;
   String codeMessage = '';
+  String verifyId = '';
 
   bool isLoadingButton = false;
   bool isLoadingResendButton = false;
@@ -46,83 +47,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
   void initState() {
     super.initState();
     initMixpanel();
-    if (ENV == "production" && widget.data['phone_number'] != "9061234560") {
-      onResend();
-    } else if (widget.data['phone_number'] == "9061234560") {
-      loginDirectly();
-    } else {
-      loginDirectly();
-    }
-  }
-
-  loginDirectly() async {
-    var phoneNumber = widget.data['phone_number'];
-
-    String value =
-        phoneNumber +
-        "-" +
-        new DateTime.now().millisecondsSinceEpoch.toString();
-    var encryptAccess = encrypt(value, CREDENTIAL_KEY, CREDENTIAL_IV);
-
-    var response = await netPost(
-      isUserToken: false,
-      endPoint: "auth/login",
-      params: {"phone_number": encryptAccess},
-    );
-    if (mounted)
-      setState(() {
-        isVerifyOTP = false;
-        isLoadingButton = false;
-      });
-
-    if (response['resp_code'] == "200") {
-      var userData = response["resp_data"]['data'];
-
-      // no profile account
-      await setStorage(STORAGE_USER, userData);
-
-      await getStorageUser();
-
-      bool isFirstTimeLogin =
-          response['resp_data']['data']['is_first_time_login'];
-
-      if (isFirstTimeLogin) {
-        // first time
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddNamePage()),
-        );
-      } else {
-        // profile + token
-        var user = await getProfileData(context);
-
-        await setStorage(STORAGE_USER, user);
-
-        await getStorageUser();
-        // second time
-        Future.delayed(Duration.zero, () async {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            "/root_app",
-            (route) => false,
-            arguments: {"activePageIndex": 0},
-          );
-        });
-      }
-    } else {
-      var message = reponseErrorMessage(
-        response,
-        requestedParams: ["verification_code", "user_id"],
-      );
-      notifyAlert(
-        context,
-        desc: message,
-        btnTitle: "Ok!",
-        onConfirm: () {
-          Navigator.pop(context);
-        },
-      );
-    }
+    onResend();
   }
 
   @override
@@ -390,6 +315,9 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
       if (mounted) {
         if (response['resp_code'] == "200") {
           showToast("sms_sent_successfully".tr(), context);
+          setState(() {
+            verifyId = response['resp_data']['data']['verify_id'];
+          });
         } else {
           showToast(response["resp_data"]['message'].toString(), context);
         }
@@ -429,6 +357,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
         "phone_number": phoneNumber,
         "otp": codeController.text,
         "country_code": COUNTRY_CODE,
+        "verify_id": verifyId,
       },
     );
 

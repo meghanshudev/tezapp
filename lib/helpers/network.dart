@@ -33,7 +33,8 @@ netPost({
   bool isUserToken = true,
 }) async {
   String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
-  String userTokenType = (isUserToken) ? userSession['token_type'] ?? "" : "";
+  String userTokenType =
+      (isUserToken) ? userSession['token_type'] ?? "Bearer" : "";
   var url = Uri.parse(API_URL + endPoint);
   final response = await http.post(url, body: json.encode(params), headers: {
     "Authorization": "$userTokenType $userToken",

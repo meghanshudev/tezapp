@@ -9,15 +9,12 @@ Widget getSearchButton(context, Function onOpenSearch, Function onCloseSearch) {
     height: 50,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(16),
-      color: white,
-      boxShadow: [
-        BoxShadow(
-          color: black.withOpacity(0.06),
-          spreadRadius: 5,
-          blurRadius: 10,
-        ),
-      ],
+      border: Border.all(
+        color: greyLight,
+        width: 1.5,
+      ),
     ),
+    margin: EdgeInsets.all(10),
     child: Row(
       children: [
         Container(

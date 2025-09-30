@@ -13,15 +13,18 @@ import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/pages/Account/order_detail_page.dart';
 import 'package:tezchal/pages/Account/order_history_page.dart';
 import 'package:tezchal/pages/Category/category_page.dart';
+import 'package:tezchal/pages/Home/components/slider_section.dart';
 import 'package:tezchal/pages/Product/product_detail_page.dart';
 import 'package:tezchal/ui_elements/category_item.dart';
 import 'package:tezchal/ui_elements/custom_circular_progress.dart';
 import 'package:tezchal/ui_elements/loading_widget.dart';
 import 'package:tezchal/ui_elements/product_item_network.dart';
+import 'package:tezchal/ui_elements/custom_search_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../helpers/network.dart';
 import '../../ui_elements/slider_widget.dart';
-
+import 'components/category_section.dart';
+import 'components/product_section.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -206,7 +209,7 @@ class _HomePageState extends State<HomePage> {
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
       List tempCategories = data["list"];
-      int cnt = int.parse(data["total"].toString());
+      int cnt = data != null ? int.parse(data["total"].toString()) : 0;
       if (mounted) {
         setState(() {});
 
@@ -254,54 +257,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   getCategories() {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(15, 0, 15, 15),
-      child: Column(
-        children: [
-          Text("jbffggfhsgfh"),
-          SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: List.generate(categories.length, (index) {
-                return GestureDetector(
-                  onTap: () async {
-                    dynamic dataPanel = {
-                      "phone": userSession['phone_number'],
-                      "category": categories[index]['name'],
-                    };
-
-                    mixpanel.track(CLICK_CATEGORY, properties: dataPanel);
-
-                    setState(() {
-                      HOME_PAGE_LEAVE = false;
-                    });
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => CategoryPage(
-                              data: {
-                                "category": categories[index],
-                                "allCategories": categories,
-                                "isParent": true,
-                              },
-                            ),
-                      ),
-                    );
-                    setState(() {
-                      HOME_PAGE_LEAVE = true;
-                    });
-                  },
-                  child: CategoryItem(data: categories[index]),
-                );
-              }),
-            ),
-          ),
-        ],
-      ),
+    return CategorySection(
+      categories: categories,
+      mixpanel: mixpanel,
+      onLeave: (bool leave) {
+        setState(() {
+          HOME_PAGE_LEAVE = leave;
+        });
+      },
     );
   }
 
@@ -391,6 +354,11 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        getSearchButton(
+          context,
+          () {},
+          () {},
+        ),
         SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
@@ -398,7 +366,6 @@ class _HomePageState extends State<HomePage> {
         ),
         getCategories(),
         SizedBox(height: 5),
-        Divider(thickness: 0.8),
         SizedBox(height: 10),
         (isLoading && page == 1 && !isPulling)
             ? SizedBox(
@@ -441,132 +408,18 @@ class _HomePageState extends State<HomePage> {
   // }
 
   Widget getProductByCagories(index, title, subTitle, List products) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(right: 15, left: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      subTitle,
-                      style: TextStyle(fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => CategoryPage(
-                            data: {
-                              "category": categoryFeatures[index],
-                              "allCategories": categoryFeatures,
-                              "isParent":
-                                  !categoryFeatures[index]["is_sub_category"],
-                            },
-                          ),
-                    ),
-                  );
-                  setState(() {
-                    HOME_PAGE_LEAVE = true;
-                  });
-                  dynamic dataPanel = {
-                    "phone": userSession['phone_number'],
-                    "category": categories[index],
-                  };
-                  mixpanel.track(CLICK_CATEGORY, properties: dataPanel);
-                  setState(() {
-                    HOME_PAGE_LEAVE = false;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Text("see_more", style: TextStyle(fontSize: 16)).tr(),
-                    SizedBox(width: 3),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        color: black,
-                        size: 18,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        SingleChildScrollView(
-          padding: EdgeInsets.only(left: 15),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(products.length, (index) {
-              var product = products[index]['product'];
-              return Padding(
-                padding: const EdgeInsets.only(right: 20, top: 20, bottom: 20),
-                child: GestureDetector(
-                  onTap: () async {
-                    dynamic dataPanel = {
-                      "phone": userSession['phone_number'],
-                      "product": products[index]['product']['name'],
-                    };
-
-                    mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
-                    setState(() {
-                      HOME_PAGE_LEAVE = false;
-                    });
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => ProductDetailPage(
-                              data: {"product": products[index]},
-                            ),
-                      ),
-                    );
-                    setState(() {
-                      HOME_PAGE_LEAVE = true;
-                    });
-                  },
-                  child: ProductItemNetwork(
-                    product: product,
-                    discountLabel:
-                        convertDouble(product['percent_off']).toInt(),
-                    kgLabel:
-                        product["attributes"].length == 0
-                            ? ""
-                            : product["attributes"][0]["value"],
-                    image: product['image'],
-                    name: product['name'],
-                    priceStrike: CURRENCY + "${product["unit_price"]}",
-                    price: CURRENCY + "${product["sale_price"]}",
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-      ],
+    return ProductSection(
+      index: index,
+      title: title,
+      subTitle: subTitle,
+      products: products,
+      categoryFeatures: categoryFeatures,
+      mixpanel: mixpanel,
+      onLeave: (bool leave) {
+        setState(() {
+          HOME_PAGE_LEAVE = leave;
+        });
+      },
     );
   }
 }

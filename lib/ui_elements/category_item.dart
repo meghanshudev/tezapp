@@ -15,13 +15,21 @@ class CategoryItem extends StatelessWidget {
       width: (size.width - 80) / 3,
       height: (size.width - 40) / 3,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: white,
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            Colors.grey[100]!,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         boxShadow: [
           BoxShadow(
-            color: black.withOpacity(0.06),
-            spreadRadius: 5,
-            blurRadius: 10,
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
           )
         ],
       ),
@@ -38,7 +46,9 @@ class CategoryItem extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 style: TextStyle(
-                    fontSize: 14, color: primary, fontWeight: FontWeight.bold),
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600),
               ),
             ),
             SizedBox(

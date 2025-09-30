@@ -20,6 +20,7 @@ import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_circular_progress.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:tezchal/ui_elements/custom_search_button.dart';
 
 import 'helpers/network.dart';
 import 'helpers/utils.dart';
@@ -100,6 +101,18 @@ class _RootAppState extends State<RootApp> {
       optOutTrackingDefault: false,
       trackAutomaticEvents: true,
     );
+  }
+
+  void onOpenSearch() {
+    setState(() {
+      HOME_PAGE_LEAVE = false;
+    });
+  }
+
+  void onCloseSearch() {
+    setState(() {
+      HOME_PAGE_LEAVE = true;
+    });
   }
 
   checkInOperationCity({lat = 0.0, lng = 0.0}) async {
@@ -221,19 +234,9 @@ class _RootAppState extends State<RootApp> {
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(60),
           child: CustomAppBar(
             isClick: true,
-            onOpenSearch: () {
-              setState(() {
-                HOME_PAGE_LEAVE = false;
-              });
-            },
-            onCloseSearch: () {
-              setState(() {
-                HOME_PAGE_LEAVE = true;
-              });
-            },
             onCallBack: (result) async {
               await getCurrentLocation(lat: result['lat'], lng: result['lng']);
 
@@ -258,12 +261,9 @@ class _RootAppState extends State<RootApp> {
       index: pageIndex,
       children: [
         HomePage(),
-        // Center(),
         OrderHistoryPage(),
-        // Center(),
         AccountPage(),
-        // Center(),
-        Center(child: Text("cart").tr()),
+        CartPage(),
       ],
     );
   }
@@ -282,132 +282,71 @@ class _RootAppState extends State<RootApp> {
 
   Widget getFooter() {
     List bottomItems = [
-      iconPath + "home_icon.svg",
-      iconPath + "orders_icon.svg",
-      iconPath + "user_icon.svg",
-      iconPath + "home_icon.svg",
+      {"icon": Feather.home, "label": "Home", "page": 0},
+      {"icon": Feather.list, "label": "Orders", "page": 1},
+      {"icon": Feather.user, "label": "Account", "page": 2},
+      {"icon": Feather.shopping_cart, "label": "Cart", "page": 3},
     ];
     if (isLoadingScreen) {
       return Center(child: CustomCircularProgress());
     } else {
       return isInOperationCity
           ? Container(
-            width: double.infinity,
-            height: 90,
-            decoration: BoxDecoration(
-              color: white,
-              boxShadow: [
-                BoxShadow(
-                  color: black.withOpacity(0.06),
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    top: 15,
-                    bottom: 20,
+              width: double.infinity,
+              height: 90,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(
+                    color: greyLight70,
+                    width: 1.5,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: List.generate(bottomItems.length, (index) {
-                      if (index == 3) {
-                        return context.watch<CartProvider>().isHasCart
-                            ? GestureDetector(
-                              onTap: () async {
-                                dynamic dataPanel = {
-                                  "phone": userSession['phone_number'],
-                                  "cart_screen": "cart_screen",
-                                };
-
-                                mixpanel.track(
-                                  CART_SCREEN,
-                                  properties: dataPanel,
-                                );
-                                setState(() {
-                                  HOME_PAGE_LEAVE = false;
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CartPage(),
-                                  ),
-                                );
-                                setState(() {
-                                  HOME_PAGE_LEAVE = true;
-                                });
-                              },
-                              child: Container(
-                                width: 99,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: primary,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("cart", style: normalWhiteText).tr(),
-                                    SizedBox(width: 5),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Icon(
-                                        Icons.arrow_forward_ios,
-                                        color: white,
-                                        size: 18,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                            : Container(
-                              width: 99,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: primary),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text("cart", style: normalPrimaryText).tr(),
-                                  SizedBox(width: 5),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: primary,
-                                      size: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                      }
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 15,
+                  bottom: 20,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(
+                    bottomItems.length,
+                    (index) {
                       return InkWell(
                         onTap: () {
                           setState(() {
-                            pageIndex = index;
+                            pageIndex = bottomItems[index]['page'] as int;
                           });
                         },
-                        child: SvgPicture.asset(
-                          bottomItems[index],
-                          width: 28,
-                          color: pageIndex == index ? black : greyLight,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              bottomItems[index]['icon'] as IconData?,
+                              color: pageIndex == bottomItems[index]['page']
+                                  ? primary
+                                  : black,
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              bottomItems[index]['label'] as String,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: pageIndex == bottomItems[index]['page']
+                                    ? primary
+                                    : black,
+                              ),
+                            ),
+                          ],
                         ),
                       );
-                    }),
+                    },
                   ),
                 ),
-              ],
-            ),
-          )
+              ),
+            )
           : comingLocation();
     }
   }

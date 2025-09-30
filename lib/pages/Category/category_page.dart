@@ -201,18 +201,8 @@ class _CategoryPageState extends State<CategoryPage> {
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(60),
           child: CustomAppBar(
-            onOpenSearch: () {
-              setState(() {
-                isInPage = false;
-              });
-            },
-            onCloseSearch: () {
-              setState(() {
-                isInPage = true;
-              });
-            },
             subtitle:
                 zipCode + " - " + context.watch<AccountInfoProvider>().name,
             subtitleIcon: Entypo.location_pin,
@@ -278,64 +268,61 @@ class _CategoryPageState extends State<CategoryPage> {
       //     child: CustomCircularProgress(),
       //   ),
       // );
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+      return GridView.builder(
+        padding: const EdgeInsets.all(10),
         itemCount: 10,
-        padding: EdgeInsets.only(top: 20, left: 10),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.7,
+        ),
         itemBuilder: (context, index) {
           return CategoryLoading();
         },
       );
     return (checkIsNullValue(products) || products.length == 0)
         ? Container(child: Center(child: Text("no_data").tr()))
-        : SingleChildScrollView(
-          controller: scollController,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: List.generate(products.length, (index) {
-                    var _product = products[index]["product"];
+        : GridView.builder(
+            controller: scollController,
+            padding: const EdgeInsets.all(10),
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.7,
+            ),
+            itemBuilder: (context, index) {
+              var _product = products[index]["product"];
+              return ProductCategoryItem(
+                data: _product,
+                onTap: () async {
+                  dynamic dataPanel = {
+                    "phone": userSession['phone_number'],
+                    "product": products[index]['product']['name'],
+                  };
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20, right: 10),
-                      child: ProductCategoryItem(
-                        data: _product,
-                        onTap: () async {
-                          dynamic dataPanel = {
-                            "phone": userSession['phone_number'],
-                            "product": products[index]['product']['name'],
-                          };
-
-                          mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
-                          setState(() {
-                            isInPage = false;
-                          });
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => ProductDetailPage(
-                                    data: {"product": products[index]},
-                                  ),
-                            ),
-                          );
-
-                          setState(() {
-                            isInPage = true;
-                          });
-                        },
+                  mixpanel.track(CLICK_PRODUCT, properties: dataPanel);
+                  setState(() {
+                    isInPage = false;
+                  });
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductDetailPage(
+                        data: {"product": products[index]},
                       ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
-        );
+                    ),
+                  );
+
+                  setState(() {
+                    isInPage = true;
+                  });
+                },
+              );
+            },
+          );
   }
 
   Widget getBody() {
@@ -357,18 +344,20 @@ class _CategoryPageState extends State<CategoryPage> {
           ),
           child: getSubCategory(),
         ),
-        Flexible(
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: black.withOpacity(0.02),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                ),
-              ],
+        Expanded(
+          child: Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: black.withOpacity(0.02),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
+              child: getProducts(),
             ),
-            child: getProducts(),
           ),
         ),
       ],

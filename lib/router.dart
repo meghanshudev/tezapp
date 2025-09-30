@@ -64,7 +64,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     case '/enter_otp_page':
       return MaterialPageRoute(
-        builder: (_) => EnterOTPPage(data: args['data'] ?? {}),
+        builder: (_) => EnterOTPPage(data: args),
       );
 
     case '/add_name_page':

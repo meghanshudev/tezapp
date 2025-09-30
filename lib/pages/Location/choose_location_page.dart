@@ -114,7 +114,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
 
   Widget getAppBar() {
     return AppBar(
-      backgroundColor: primary,
+      backgroundColor: white,
       titleSpacing: 0,
       automaticallyImplyLeading: false,
       elevation: 0,
@@ -124,8 +124,8 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
             children: [
               Container(
                 width: double.infinity,
-                height: 80,
-                decoration: BoxDecoration(color: primary),
+                height: 100,
+                decoration: BoxDecoration(color: white),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Row(

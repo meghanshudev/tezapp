@@ -33,12 +33,17 @@ class ProductItemNetwork extends StatelessWidget {
       width: width,
       height: 230,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: white,
-          boxShadow: [
-            BoxShadow(
-                color: black.withOpacity(0.06), spreadRadius: 5, blurRadius: 10)
-          ]),
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -103,7 +108,11 @@ class ProductItemNetwork extends StatelessWidget {
                 name,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: smallMediumGreyText,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             SizedBox(
@@ -117,14 +126,22 @@ class ProductItemNetwork extends StatelessWidget {
                   children: [
                     Text(
                       priceStrike,
-                      style: smallStrikeBoldBlackText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
+                      ),
                     ),
                     SizedBox(
                       height: 1,
                     ),
                     Text(
                       price,
-                      style: smallMediumBoldBlackText,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     )
                   ],
                 ),

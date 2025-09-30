@@ -42,21 +42,6 @@ class _CustomAppBarDynamicState extends State<CustomAppBarDynamic> {
             children: [
               Container(
                 width: double.infinity,
-                height: 80,
-                decoration: BoxDecoration(color: primary),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset("assets/images/logo-bg.png"),
-                      widget.actionChild
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
                 height: 40,
                 decoration: BoxDecoration(color: secondary),
                 child: Padding(
@@ -72,7 +57,7 @@ class _CustomAppBarDynamicState extends State<CustomAppBarDynamic> {
                             Icon(
                               Entypo.location_pin,
                               size: 28,
-                              color: primary.withOpacity(0.5),
+                              color: white,
                             ),
                             SizedBox(
                               width: 5,
@@ -84,7 +69,7 @@ class _CustomAppBarDynamicState extends State<CustomAppBarDynamic> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
-                                    color: black.withOpacity(0.5)),
+                                    color: white),
                               ),
                             )
                           ],
@@ -101,7 +86,7 @@ class _CustomAppBarDynamicState extends State<CustomAppBarDynamic> {
                             Icon(
                               MaterialCommunityIcons.wallet,
                               size: 25,
-                              color: primary.withOpacity(0.5),
+                              color: white,
                             ),
                             SizedBox(
                               width: 5,
@@ -118,50 +103,12 @@ class _CustomAppBarDynamicState extends State<CustomAppBarDynamic> {
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
-                                    color: black.withOpacity(0.5)),
+                                    color: white),
                               ),
                             )
                           ],
                         ),
                       ),
-                      // Row(
-                      //   children: [
-                      //     Icon(
-                      //       Entypo.location_pin,
-                      //       size: 28,
-                      //       color: primary.withOpacity(0.5),
-                      //     ),
-                      //     SizedBox(
-                      //       width: 5,
-                      //     ),
-                      //     Text(
-                      //       "deliver_to".tr() +  " $deliverTo $zipCode",
-                      //       style: TextStyle(
-                      //           fontSize: 15,
-                      //           fontWeight: FontWeight.w500,
-                      //           color: black.withOpacity(0.5)),
-                      //     )
-                      //   ],
-                      // ),
-                      // Row(
-                      //   children: [
-                      //     Icon(
-                      //       MaterialCommunityIcons.wallet,
-                      //       size: 25,
-                      //       color: primary.withOpacity(0.5),
-                      //     ),
-                      //     SizedBox(
-                      //       width: 10,
-                      //     ),
-                      //     Text(
-                      //       "₹ "+context.watch<CreditProvider>().balance.toString(),
-                      //       style: TextStyle(
-                      //           fontSize: 15,
-                      //           fontWeight: FontWeight.w500,
-                      //           color: black.withOpacity(0.5)),
-                      //     )
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),

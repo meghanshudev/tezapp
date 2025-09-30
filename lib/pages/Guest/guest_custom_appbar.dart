@@ -52,9 +52,56 @@ class _GuestCustomAppBarState extends State<GuestCustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset("assets/images/logo-bg.png"),
-                      SizedBox(
-                        width: 40,
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Row(
+                          children: [
+                            if (widget.subtitleIcon != null)
+                              Icon(
+                                widget.subtitleIcon,
+                                size: 28,
+                                color: white,
+                              ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              child: Text(
+                                widget.subtitle,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: white),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              MaterialCommunityIcons.wallet,
+                              size: 25,
+                              color: white,
+                            ),
+                            SizedBox(width: 10,),
+                            Text(
+                              "₹" +
+                                  context
+                                      .watch<CreditProvider>()
+                                      .balance
+                                      .toString(),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: white),
+                            )
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -67,58 +114,15 @@ class _GuestCustomAppBarState extends State<GuestCustomAppBar> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10, right: 20),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        child: Row(
-                          children: [
-                            if (widget.subtitleIcon != null)
-                              Icon(
-                                widget.subtitleIcon,
-                                size: 28,
-                                color: primary.withOpacity(0.5),
-                              ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.6,
-                              child: Text(
-                                widget.subtitle,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: black.withOpacity(0.5)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Flexible(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Icon(
-                              MaterialCommunityIcons.wallet,
-                              size: 25,
-                              color: primary.withOpacity(0.5),
-                            ),
-                            Text(
-                              "₹" +
-                                  context
-                                      .watch<CreditProvider>()
-                                      .balance
-                                      .toString(),
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: black.withOpacity(0.5)),
-                            )
-                          ],
-                        ),
-                      ),
+                      Text(
+                        "Login to check exclusive offers",
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: black.withOpacity(0.5)),
+                      )
                     ],
                   ),
                 ),

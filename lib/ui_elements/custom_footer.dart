@@ -26,63 +26,6 @@ class CustomFooter extends StatelessWidget {
       ]),
       child: Column(
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 25, bottom: 20),
-          //   child: Container(
-          //     width: double.infinity,
-          //     height: 50,
-          //     decoration: BoxDecoration(
-          //         borderRadius: BorderRadius.circular(10),
-          //         color: white,
-          //         boxShadow: [
-          //           BoxShadow(
-          //               color: black.withOpacity(0.06),
-          //               spreadRadius: 5,
-          //               blurRadius: 10)
-          //         ]),
-          //     child: Row(
-          //       children: [
-          //         Container(
-          //           width: 60,
-          //           child: Center(
-          //               child: Icon(
-          //             Icons.search,
-          //             size: 30,
-          //             color: greyLight,
-          //           )),
-          //         ),
-          //         Flexible(
-          //             child: TextField(
-          //               onTap: () => Navigator.pushNamed(context, "/product_search_page"),
-          //           cursorColor: black,
-          //           decoration: InputDecoration(
-          //             border: InputBorder.none,
-          //             hintText: "search_for_dal_atta_oil_bread".tr()
-          //           ),
-          //         )),
-          //         SizedBox(
-          //           width: 15,
-          //         ),
-          //         Padding(
-          //           padding: const EdgeInsets.only(top: 8, bottom: 8),
-          //           child: Container(
-          //             width: 60,
-          //             decoration: BoxDecoration(
-          //                 border: Border(
-          //                     left: BorderSide(
-          //                         width: 1, color: placeHolderColor))),
-          //             child: Center(
-          //                 child: Icon(
-          //               Icons.menu,
-          //               size: 30,
-          //               color: greyLight,
-          //             )),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
           Padding(
             padding:
                 const EdgeInsets.only(left: 10, right: 10, top: 15, bottom: 20),

@@ -180,20 +180,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(60),
           child: CustomAppBar(
             subtitle: "$zipCode - $deliverTo ",
             subtitleIcon: Entypo.location_pin,
-            onOpenSearch: () {
-              setState(() {
-                isInPage = false;
-              });
-            },
-            onCloseSearch: () {
-              setState(() {
-                isInPage = true;
-              });
-            },
           ),
         ),
         bottomNavigationBar: getFooter(),

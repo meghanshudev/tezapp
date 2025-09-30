@@ -253,57 +253,54 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
       //     child: CustomCircularProgress(),
       //   ),
       // );
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+      return GridView.builder(
+        padding: const EdgeInsets.all(10),
         itemCount: 10,
-        padding: EdgeInsets.only(top: 20, left: 10),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 0.7,
+        ),
         itemBuilder: (context, index) {
           return CategoryLoading();
         },
       );
     return (checkIsNullValue(products) || products.length == 0)
         ? Container(child: Center(child: Text("no_data").tr()))
-        : SingleChildScrollView(
-          controller: scollController,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: List.generate(products.length, (index) {
-                    var _product = products[index]["product"];
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20, right: 10),
-                      child: GuestProductCategoryItem(
-                        data: _product,
-                        onTap: () async {
-                          setState(() {
-                            isInPage = false;
-                          });
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => GuestProductDetailPage(
-                                    data: {"product": products[index]},
-                                  ),
-                            ),
-                          );
-                          setState(() {
-                            isInPage = true;
-                          });
-                        },
+        : GridView.builder(
+            controller: scollController,
+            padding: const EdgeInsets.all(10),
+            itemCount: products.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.7,
+            ),
+            itemBuilder: (context, index) {
+              var _product = products[index]["product"];
+              return GuestProductCategoryItem(
+                data: _product,
+                onTap: () async {
+                  setState(() {
+                    isInPage = false;
+                  });
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GuestProductDetailPage(
+                        data: {"product": products[index]},
                       ),
-                    );
-                  }),
-                ),
-              ),
-            ],
-          ),
-        );
+                    ),
+                  );
+                  setState(() {
+                    isInPage = true;
+                  });
+                },
+              );
+            },
+          );
   }
 
   Widget getBody() {
@@ -325,18 +322,20 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
           ),
           child: getSubCategory(),
         ),
-        Flexible(
-          child: Container(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: black.withOpacity(0.02),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                ),
-              ],
+        Expanded(
+          child: Flexible(
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: black.withOpacity(0.02),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
+              child: getProducts(),
             ),
-            child: getProducts(),
           ),
         ),
       ],

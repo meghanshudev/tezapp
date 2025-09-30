@@ -257,6 +257,8 @@ class _AddNamePageState extends State<AddNamePage> {
         isLoadingButton = false;
       });
 
+    print("TESTING ${response}");
+
     if (response['resp_code'] == "200") {
 
       // mix panel

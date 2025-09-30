@@ -16,6 +16,7 @@ import 'package:tezchal/provider/cart_provider.dart';
 import 'package:tezchal/provider/credit_provider.dart';
 import 'package:tezchal/provider/has_group.dart';
 import 'package:tezchal/root_app.dart';
+import 'package:tezchal/router.dart';
 
 import 'firebase_options.dart';
 
@@ -57,6 +58,7 @@ void main() async {
             locale: context.locale,
             debugShowCheckedModeBanner: ENV != "production",
             home: const AppInitializer(),
+            onGenerateRoute: generateRoute,
           ),
         ),
       ),
