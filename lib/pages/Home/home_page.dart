@@ -393,31 +393,6 @@ class _HomePageState extends State<HomePage> {
       children: [
         SizedBox(height: 15),
         Padding(
-          padding: const EdgeInsets.only(right: 20, left: 20),
-          child: GestureDetector(
-            onTap: () => onOrderOnWhatsapp(),
-            child: Container(
-              height: 50,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: whatsAppColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Icon(LineIcons.whatSApp, color: white, size: 25),
-                  SizedBox(width: 5),
-                  Text("order_kirana_on_whatsapp", style: normalWhiteText).tr(),
-                  SizedBox(width: 5),
-                  Icon(LineIcons.camera, color: white, size: 25),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SizedBox(height: 15),
-        Padding(
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SliderWidget(items: ads),
         ),

@@ -37,7 +37,7 @@ class _RootAppState extends State<RootApp> {
   int pageIndex = 0;
 
   // is in operation city
-  bool isInOperationCity = false;
+  bool isInOperationCity = true;
   bool isLoadingScreen = false;
   var zipCode = '';
   var deliverTo = '';
@@ -80,7 +80,7 @@ class _RootAppState extends State<RootApp> {
       registerOnDeepLinkingCallback: true,
     );
 
-    checkInOperationCity();
+    // checkInOperationCity();
 
     initPage();
     getProfileData(context);

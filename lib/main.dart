@@ -97,7 +97,7 @@ class _AppInitializerState extends State<AppInitializer> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => GuestRootApp(data: {"activePageIndex": 0}),
+            builder: (context) => RootApp(data: {"activePageIndex": 0}),
           ),
         );
       } else {

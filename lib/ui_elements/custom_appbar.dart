@@ -56,7 +56,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("tez chall", style: appBarText),
+                      Image.asset("assets/images/logo-bg.png"),
                       SizedBox(width: 40),
                       Flexible(
                         child: getSearchButton(

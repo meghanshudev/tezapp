@@ -73,10 +73,7 @@ class _AddNamePageState extends State<AddNamePage> {
                   height: size.height * 0.4,
                   decoration: BoxDecoration(color: primary),
                   child: Center(
-                      child: Text(
-                    "tez chall",
-                    style: logoText,
-                  )),
+                      child: Image.asset("assets/images/logo-bg.png"),),
                 ),
                 Container(
                   width: size.width,
