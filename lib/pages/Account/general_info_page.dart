@@ -39,10 +39,11 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
-          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
-          subtitleIcon: Entypo.location_pin,
+          isWidget: true,
+          title: "general_information".tr(),
+          subtitle: "$deliverTo • $phone",
         ),
       ),
       body: buildBody(),
@@ -59,10 +60,6 @@ class _GeneralInfoPageState extends State<GeneralInfoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomSubHeader(
-            title: "general_information".tr(),
-            subtitle: "$deliverTo • $phone",
-          ),
           SizedBox(height: 23),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),

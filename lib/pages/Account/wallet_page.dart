@@ -55,10 +55,11 @@ class _WalletPageState extends State<WalletPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
-          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
-          subtitleIcon: Entypo.location_pin,
+          isWidget: true,
+          title: "tez_cash".tr(),
+          subtitle: "$deliverTo • $phone",
         ),
       ),
       body: buildBody(),
@@ -75,10 +76,6 @@ class _WalletPageState extends State<WalletPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomSubHeader(
-            title: "tez_cash".tr(),
-            subtitle: "$deliverTo • $phone",
-          ),
           SizedBox(height: 23),
           getBalanceCard(),
           // SizedBox(
@@ -216,7 +213,7 @@ class _WalletPageState extends State<WalletPage> {
   Widget getBalanceCard() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(20, 0, 20, 15),
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
       margin: EdgeInsets.fromLTRB(15, 0, 15, 20),
       decoration: BoxDecoration(
         color: primary,
@@ -237,7 +234,7 @@ class _WalletPageState extends State<WalletPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("your_balance", style: normalBoldWhiteTitle).tr(),
-              Image.asset("assets/images/logo-bg.png"),
+              // Image.asset("assets/images/logo-bg.png"),
             ],
           ),
           Text("₹$balance", style: titleBoldWhiteTitle),

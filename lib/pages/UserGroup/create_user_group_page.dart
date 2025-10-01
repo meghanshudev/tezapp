@@ -86,7 +86,7 @@ class _CreateUserGroupPageState extends State<CreateUserGroupPage> {
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
             subtitle: "$zipCodeLabel - $deliverTo",
             subtitleIcon: Entypo.location_pin,

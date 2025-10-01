@@ -25,6 +25,7 @@ class _TermConditionPageState extends State<TermConditionPage> {
   bool isLoading = false;
   String title = "";
   String content = "";
+  String phone = '';
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _TermConditionPageState extends State<TermConditionPage> {
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code'] ?? ""
         : "";
+    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
     fetchTermCondition();
   }
 
@@ -66,11 +68,10 @@ class _TermConditionPageState extends State<TermConditionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
+            title: "terms_&_conditions".tr(),
+            subtitle: "$deliverTo • $phone",
           ),
         ),
         // body: buildBody(),

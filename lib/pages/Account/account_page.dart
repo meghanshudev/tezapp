@@ -128,10 +128,12 @@ class _AccountPageState extends State<AccountPage> {
     if (currentLang == "en_US") {
       setState(() {
         lang = "English";
+        langIndex = 0;
       });
     } else {
       setState(() {
         lang = "हिन्दी";
+        langIndex = 1;
       });
     }
   }
@@ -322,72 +324,62 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   onChangedLang() async {
-    int tempIndex = 0;
+    int tempIndex = langIndex;
     await showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
       builder: (BuildContext context) {
-        return Container(
-          height: 230.0,
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.only(left: 10, right: 10),
-                height: 40,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child:
-                          Text(
-                            "cancel",
-                            style: TextStyle(color: primary, fontSize: 16),
-                          ).tr(),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          langIndex = tempIndex;
-                        });
-                        setLang(langIndex);
-                        Navigator.of(context).pop();
-                      },
-                      child:
-                          Text(
-                            "done",
-                            style: TextStyle(color: primary, fontSize: 16),
-                          ).tr(),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CupertinoPicker(
-                  scrollController: new FixedExtentScrollController(
-                    initialItem: langIndex,
-                  ),
-                  itemExtent: 32.0,
-                  onSelectedItemChanged: (int index) {
-                    setState(() {
-                      tempIndex = index;
-                    });
-                    setLang(langIndex);
-                  },
-                  children: List.generate(languages.length, (index) {
-                    return new Center(
-                      child: new Text(
-                        languages[index],
-                        style: TextStyle(color: black),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("choose_your_language".tr(),
+                          style: normalBoldBlackTitle),
+                      TextButton(
+                        onPressed: () {
+                          setLang(tempIndex);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          "done".tr(),
+                          style: TextStyle(color: primary, fontSize: 16),
+                        ),
                       ),
-                    );
-                  }),
-                ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: languages.length,
+                    itemBuilder: (context, index) {
+                      return RadioListTile(
+                        title: Text(languages[index]),
+                        value: index,
+                        groupValue: tempIndex,
+                        activeColor: primary,
+                        onChanged: (int? value) {
+                          if (value != null) {
+                            setState(() {
+                              tempIndex = value;
+                            });
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );

@@ -73,11 +73,11 @@ class _SuggestPageState extends State<SuggestPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
+            isWidget: true,
+            title: "suggest_us".tr(),
+            subtitle: "$deliverTo • $phone",
           ),
         ),
         body: buildBody(),
@@ -91,10 +91,6 @@ class _SuggestPageState extends State<SuggestPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomSubHeader(
-            title: "suggest_us".tr(),
-            subtitle: "$deliverTo • $phone",
-          ),
           SizedBox(
             height: 23,
           ),

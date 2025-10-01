@@ -106,7 +106,7 @@ class _UserGroupViewPageState extends State<UserGroupViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
           subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
           subtitleIcon: Entypo.location_pin,

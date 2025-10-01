@@ -32,6 +32,7 @@ class _EditProfileState extends State<EditProfile> {
 
   var zipCode = '';
   var deliverTo = '';
+  String phone = '';
   @override
   void initState() {
     super.initState();
@@ -52,6 +53,7 @@ class _EditProfileState extends State<EditProfile> {
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
+    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
   }
 
   onValidate() {
@@ -144,10 +146,10 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
-          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
-          subtitleIcon: Entypo.location_pin,
+          title: "edit_profile".tr(),
+          subtitle: "$deliverTo • $phone",
         ),
       ),
       body: buildBody(),
@@ -161,10 +163,6 @@ class _EditProfileState extends State<EditProfile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "edit_profile",
-            style: normalBoldBlackTitle,
-          ).tr(),
           SizedBox(
             height: 20,
           ),

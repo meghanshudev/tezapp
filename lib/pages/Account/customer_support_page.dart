@@ -61,11 +61,11 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
+            isWidget: true,
+            title: "customer_support".tr(),
+            subtitle: "$deliverTo • $phone",
           ),
         ),
         body: buildBody(),
@@ -81,10 +81,6 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CustomSubHeader(
-            title: "customer_support".tr(),
-            subtitle: "$deliverTo • $phone",
-          ),
           SizedBox(
             height: 23,
           ),

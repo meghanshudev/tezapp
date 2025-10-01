@@ -80,7 +80,7 @@ class _CreateUserGroupNamePageState extends State<CreateUserGroupNamePage> {
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
             subtitle:
                 zipCode + " - " + context.watch<AccountInfoProvider>().name,

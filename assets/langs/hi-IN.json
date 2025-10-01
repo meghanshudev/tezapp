@@ -1,5 +1,6 @@
 {
     "login_or_signup": "लॉग इन या साइन अप",
+    "account": "प्रोफाइल",
     "your_account": "आपकी प्रोफाइल",
     "enter_your_phone_number": "अपना फोन नंबर डालें",
     "send_otp": "OTP भेजें",
@@ -87,6 +88,7 @@
     "new_orders" : "नए ऑर्डर",
     "past_orders" : "पिछले ऑर्डर",
     "back_to_group_details" : "वापस जाएं",
+    "order" : "ऑर्डर",
     "order_details" : "ऑर्डर का विवरण",
     "order_id" : "ऑर्डर ID:",
     "order_placed_on" : "ऑर्डर दिया गया",
@@ -178,6 +180,7 @@
     "order_received": "ऑर्डर प्राप्त",
     "your_order_will_be_confirmed_on": "आपके ऑर्डर की पुष्टि की जाएगी",
     "customer_support_have_an_issue?": "ग्राहक सहायता • आर्डर Cancel करना है? ",
+    "home": "होम",
     "back_to_home": "होम में जाये",
     "order_kirana_on_whatsapp": "WhatsApp करें किराना",
     "whatsapp_not_installed": "WhatsApp इंस्टॉल नहीं है",
@@ -197,5 +200,7 @@
     "delete_group" : "डिलीट करे ग्रुप",
     "delete_group_des" : "क्या आपको सच में ग्रुप डिलीट करना है?",
     "change_location": "लोकेशन बदले",
+    "no_orders_yet": "अभी तक कोई ऑर्डर नहीं",
+    "explore_products_and_place_order": "उत्पादों को एक्सप्लोर करें और अपना पहला ऑर्डर दें!",
     "set_or_change_your_delivery_location" : "अपना डिलीवरी का लोकेशन देखे या फिर बदले"
 }

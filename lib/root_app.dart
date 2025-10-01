@@ -43,6 +43,7 @@ class _RootAppState extends State<RootApp> {
   var zipCode = '';
   var deliverTo = '';
 
+
   // load cart
   bool hasCartItem = false;
   bool isLoadingCart = false;
@@ -229,26 +230,37 @@ class _RootAppState extends State<RootApp> {
   @override
   Widget build(BuildContext context) {
     // String username = ;
+    List topItems = [
+      {"icon": Feather.home, "label": "home".tr(), "page": 0},
+      {"icon": Feather.list, "label": "order_history".tr(), "page": 1},
+      {"icon": Feather.user, "label": "account".tr(), "page": 2},
+      {"icon": Feather.shopping_cart, "label": "cart".tr(), "page": 3},
+    ];
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
-          child: CustomAppBar(
-            isClick: true,
-            onCallBack: (result) async {
-              await getCurrentLocation(lat: result['lat'], lng: result['lng']);
-
-              await checkInOperationCity(
-                lat: result['lat'],
-                lng: result['lng'],
-              );
-            },
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
-          ),
+          child: pageIndex == 0
+              ? CustomAppBar(
+                  isClick: true,
+                  onCallBack: (result) async {
+                    await getCurrentLocation(
+                        lat: result['lat'], lng: result['lng']);
+                    await checkInOperationCity(
+                      lat: result['lat'],
+                      lng: result['lng'],
+                    );
+                  },
+                  subtitle: zipCode +
+                      " - " +
+                      context.watch<AccountInfoProvider>().name,
+                  subtitleIcon: Entypo.location_pin,
+                )
+              : CustomAppBar(
+                  subtitle: topItems[pageIndex]['label'],
+                ),
         ),
         bottomNavigationBar: getFooter(),
         body: getBody(),
@@ -282,10 +294,10 @@ class _RootAppState extends State<RootApp> {
 
   Widget getFooter() {
     List bottomItems = [
-      {"icon": Feather.home, "label": "Home", "page": 0},
-      {"icon": Feather.list, "label": "Orders", "page": 1},
-      {"icon": Feather.user, "label": "Account", "page": 2},
-      {"icon": Feather.shopping_cart, "label": "Cart", "page": 3},
+      {"icon": Feather.home, "label": "home".tr(), "page": 0},
+      {"icon": Feather.list, "label": "order".tr(), "page": 1},
+      {"icon": Feather.user, "label": "account".tr(), "page": 2},
+      {"icon": Feather.shopping_cart, "label": "cart".tr(), "page": 3},
     ];
     if (isLoadingScreen) {
       return Center(child: CustomCircularProgress());

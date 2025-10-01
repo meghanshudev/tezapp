@@ -20,6 +20,7 @@ import 'package:tezchal/ui_elements/cart_loading.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_circular_progress.dart';
 import 'package:tezchal/ui_elements/slider_widget.dart';
+import 'package:tezchal/ui_elements/empty_page.dart';
 
 import '../../helpers/constant.dart';
 import '../../helpers/network.dart';
@@ -263,11 +264,7 @@ class _CartPageState extends State<CartPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomAppBar(subtitle: "your_cart".tr()),
-        ),
-        bottomNavigationBar: getFooter(),
+        // bottomNavigationBar: getFooter(),
         body: getBody(),
       ),
     );
@@ -1186,48 +1183,10 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget getEmptyCart() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        Center(
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(200 / 2),
-            ),
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(color: white, shape: BoxShape.circle),
-              child: Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  child: Image.asset("assets/images/no_cart_red.png"),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Column(
-          children: <Widget>[
-            Text(
-              "empty_cart",
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w500,
-                color: black.withOpacity(0.5),
-              ),
-            ).tr(),
-            SizedBox(height: 10),
-            Text(
-              "go_to_product_list_to_explore_product",
-              style: TextStyle(color: black.withOpacity(0.5)),
-            ).tr(),
-            SizedBox(height: 10),
-          ],
-        ),
-      ],
+    return EmptyPage(
+      image: "assets/images/no_cart_red.png",
+      title: "empty_cart",
+      subtitle: "go_to_product_list_to_explore_product",
     );
   }
 }

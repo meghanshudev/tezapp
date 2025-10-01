@@ -14,6 +14,7 @@ import 'package:tezchal/ui_elements/custom_sub_header.dart';
 import 'package:tezchal/ui_elements/order_history_box.dart';
 import 'package:tezchal/ui_elements/order_history_loading.dart';
 import 'package:tezchal/ui_elements/pagination_widget.dart';
+import 'package:tezchal/ui_elements/empty_page.dart';
 
 import '../../helpers/network.dart';
 import '../../helpers/utils.dart';
@@ -110,37 +111,16 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(95),
-          child: CustomSubHeader(
-            title: "order_history".tr(),
-            subtitle: "$deliverTo • $phone",
-          )),
+      backgroundColor: white,
       body: getBody(),
     );
   }
 
-  // Widget buildBody() {
-  //   return SingleChildScrollView(
-  //     controller: scollController,
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         CustomSubHeader(
-  //           title: "order_history".tr(),
-  //           subtitle: "$deliverTo • $phone",
-  //         ),
-  //         SizedBox(
-  //           height: 10,
-  //         ),
-  //         getOrders(),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget getBody() {
     if (isLoading && page == 1 && !isPulling) return LoadingData();
+    if (!isLoading && (checkIsNullValue(orders) || orders.length == 0)) {
+      return getEmptyOrder();
+    }
     return PaginationWidget(
       isLoading: isLoading,
       totalRow: total,
@@ -164,22 +144,23 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
 
   Widget getOrders() {
     if (isLoading && page == 1) return orderHistoryLoading();
-    return (checkIsNullValue(orders) || orders.length == 0)
-        ? Container(
-            margin: EdgeInsets.only(top: 30),
-            child: Center(
-              child: Text("no_order").tr(),
-            ),
-          )
-        : ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              return OrderHistoryBox(
-                data: orders[index],
-              );
-            });
+    return ListView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          return OrderHistoryBox(
+            data: orders[index],
+          );
+        });
+  }
+
+  Widget getEmptyOrder() {
+    return EmptyPage(
+      image: "assets/images/no_cart_red.png",
+      title: "no_orders_yet",
+      subtitle: "explore_products_and_place_order",
+    );
   }
 
   Widget orderHistoryLoading() {

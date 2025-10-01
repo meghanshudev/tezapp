@@ -52,6 +52,9 @@ void main() async {
         fallbackLocale: APP_LOCALES[0],
         child: Builder(
           builder: (context) => MaterialApp(
+            theme: ThemeData(
+              fontFamily: 'VarelaRound',
+            ),
             navigatorKey: navigatorKey,
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,

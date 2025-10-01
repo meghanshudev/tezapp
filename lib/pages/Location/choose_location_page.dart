@@ -15,7 +15,7 @@ import 'package:tezchal/helpers/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:tezchal/pages/Location/location_picker_page.dart';
 import 'package:tezchal/provider/credit_provider.dart';
-import 'package:tezchal/ui_elements/custom_search_button.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
 
 class ChoooseLocationPage extends StatefulWidget {
   const ChoooseLocationPage({Key? key}) : super(key: key);
@@ -75,8 +75,11 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
       child: Scaffold(
         // resizeToAvoidBottomInset: true,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: getAppBar(),
+          preferredSize: Size.fromHeight(60),
+          child: CustomAppBar(
+            subtitle: "Choose Location",
+            subtitleIcon: Entypo.location_pin,
+          ),
         ),
         backgroundColor: white,
         body: getBody(),
@@ -112,112 +115,6 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
     );
   }
 
-  Widget getAppBar() {
-    return AppBar(
-      backgroundColor: white,
-      titleSpacing: 0,
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      flexibleSpace: Container(
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 100,
-                decoration: BoxDecoration(color: white),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset("assets/images/logo-bg.png"),
-                      SizedBox(width: 40),
-                      Flexible(child: getSearchButton(context, () {}, () {})),
-                      // Container(
-                      //   width: 145,
-                      //   height: 35,
-                      //   padding: EdgeInsets.symmetric(horizontal: 5),
-                      //   decoration: BoxDecoration(
-                      //       color: white,
-                      //       borderRadius: BorderRadius.circular(10)),
-                      //   child: Row(
-                      //     // mainAxisAlignment: MainAxisAlignment.center,
-                      //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //     children: [
-                      //       Icon(
-                      //         Icons.add,
-                      //         size: 15,
-                      //         color: greyLight,
-                      //       ),
-                      //       // SizedBox(
-                      //       //   width: 5,
-                      //       // ),
-                      //       Text(
-                      //         "join_a_group",
-                      //         maxLines: 1,
-                      //         overflow: TextOverflow.ellipsis,
-                      //         style: TextStyle(
-                      //             fontSize: 15,
-                      //             fontWeight: FontWeight.w500,
-                      //             color: greyLight),
-                      //       ).tr()
-                      //     ],
-                      //   ),
-                      // )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(color: secondary),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "select_address",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: black.withOpacity(0.5),
-                        ),
-                      ).tr(),
-                      Row(
-                        children: [
-                          Icon(
-                            MaterialCommunityIcons.wallet,
-                            size: 25,
-                            color: primary.withOpacity(0.5),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "₹ " +
-                                context
-                                    .watch<CreditProvider>()
-                                    .balance
-                                    .toString(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: black.withOpacity(0.5),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget getBody() {
     var size = MediaQuery.of(context).size;

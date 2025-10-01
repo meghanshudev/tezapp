@@ -10,12 +10,13 @@ import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/models/product.dart';
 import 'package:tezchal/pages/Cart/cart_page.dart';
 import 'package:tezchal/pages/Product/product_detail_page.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/provider/cart_provider.dart';
 import 'package:tezchal/provider/credit_provider.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/loading_widget.dart';
 import 'package:tezchal/ui_elements/product_search_loading.dart';
-
+import 'package:tezchal/ui_elements/custom_search_button.dart';
 import '../../helpers/constant.dart';
 import '../../models/category.dart';
 import '../../ui_elements/content_placeholder.dart';
@@ -147,16 +148,28 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: white,
-        // appBar: PreferredSize(
-        //   preferredSize: Size.fromHeight(120),
-        //   child: CustomAppBar(
-        //     subtitle: "search".tr(),
-        //   ),
-        // ),
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: getAppBar(),
+          preferredSize: Size.fromHeight(80),
+          child: CustomAppBar(
+            isClick: true,
+            // onCallBack: (result) async {
+            //   await getCurrentLocation(
+            //       lat: result['lat'], lng: result['lng']);
+            //   await checkInOperationCity(
+            //     lat: result['lat'],
+            //     lng: result['lng'],
+            //   );
+            // },
+            // subtitle: zipCode +
+            //     " - " +
+            //     context.watch<AccountInfoProvider>().name,
+            subtitleIcon: Entypo.location_pin,
+          ),
         ),
+        // appBar: PreferredSize(
+        //   preferredSize: Size.fromHeight(60),
+        //   child: getAppBar(),
+        // ),
         bottomNavigationBar: getFooter(),
         body: getBody(),
       ),
@@ -170,44 +183,37 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
         // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: 5),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 15,
-              bottom: 15,
-              left: 15,
-              right: 15,
+          Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: greyLight, width: 1.5),
             ),
-            child: Container(
-              width: size.width - 30,
-              height: 40,
-              decoration: BoxDecoration(
-                border: Border.all(color: primary),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    child: Center(
-                      child: Icon(Icons.search, size: 20, color: greyLight),
+            margin: EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  child: Center(
+                    child: Icon(Icons.search, size: 30, color: greyLight),
+                  ),
+                ),
+                Flexible(
+                  child: TextField(
+                    controller: searchController,
+                    onSubmitted: (val) => onSearch(val),
+                    onChanged: (val) => onSearch(val),
+                    onEditingComplete: () => onSearch(searchController.text),
+                    cursorColor: black,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "search_for_products".tr(),
                     ),
                   ),
-                  Flexible(
-                    child: TextField(
-                      controller: searchController,
-                      onSubmitted: (val) => onSearch(val),
-                      onChanged: (val) => onSearch(val),
-                      onEditingComplete: () => onSearch(searchController.text),
-                      cursorColor: black,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        hintText: "search_for_products".tr(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(width: 20),
+              ],
             ),
           ),
           SizedBox(height: 5),
@@ -226,67 +232,49 @@ class _ProductSearchPageState extends State<ProductSearchPage> {
       elevation: 0,
       flexibleSpace: Container(
         child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                height: 80,
-                decoration: BoxDecoration(color: primary),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset("assets/images/logo-bg.png"),
-                      SizedBox(width: 40),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(color: secondary),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Container(
+            width: double.infinity,
+            height: 80,
+            decoration: BoxDecoration(color: primary),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     children: [
                       Text(
                         "search",
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 22,
                           fontWeight: FontWeight.w500,
-                          color: black.withOpacity(0.5),
+                          color: white,
                         ),
                       ).tr(),
-                      Row(
-                        children: [
-                          Icon(
-                            MaterialCommunityIcons.wallet,
-                            size: 25,
-                            color: primary.withOpacity(0.5),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            "₹ " +
-                                context
-                                    .watch<CreditProvider>()
-                                    .balance
-                                    .toString(),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: black.withOpacity(0.5),
-                            ),
-                          ),
-                        ],
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        MaterialCommunityIcons.wallet,
+                        size: 25,
+                        color: white,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "₹ " +
+                            context.watch<CreditProvider>().balance.toString(),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: white,
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

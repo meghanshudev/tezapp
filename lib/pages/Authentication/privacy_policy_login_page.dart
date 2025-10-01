@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:tezchal/helpers/network.dart';
 import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/ui_elements/custom_appbar.dart';
 
 import '../../ui_elements/loading_widget.dart';
 
@@ -52,20 +53,14 @@ class _PrivacyPolicyLoginPageState extends State<PrivacyPolicyLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: getAppBar(),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: CustomAppBar(
+          title: "privacy_policy".tr(),
+        ),
+      ),
       body: isLoading ? LoadingData() : getBody(),
       bottomNavigationBar: getFooter(),
-    );
-  }
-
-  AppBar getAppBar() {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: primary,
-      elevation: 0,
-      centerTitle: false,
-      toolbarHeight: 61,
-      title: Image.asset("assets/images/logo.png", height: 100,)
     );
   }
 

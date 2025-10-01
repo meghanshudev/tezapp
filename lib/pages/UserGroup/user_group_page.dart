@@ -19,6 +19,7 @@ import 'package:tezchal/ui_elements/slider_widget.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_footer.dart';
 import 'package:tezchal/provider/account_info_provider.dart';
+import 'package:tezchal/ui_elements/custom_sub_header.dart';
 
 class UserGroupPage extends StatefulWidget {
   const UserGroupPage({Key? key}) : super(key: key);
@@ -68,10 +69,11 @@ class _UserGroupPageState extends State<UserGroupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
-          subtitle: zipCode + " - " + context.watch<AccountInfoProvider>().name,
-          subtitleIcon: Entypo.location_pin,
+          isWidget: true,
+          title: "your_tez_group".tr(),
+          subtitle: "get_upto_75%_off_when_you_buy_in_a_group".tr(),
         ),
       ),
       body: getBody(),
@@ -129,12 +131,6 @@ class _UserGroupPageState extends State<UserGroupPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("your_tez_group", style: normalBoldBlackTitle).tr(),
-                SizedBox(height: 2),
-                Text(
-                  "get_upto_75%_off_when_you_buy_in_a_group",
-                  style: smallMediumGreyText,
-                ).tr(),
                 SizedBox(height: 20),
                 SliderWidget(items: ads),
                 SizedBox(height: 20),

@@ -13,13 +13,17 @@ class CustomAppBar extends StatefulWidget {
   const CustomAppBar({
     Key? key,
     this.subtitle = "",
+    this.title,
     this.subtitleIcon,
     this.onCallBack,
     this.isClick = false,
+    this.isWidget = false,
   }) : super(key: key);
   final String subtitle;
+  final String? title;
   final IconData? subtitleIcon;
   final bool isClick;
+  final bool isWidget;
   final Function(dynamic)? onCallBack;
 
   @override
@@ -39,104 +43,137 @@ class _CustomAppBarState extends State<CustomAppBar> {
       titleSpacing: 0,
       automaticallyImplyLeading: false,
       elevation: 0,
-      flexibleSpace: Container(
-        child: SafeArea(
-          child: Container(
-            height: 60,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20),
+      flexibleSpace: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  widget.isClick
-                      ? Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: GestureDetector(
-                          onTap: () async {
-                            var result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChoooseLocationPage(),
-                              ),
-                            );
-                            widget.onCallBack!(result);
-                          },
-                          child: Row(
-                            children: [
-                              if (widget.subtitleIcon != null)
-                                Icon(
-                                  widget.subtitleIcon,
-                                  size: 28,
-                                  color: white,
-                                ),
-                              SizedBox(width: 5),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                child: Text(
-                                  widget.subtitle,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: white,
+                  if (!widget.isWidget)
+                    widget.isClick
+                        ? Container(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: GestureDetector(
+                              onTap: () async {
+                                var result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChoooseLocationPage(),
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                      : Container(
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: Row(
-                          children: [
-                            if (widget.subtitleIcon != null)
-                              Icon(widget.subtitleIcon, size: 28, color: white),
-                            SizedBox(width: 5),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              child: Text(
-                                widget.subtitle,
-                                maxLines: 1,
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: white,
-                                ),
+                                );
+                                widget.onCallBack!(result);
+                              },
+                              child: Row(
+                                children: [
+                                  if (widget.subtitleIcon != null)
+                                    Icon(
+                                      widget.subtitleIcon,
+                                      size: 28,
+                                      color: white,
+                                    ),
+                                  SizedBox(width: 5),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.3,
+                                    child: Text(
+                                      widget.subtitle,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w500,
+                                        color: white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Icon(
-                          MaterialCommunityIcons.wallet,
-                          size: 25,
-                          color: white,
-                        ),
-                        SizedBox(width: 10,),
-                        Text(
-                          "₹" +
-                              context
-                                  .watch<CreditProvider>()
-                                  .balance
-                                  .toString(),
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                          )
+                        : Container(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: Row(
+                              children: [
+                                if (widget.subtitleIcon != null)
+                                  Icon(widget.subtitleIcon,
+                                      size: 28, color: white),
+                                SizedBox(width: 5),
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width *
+                                      0.3,
+                                  child: Text(
+                                    widget.subtitle,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w500,
+                                      color: white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  if (!widget.isWidget)
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(
+                            MaterialCommunityIcons.wallet,
+                            size: 25,
                             color: white,
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "₹" +
+                                context
+                                    .watch<CreditProvider>()
+                                    .balance
+                                    .toString(),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
-          ),
+            if (widget.isWidget)
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (widget.title != null)
+                      Text(
+                        widget.title!,
+                        style: normalBoldWhiteTitle,
+                      ),
+                  ],
+                ),
+              ),
+            if (widget.isWidget)
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.subtitle,
+                      style: smallMediumWhiteText,
+                    ),
+                  ],
+                ),
+              )
+          ],
         ),
       ),
     );

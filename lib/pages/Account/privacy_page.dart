@@ -27,6 +27,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
   bool isLoading = false;
   String title = "";
   String content = "";
+  String phone = '';
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code'] ?? ""
         : "";
+    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
     fetchPrivacyPolicy();
   }
 
@@ -68,11 +70,10 @@ class _PrivacyPageState extends State<PrivacyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
+            title: "privacy_policy".tr(),
+            subtitle: "$deliverTo • $phone",
           ),
         ),
         // body: buildBody(),
