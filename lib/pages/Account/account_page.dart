@@ -315,7 +315,12 @@ class _AccountPageState extends State<AccountPage> {
       children: [
         TextButton(
           onPressed: () {
-            onSignOut(context);
+            confirmAlert(
+              context,
+              des: "are_you_sure_you_want_to_logout?".tr(),
+              onCancel: () => Navigator.pop(context),
+              onConfirm: () => onSignOut(context),
+            );
           },
           child: Text("logout", style: normalBoldPrimaryTitle).tr(),
         ),

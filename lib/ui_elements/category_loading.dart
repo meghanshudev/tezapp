@@ -32,39 +32,41 @@ class CategoryLoading extends StatelessWidget {
             flex: 1,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ContentPlaceholder(
-                        height: 10,
-                        spacing: EdgeInsets.only(bottom: 5),
-                      ),
-                      ContentPlaceholder(
-                        height: 10,
-                        width: 100,
-                        spacing: EdgeInsets.only(bottom: 5),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: ContentPlaceholder(height: 30),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        flex: 3,
-                        child: ContentPlaceholder(height: 30),
-                      ),
-                    ],
-                  ),
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ContentPlaceholder(
+                          height: 10,
+                          spacing: EdgeInsets.only(bottom: 5),
+                        ),
+                        ContentPlaceholder(
+                          height: 10,
+                          width: 100,
+                          spacing: EdgeInsets.only(bottom: 5),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: ContentPlaceholder(height: 30),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          flex: 3,
+                          child: ContentPlaceholder(height: 30),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

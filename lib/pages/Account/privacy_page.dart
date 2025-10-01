@@ -74,6 +74,7 @@ class _PrivacyPageState extends State<PrivacyPage> {
           child: CustomAppBar(
             title: "privacy_policy".tr(),
             subtitle: "$deliverTo • $phone",
+            isWidget: true,
           ),
         ),
         // body: buildBody(),

@@ -358,12 +358,8 @@ removeStorage(storageName) async {
 onSignOut(context) async {
   await removeStorage(STORAGE_USER);
   userSession = '';
-  navigatorKey.currentState!.pushNamedAndRemoveUntil(
-    "/login_page",
-    (Route<dynamic> route) => false,
-  );
-  // Navigator.pushNamedAndRemoveUntil(
-  //     context, "/login_page", (Route<dynamic> route) => false);
+  Navigator.pushNamedAndRemoveUntil(
+      context, "/login_page", (Route<dynamic> route) => false);
 }
 
 // check if null value and return back the value if not null

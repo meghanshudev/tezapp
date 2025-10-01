@@ -49,13 +49,20 @@ class _HomePageState extends State<HomePage> {
   bool isAdsLoading = false;
 
   late Mixpanel mixpanel;
+  bool _isMixpanelLoading = true;
 
   @override
   void initState() {
     super.initState();
-    initPage();
+    _initializePage();
+  }
 
-    initMixpanel();
+  Future<void> _initializePage() async {
+    await initMixpanel();
+    setState(() {
+      _isMixpanelLoading = false;
+    });
+    initPage();
     initailize();
   }
 
@@ -144,6 +151,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isMixpanelLoading) {
+      return Scaffold(
+        backgroundColor: white,
+        body: Center(child: CustomCircularProgress()),
+      );
+    }
     return Scaffold(backgroundColor: white, body: getBody());
   }
 

@@ -72,6 +72,7 @@ class _TermConditionPageState extends State<TermConditionPage> {
           child: CustomAppBar(
             title: "terms_&_conditions".tr(),
             subtitle: "$deliverTo • $phone",
+            isWidget: true,
           ),
         ),
         // body: buildBody(),

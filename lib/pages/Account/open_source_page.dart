@@ -72,6 +72,7 @@ class _OpenSourcePageState extends State<OpenSourcePage> {
           child: CustomAppBar(
             title: "open_source_licenses".tr(),
             subtitle: "$deliverTo • $phone",
+            isWidget: true,
           ),
         ),
         // body: buildBody(),

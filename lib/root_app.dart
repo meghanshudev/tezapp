@@ -53,12 +53,17 @@ class _RootAppState extends State<RootApp> {
   // bool isUpdateLocation = false;
 
   late Mixpanel mixpanel;
+  bool _isLoading = true;
 
   @override
   void initState() {
     // ignore: todo
     // TODO: implement initState
     super.initState();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
     print("ROOT PAGE");
 
     pageIndex =
@@ -84,7 +89,8 @@ class _RootAppState extends State<RootApp> {
 
     // checkInOperationCity();
 
-    initPage();
+    await initMixpanel();
+    await initPage();
     getProfileData(context);
     deliverTo =
         !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
@@ -93,15 +99,16 @@ class _RootAppState extends State<RootApp> {
             ? userSession['zip_code'] ?? ""
             : "";
 
-    initMixpanel();
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(
-      MIX_PANEL,
-      optOutTrackingDefault: false,
-      trackAutomaticEvents: true,
-    );
+    mixpanel = await Mixpanel.init(MIX_PANEL,
+        optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
   void onOpenSearch() {
@@ -229,6 +236,12 @@ class _RootAppState extends State<RootApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: white,
+        body: Center(child: CustomCircularProgress()),
+      );
+    }
     // String username = ;
     List topItems = [
       {"icon": Feather.home, "label": "home".tr(), "page": 0},
