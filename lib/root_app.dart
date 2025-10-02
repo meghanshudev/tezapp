@@ -40,6 +40,7 @@ class _RootAppState extends State<RootApp> {
   // is in operation city
   bool isInOperationCity = true;
   bool isLoadingScreen = false;
+  var address = '';
   var zipCode = '';
   var deliverTo = '';
 
@@ -98,6 +99,9 @@ class _RootAppState extends State<RootApp> {
         !checkIsNullValue(userSession['zip_code'])
             ? userSession['zip_code'] ?? ""
             : "";
+    address = !checkIsNullValue(userSession['address'])
+        ? userSession['address'] ?? ""
+        : "";
 
     if (mounted) {
       setState(() {
@@ -266,9 +270,7 @@ class _RootAppState extends State<RootApp> {
                       lng: result['lng'],
                     );
                   },
-                  subtitle: zipCode +
-                      " - " +
-                      context.watch<AccountInfoProvider>().name,
+                  subtitle: address + " - " + zipCode,
                   subtitleIcon: Entypo.location_pin,
                 )
               : CustomAppBar(
@@ -329,8 +331,8 @@ class _RootAppState extends State<RootApp> {
               ),
               child: Padding(
                 padding: const EdgeInsets.only(
-                  left: 20,
-                  right: 20,
+                  left: 40,
+                  right: 40,
                   top: 15,
                   bottom: 20,
                 ),

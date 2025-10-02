@@ -35,36 +35,35 @@ class CategoryItem extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 30,
-              child: Text(
-                data["name"],
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w600),
+        child: Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  data["name"],
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600),
+                ),
               ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(0),
-              child: CustomImage(
-                data["image"],
-                radius: 0,
-                width: 75,
-                height: 55,
-                isShadow: false,
+              // Spacer(),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(0),
+                child: CustomImage(
+                  data["image"],
+                  radius: 0,
+                  width: 75,
+                  height: 55,
+                  isShadow: false,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

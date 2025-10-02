@@ -102,21 +102,25 @@ class ProductItemNetwork extends StatelessWidget {
             SizedBox(
               height: 8,
             ),
-            Container(
-              height: 33,
-              child: Text(
-                name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                ],
               ),
-            ),
-            SizedBox(
-              height: 12,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

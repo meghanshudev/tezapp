@@ -260,6 +260,8 @@ class _HomePageState extends State<HomePage> {
     }
 
     var response = await netGet(endPoint: "product", params: params);
+      print("DATA  products${response}");
+
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
       List products = data['list'] ?? [];

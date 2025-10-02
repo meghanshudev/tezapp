@@ -222,30 +222,30 @@ class _AccountPageState extends State<AccountPage> {
           subTitle: "view_your_wallet".tr(),
         ),
         SizedBox(height: 10),
-        context.watch<HasGroupProvider>().hasGroup
-            ? CardItem(
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserGroupViewPage(),
-                    ),
-                  ),
-              icon: MaterialCommunityIcons.account_group,
-              title: "Tez Group",
-              subTitle: "Join or start your Tez group",
-            )
-            : CardItem(
-              onTap:
-                  () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserGroupPage()),
-                  ),
-              icon: MaterialCommunityIcons.account_group,
-              title: "Tez Group",
-              subTitle: "Join or start your Tez group",
-            ),
-        SizedBox(height: 10),
+        // context.watch<HasGroupProvider>().hasGroup
+        //     ? CardItem(
+        //       onTap:
+        //           () => Navigator.push(
+        //             context,
+        //             MaterialPageRoute(
+        //               builder: (context) => UserGroupViewPage(),
+        //             ),
+        //           ),
+        //       icon: MaterialCommunityIcons.account_group,
+        //       title: "Tez Group",
+        //       subTitle: "Join or start your Tez group",
+        //     )
+        //     : CardItem(
+        //       onTap:
+        //           () => Navigator.push(
+        //             context,
+        //             MaterialPageRoute(builder: (context) => UserGroupPage()),
+        //           ),
+        //       icon: MaterialCommunityIcons.account_group,
+        //       title: "Tez Group",
+        //       subTitle: "Join or start your Tez group",
+        //     ),
+        // SizedBox(height: 10),
         CardItem(
           onTap:
               () => Navigator.push(
