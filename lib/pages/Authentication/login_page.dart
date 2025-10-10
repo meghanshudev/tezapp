@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
 
         // store login token
         await setStorage(STORAGE_USER, userData);
-        await getStorageUser();
+        userSession = await getStorageUser();
 
         // Get profile data before navigation
         var user = await getProfileData(context);

@@ -96,20 +96,13 @@ class _AppInitializerState extends State<AppInitializer> {
       if (checkIsNullValue(userSession)) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
-      } else if (userSession['id'] == 676) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RootApp(data: {"activePageIndex": 0}),
-          ),
+          MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => RootApp(data: {"activePageIndex": 0}),
+            builder: (context) => RootApp(data: const {"activePageIndex": 0}),
           ),
         );
       }
@@ -117,7 +110,7 @@ class _AppInitializerState extends State<AppInitializer> {
       // If no userResult found, go to login page as fallback
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     }
 

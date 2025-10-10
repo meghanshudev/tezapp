@@ -33,12 +33,13 @@ Map<String, dynamic> userProfile = {
   "email": "",
 };
 
-Future<void> getStorageUser() async {
+Future<dynamic> getStorageUser() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var userResult = prefs.getString(APP_PREFIX + STORAGE_USER);
   if (!checkIsNullValue(userResult)) {
     userSession = json.decode(userResult!);
   }
+  return userSession;
 }
 
 getOrderDay(int number) {
@@ -174,8 +175,8 @@ launchSocialLink(link) async {
 
 getProfileData(BuildContext context) async {
   var response = await netGet(isUserToken: true, endPoint: "me/profile");
-  await removeStorage(STORAGE_USER);
   if (response['resp_code'] == "200") {
+    userSession = await getStorageUser();
     var object = {
       "id": response['resp_data']['data']['id'],
       "name": response['resp_data']['data']['name'],
