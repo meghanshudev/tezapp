@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
+import 'dart:developer';
+
 import 'package:provider/provider.dart';
 import 'package:tezchal/helpers/constant.dart';
 import 'package:tezchal/helpers/styles.dart';
@@ -78,6 +80,7 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   initPage() async {
+    log("Category data: ${widget.data}");
     eventBus.on().listen((event) async {
       if (!isInPage) {
         List temp = products;
@@ -100,7 +103,11 @@ class _CategoryPageState extends State<CategoryPage> {
     }
 
     await loadSubCategories(categoryId);
-    await loadProductsBySubCategory(selectedSubCategoryId);
+    if (subCategories.length > 1) {
+      await loadProductsBySubCategory(subCategories[1]['id'], isLoading: false);
+    } else {
+      await loadProductsBySubCategory(selectedSubCategoryId);
+    }
 
     scollController.addListener(() async {
       if (scollController.position.pixels >
@@ -131,6 +138,7 @@ class _CategoryPageState extends State<CategoryPage> {
     var params = {"page": "1", "limit": "0", "order": "rgt", "sort": "asc"};
 
     var response = await netGet(endPoint: "category", params: params);
+    log("Sub-categories API response: $response");
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
       List tempCategories = data["list"];
@@ -172,10 +180,13 @@ class _CategoryPageState extends State<CategoryPage> {
       params["sub_category_id"] = categoryId.toString();
     } else {
       params["category_id"] = categoryId.toString();
-      params["sub_category_id"] = _subCategoryId.toString();
+      if (_subCategoryId != 0) {
+        params["sub_category_id"] = _subCategoryId.toString();
+      }
     }
 
     var response = await netGet(endPoint: "product", params: params);
+    log("Products API response: $response");
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
       if (pageIndex == 1)
@@ -345,19 +356,17 @@ class _CategoryPageState extends State<CategoryPage> {
           child: getSubCategory(),
         ),
         Expanded(
-          child: Flexible(
-            child: Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: black.withOpacity(0.02),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                  ),
-                ],
-              ),
-              child: getProducts(),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: black.withOpacity(0.02),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                ),
+              ],
             ),
+            child: getProducts(),
           ),
         ),
       ],

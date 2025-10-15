@@ -323,19 +323,17 @@ class _GuestCategoryPageState extends State<GuestCategoryPage> {
           child: getSubCategory(),
         ),
         Expanded(
-          child: Flexible(
-            child: Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: black.withOpacity(0.02),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                  ),
-                ],
-              ),
-              child: getProducts(),
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: black.withOpacity(0.02),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                ),
+              ],
             ),
+            child: getProducts(),
           ),
         ),
       ],

@@ -53,13 +53,11 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        data["name"],
-                        style: meduimBoldBlackText,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      data["name"],
+                      style: meduimBoldBlackText,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(
                       height: 5,
@@ -72,6 +70,7 @@ class ProductCard extends StatelessWidget {
                         fontSize: 12,
                       ),
                     ),
+                    Spacer(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,

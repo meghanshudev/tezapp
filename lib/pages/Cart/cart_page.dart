@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easebuzz_flutter_sdk/easebuzz_flutter_sdk.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -1112,31 +1113,47 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       confirmingCheckout = true;
     });
+
+    // Step 1: Get Access Key from the server
     var response = await netPost(endPoint: "me/cart/confirm", params: {});
 
     if (response['resp_code'] == "200") {
-      print(cart["lines"]);
+      var accessKey = response['resp_data']['data']['access_key'];
+      var payMode = "production";
 
-      dynamic dataPanel = {
-        "phone": userSession['phone_number'],
-        "total": cart["total"].toString(),
-        "order_confirm": "order_confirm",
+      Object params = {
+        "access_key": accessKey,
+        "pay_mode": payMode,
       };
 
-      mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
+      // final paymentResponse = await EasebuzzFlutterSdk.initiatePayment(params);
+      final paymentResponse = null;
+      if (paymentResponse != null &&
+          paymentResponse["result"] == "payment_successfull") {
+        print(cart["lines"]);
 
-      await CartRepository().removeAll();
-      var temp = response["resp_data"]["data"];
-      showToast("your_order_is_completed".tr(), context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder:
-              (context) => OrderConfirmedPage(
-                data: {"schedules": schedules, "orderData": temp},
-              ),
-        ),
-      );
+        dynamic dataPanel = {
+          "phone": userSession['phone_number'],
+          "total": cart["total"].toString(),
+          "order_confirm": "order_confirm",
+        };
+
+        mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
+
+        await CartRepository().removeAll();
+        var temp = response["resp_data"]["data"];
+        showToast("your_order_is_completed".tr(), context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderConfirmedPage(
+              data: {"schedules": schedules, "orderData": temp},
+            ),
+          ),
+        );
+      } else {
+        showToast("Payment Failed", context);
+      }
     } else {
       var ms = response["resp_data"]["message"];
       showToast(ms.toString(), context);
