@@ -71,7 +71,7 @@ class _SearchButtonState extends State<SearchButton> {
             ),
             Expanded(
               child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 800),
                 transitionBuilder: (Widget child, Animation<double> animation) {
                   final inAnimation = Tween<Offset>(
                     begin: Offset(0, 1),
@@ -98,12 +98,15 @@ class _SearchButtonState extends State<SearchButton> {
                     );
                   }
                 },
-                child: Text(
-                  _searchHints[_currentIndex].tr(),
+                child: Align(
                   key: ValueKey<int>(_currentIndex),
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _searchHints[_currentIndex].tr(),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),

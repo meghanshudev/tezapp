@@ -34,6 +34,7 @@ class _AddNamePageState extends State<AddNamePage> {
   int pageIndex = 0;
 
   bool isLoadingButton = false;
+  bool isDefencePersonnel = false;
 
   late Mixpanel mixpanel;
 
@@ -128,6 +129,29 @@ class _AddNamePageState extends State<AddNamePage> {
                         height: 25,
                       ),
                       Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 20),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              activeColor: primary,
+                              value: isDefencePersonnel,
+                              onChanged: (value) {
+                                setState(() {
+                                  isDefencePersonnel = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              "are_you_a_defence_personnel".tr(),
+                              style: normalBlackText,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Row(
                           children: [
@@ -144,19 +168,22 @@ class _AddNamePageState extends State<AddNamePage> {
                                 await getStorage(LANGUAGE);
                                 context.setLocale(APP_LOCALES[0]);
                               },
-                              child: pageIndex == 0 ?  CustomPrimaryButton(
-                                text: "English",
-                              ) : Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: primary),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                    child: Text(
-                                  "English",
-                                  style: normalPrimaryText,
-                                )),
-                              ),
+                              child: pageIndex == 0
+                                  ? CustomPrimaryButton(
+                                      text: "English",
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: primary),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                          child: Text(
+                                        "English",
+                                        style: normalPrimaryText,
+                                      )),
+                                    ),
                             )),
                             SizedBox(
                               width: 15,
@@ -174,19 +201,22 @@ class _AddNamePageState extends State<AddNamePage> {
                                 await getStorage(LANGUAGE);
                                 context.setLocale(APP_LOCALES[1]);
                               },
-                              child: pageIndex == 1 ?  CustomPrimaryButton(
-                                text: "हिन्दी",
-                              ) :  Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: primary),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: Center(
-                                    child: Text(
-                                  "हिन्दी",
-                                  style: normalPrimaryText,
-                                )),
-                              ),
+                              child: pageIndex == 1
+                                  ? CustomPrimaryButton(
+                                      text: "हिन्दी",
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: primary),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: Center(
+                                          child: Text(
+                                        "हिन्दी",
+                                        style: normalPrimaryText,
+                                      )),
+                                    ),
                             ))
                           ],
                         ),
@@ -250,6 +280,7 @@ class _AddNamePageState extends State<AddNamePage> {
         endPoint: "me/update/profile",
         params: {
           "name": name,
+          "is_defence_personnel": isDefencePersonnel,
         });
     if (mounted)
       setState(() {
