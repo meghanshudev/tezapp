@@ -49,11 +49,15 @@ class _EditProfileState extends State<EditProfile> {
         !checkIsNullValue(userSession['email']) ? userSession['email'] : "";
     name = !checkIsNullValue(userSession['name'] ?? "") ? userSession['name'] ?? "" : "N/A";
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code']
+    deliverTo = !checkIsNullValue(userSession['name'])
+        ? userSession['name'] ?? ""
         : "";
-    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
+    zipCode = !checkIsNullValue(userSession['zip_code'])
+        ? userSession['zip_code'] ?? ""
+        : "";
+    phone = !checkIsNullValue(userSession['phone_number'])
+        ? userSession['phone_number'] ?? ""
+        : "";
   }
 
   onValidate() {

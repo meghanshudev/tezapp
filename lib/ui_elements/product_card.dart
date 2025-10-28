@@ -35,8 +35,9 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Increase image section size slightly
             Expanded(
-              flex: 5,
+              flex: 6,
               child: CustomImage(
                 data["image"],
                 radius: 10,
@@ -45,61 +46,90 @@ class ProductCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
+            // Decrease content section size slightly
             Expanded(
-              flex: 6,
+              flex: 5,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text(
-                      data["name"],
-                      style: meduimBoldBlackText,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      data["attributes"].length == 0
-                          ? ""
-                          : data["attributes"][0]["value"],
-                      style: TextStyle(
-                        fontSize: 12,
+                    // Product name and attributes section - with tighter constraints
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Limit product name to 1 line to save space
+                          Text(
+                            data["name"],
+                            style: meduimBoldBlackText,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          // SizedBox(
+                          //   height: 2, // Reduce spacing
+                          // ),
+                          Text(
+                            data["attributes"].length == 0
+                                ? ""
+                                : data["attributes"][0]["value"],
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: checkIsNullValue(data["percent_off"]) ||
-                                  data["percent_off"] == 0
-                              ? Text(
-                                  CURRENCY + "${data["unit_price"]}",
-                                  style: smallMediumBoldBlackText,
-                                )
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      CURRENCY + "${data["unit_price"]}",
-                                      style: smallStrikeBoldBlackText,
-                                    ),
-                                    Text(
-                                      CURRENCY + "${data["sale_price"]}",
-                                      style: smallMediumBoldBlackText,
-                                    )
-                                  ],
-                                ),
-                        ),
-                        AddToCardButtonItem(
-                          product: data,
-                        )
-                      ],
+                    // Price and add to cart button section - reduce height
+                    Container(
+                      height: 40, // Reduced height for the bottom section
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Price section - give it more space (75%)
+                          Expanded(
+                            flex: 3,
+                            child: checkIsNullValue(data["percent_off"]) ||
+                                    data["percent_off"] == 0
+                                ? Text(
+                                    CURRENCY + "${data["unit_price"]}",
+                                    style: smallMediumBoldBlackText,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  )
+                                : Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        CURRENCY + "${data["unit_price"]}",
+                                        style: smallStrikeBoldBlackText,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        CURRENCY + "${data["sale_price"]}",
+                                        style: smallMediumBoldBlackText,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                    ],
+                                  ),
+                          ),
+                          // Add button section - make it even smaller
+                          Container(
+                            width: 50, // Fixed width for the button
+                            height: 35, // Fixed height for the button
+                            child: AddToCardButtonItem(
+                              product: data,
+                            ),
+                          )
+                        ],
+                      ),
                     )
                   ],
                 ),

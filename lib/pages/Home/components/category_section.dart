@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tezchal/helpers/diwali_theme.dart';
 import 'package:tezchal/pages/Category/category_page.dart';
 import 'package:tezchal/ui_elements/category_item.dart';
 import 'package:tezchal/helpers/utils.dart';
@@ -24,10 +25,11 @@ class CategorySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Shop by Category",
+            "Festive Categories",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
+              color: DiwaliTheme.primaryColor,
             ),
           ),
           SizedBox(height: 20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tezchal/helpers/diwali_theme.dart';
 import 'package:tezchal/pages/Category/category_page.dart';
 import 'package:tezchal/ui_elements/product_item_network.dart';
 import 'package:tezchal/helpers/utils.dart';
@@ -84,7 +85,7 @@ class ProductSection extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Text("see_more", style: TextStyle(fontSize: 16)).tr(),
+                    Text("Explore More", style: TextStyle(fontSize: 16, color: DiwaliTheme.accentColor)).tr(),
                     SizedBox(width: 3),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
@@ -109,6 +110,7 @@ class ProductSection extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 20, top: 20, bottom: 20),
                 child: Card(
+                  color: DiwaliTheme.cardColor,
                   elevation: 4,
                   child: GestureDetector(
                     onTap: () async {

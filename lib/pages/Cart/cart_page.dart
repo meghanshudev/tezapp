@@ -531,13 +531,12 @@ class _CartPageState extends State<CartPage> {
   }
 
   Widget getBody() {
-    if (isLoadingCart)
-      // return Center(
-      //   child: CustomCircularProgress(),
-      // );
+    if (isLoadingCart) {
       return CartLoading();
-    // if (checkIsNullValue(cart) || checkIsNullValue(cart["lines"]))
-    //   return getEmptyCart();
+    }
+    if (checkIsNullValue(cart) || checkIsNullValue(cart["lines"])) {
+      return getEmptyCart();
+    }
     return context.watch<CartProvider>().isHasCart
         ? SingleChildScrollView(
           child: Column(
@@ -553,7 +552,8 @@ class _CartPageState extends State<CartPage> {
               //         ],
               //       )
               //     : Container(),
-              if (!checkIsNullValue(cart["amount_off"]))
+              // Add logging to debug 'amount_off'
+              if (!checkIsNullValue(cart) && !checkIsNullValue(cart["amount_off"]))
                 Container(
                   width: double.infinity,
                   height: 70,
@@ -708,10 +708,11 @@ class _CartPageState extends State<CartPage> {
                             style: smallMediumBlackText,
                           ),
                           SizedBox(height: 2),
-                          Text(
-                            _product["attributes"][0]["value"],
-                            style: smallBlackText,
-                          ),
+                          if (!checkIsNullValue(_product["attributes"]) && _product["attributes"].isNotEmpty)
+                            Text(
+                              _product["attributes"][0]["value"],
+                              style: smallBlackText,
+                            ),
                           SizedBox(height: 2),
                           Text("x" + qty, style: smallBoldPrimaryText),
                         ],
@@ -838,7 +839,7 @@ class _CartPageState extends State<CartPage> {
 
   Widget getFooter() {
     String byDate =
-        !checkIsNullValue(schedules.length)
+        schedules.isNotEmpty
             ? DateFormat(
               "d MMM",
             ).format(DateTime.parse(schedules[schedules.length - 1]["date"]))
@@ -1179,7 +1180,7 @@ class _CartPageState extends State<CartPage> {
   Widget getSlidable(Widget child, product, qty) {
     return Slidable(
       // Each Slidable must have a key
-      key: ValueKey(product.id), // or any unique identifier
+      key: ValueKey(product['id']), // or any unique identifier
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
         extentRatio: 0.2,

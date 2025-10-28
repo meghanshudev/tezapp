@@ -21,9 +21,12 @@ import 'package:tezchal/ui_elements/loading_widget.dart';
 import 'package:tezchal/ui_elements/product_item_network.dart';
 import 'package:tezchal/ui_elements/custom_search_button.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../helpers/diwali_theme.dart';
 import '../../helpers/network.dart';
 import '../../ui_elements/slider_widget.dart';
 import 'components/category_section.dart';
+import 'components/diwali_title.dart';
+import 'components/festive_glam_section.dart';
 import 'components/product_section.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -157,7 +160,21 @@ class _HomePageState extends State<HomePage> {
         body: Center(child: CustomCircularProgress()),
       );
     }
-    return Scaffold(backgroundColor: white, body: getBody());
+    return Theme(
+      data: DiwaliTheme.themeData,
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/home-bg.png"),
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter
+            ),
+          ),
+          child: getBody(),
+        ),
+      ),
+    );
   }
 
   fetchAds() async {
@@ -369,6 +386,8 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // DiwaliTitle(),
+        SizedBox(height: 15),
         getSearchButton(
           context,
           () {},
@@ -379,6 +398,7 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.only(left: 15, right: 15),
           child: SliderWidget(items: ads),
         ),
+        // FestiveGlamSection(),
         getCategories(),
         SizedBox(height: 5),
         SizedBox(height: 10),

@@ -357,7 +357,8 @@ removeStorage(storageName) async {
 }
 
 onSignOut(context) async {
-  await removeStorage(STORAGE_USER);
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
   userSession = '';
   Navigator.pushNamedAndRemoveUntil(
       context, "/login_page", (Route<dynamic> route) => false);

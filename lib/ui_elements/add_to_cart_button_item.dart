@@ -78,12 +78,13 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   onTap: () {
+                    log('Minus button tapped for product id: ${widget.product["id"]}');
                     addProductToCart(widget.product["id"], type: "minus");
                     // mix panel
-
-                     dynamic dataPanel = {
-                      "phone" : userSession['phone_number'],
-                       "type" : "decrease",
+ 
+                      dynamic dataPanel = {
+                       "phone" : userSession['phone_number'],
+                        "type" : "decrease",
                       "product":widget.product['name']
                      
                     };
@@ -113,12 +114,13 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
                 alignment: Alignment.centerRight,
                 child: InkWell(
                   onTap: () {
+                    log('Plus button tapped for product id: ${widget.product["id"]}');
                     addProductToCart(widget.product["id"], type: "add");
                      // mix panel
-
-                     dynamic dataPanel = {
-                      "phone" : userSession['phone_number'],
-                       "type" : "increase",
+ 
+                      dynamic dataPanel = {
+                       "phone" : userSession['phone_number'],
+                        "type" : "increase",
                       "product":widget.product['name']
                      
                     };
@@ -144,10 +146,11 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
             ? SizedBox()
             : GestureDetector(
                 onTap: () {
+                  log('Add to cart button tapped for product id: ${widget.product["id"]}');
                   addProductToCart(widget.product["id"]);
 
                    // mix panel
-
+ 
                      dynamic dataPanel = {
                       "phone" : userSession['phone_number'],
                       "product":widget.product['name']
@@ -179,7 +182,7 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
   bool isAddingCart = false;
 
   addProductToCart(int _productId, {String type = "add"}) async {
-
+    log('addProductToCart called with productId: $_productId and type: $type');
     if (isAddingCart) return;
     isAddingCart = true;
 
@@ -215,6 +218,7 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
           "qty": cnt,
         },
       );
+      log(response.toString());
     }
 
     setState(() {
