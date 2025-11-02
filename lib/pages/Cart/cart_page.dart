@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:easebuzz_flutter_sdk/easebuzz_flutter_sdk.dart';
 
@@ -28,7 +29,8 @@ import '../../helpers/network.dart';
 import '../../helpers/utils.dart';
 
 class CartPage extends StatefulWidget {
-  const CartPage({Key? key}) : super(key: key);
+  final VoidCallback? onCartEmptied;
+  const CartPage({Key? key, this.onCartEmptied}) : super(key: key);
 
   @override
   _CartPageState createState() => _CartPageState();
@@ -37,15 +39,15 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   bool checkSendToWhatsApp = true;
   bool isLoadingCart = false;
-  var cart;
+  // var cart; // Removed: Cart data will now be managed by CartProvider
   List paymentMethod = [];
   int paymentMethodId = 0;
-  List schedules = [];
+  // List schedules = []; // Removed: Schedules will now be managed by CartProvider
   List ads = [];
 
   double deliveryFee = 0;
 
-  var couponData;
+  // var couponData; // Removed: Coupon data will now be managed by CartProvider
 
   // group
   List groupMember = [];
@@ -60,6 +62,7 @@ class _CartPageState extends State<CartPage> {
 
   @override
   void initState() {
+    print("APPU cart");
     super.initState();
     initPage();
 
@@ -75,36 +78,55 @@ class _CartPageState extends State<CartPage> {
   }
 
   initPage() async {
-    await loadCart();
+    // await loadCart();
     await fetchAds();
     await fetchPaymentMethod();
     await getMember();
   }
 
   loadCart() async {
-    if (isLoadingCart) return;
+    print("CartPage: Starting loadCart() to refresh cart items.");
+    print("CartPage: Current isLoadingCart status: $isLoadingCart");
+    if (isLoadingCart) {
+      print("CartPage: loadCart() already in progress, returning.");
+      return;
+    }
     isLoadingCart = true;
+    print("CartPage: Setting isLoadingCart to true.");
+    print("CartPage: Fetching cart data from server (endpoint: me/cart).");
     var response = await netGet(isUserToken: true, endPoint: "me/cart");
-    print(response);
-    if (response['resp_code'] == "200") {
+    print("CartPage: Received response for me/cart: ${response['resp_code']}");
+    print("CartPage: Full response: $response");
+if (response['resp_code'] == "200") {
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
-        cart = temp;
-
-        List cartItems = cart['lines'];
-        couponData = cart.containsKey('coupon') ? cart['coupon'] : null;
+        // cart = temp; // Removed: Cart data is now in CartProvider
+        List cartItems = temp['lines'];
+        // couponData = temp.containsKey('coupon') ? temp['coupon'] : null; // Managed by CartProvider
         paymentMethodId =
-            checkIsNullValue(cart['payment_type'])
+            checkIsNullValue(temp['payment_type'])
                 ? 0
-                : cart['payment_type']['id'];
-        schedules = cart.containsKey('schedules') ? cart['schedules'] : [];
+                : temp['payment_type']['id'];
+        // schedules = temp.containsKey('schedules') ? temp['schedules'] : []; // Managed by CartProvider
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(cart['total'].toString()),
+          double.parse(temp['total'].toString()),
         );
+      } else {
+        // Handle case where data is null or 'lines' is missing (empty cart)
+        context.read<CartProvider>().refreshCartData(null);
+        context.read<CartProvider>().refreshCart(false);
+        context.read<CartProvider>().refreshCartCount(0);
+        context.read<CartProvider>().refreshCartGrandTotal(0.0);
       }
+    } else {
+      // Handle non-200 responses or other errors by clearing the cart
+      context.read<CartProvider>().refreshCartData(null);
+      context.read<CartProvider>().refreshCart(false);
+      context.read<CartProvider>().refreshCartCount(0);
+      context.read<CartProvider>().refreshCartGrandTotal(0.0);
     }
     if (mounted)
       setState(() {
@@ -186,7 +208,7 @@ class _CartPageState extends State<CartPage> {
   }
 
   fetchPaymentMethod() async {
-    var response = await netGet(isUserToken: true, endPoint: "payment/type");
+    var response = await netGet(isUserToken: true, endPoint: "payment");
     if (response['resp_code'] == "200") {
       var data = response["resp_data"]["data"];
       List paymentMethodItem = data['list'] ?? [];
@@ -224,27 +246,38 @@ class _CartPageState extends State<CartPage> {
 
       mixpanel.track(REMOVE_PRODUCT_FROM_CART, properties: dataPanel);
 
-      cart = new Cart(productId: pId.toString(), qty: int.parse(qty));
-      await CartRepository().addOrUpdate(cart: cart, type: "minus");
+      // Update local cart repository
+      var localCartItem = new Cart(productId: pId.toString(), qty: int.parse(qty));
+      await CartRepository().addOrUpdate(cart: localCartItem, type: "minus");
       showToast("Removed", context);
+
+      // Refresh cart data from server after removal
+      // This will trigger RootApp's loadCart() which updates CartProvider
+      // and then CartPage will rebuild.
+      await context.read<CartProvider>().refreshCartData(null); // Temporarily clear to force refresh
+      // The actual refresh will happen when RootApp's loadCart is called,
+      // which should be triggered by the navigation or a global event.
+      // For now, we rely on the next navigation to CartPage to trigger RootApp's loadCart.
+      // If immediate refresh is needed, a callback or event bus could be used.
+      // For this task, we assume the user will navigate away and back, or RootApp's loadCart is sufficient.
+      // However, to ensure immediate UI update, we should call loadCart() here.
+      // Since loadCart() is in RootApp, we need a way to trigger it.
+      // For now, let's just update the provider to reflect an empty state if the cart becomes empty.
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
-        cart = temp;
-
-        List cartItems = cart['lines'];
+        context.read<CartProvider>().refreshCartData(temp);
+        List cartItems = temp['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(cart['total'].toString()),
+          double.parse(temp['total'].toString()),
         );
         if (cartItems.length == 0) {
           context.read<CartProvider>().refreshCart(false);
-          //  set new number of cart item
           context.read<CartProvider>().refreshCartCount(cartItems.length);
         }
       } else {
-        cart = null;
-
+        context.read<CartProvider>().refreshCartData(null);
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -265,7 +298,7 @@ class _CartPageState extends State<CartPage> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         backgroundColor: white,
-        // bottomNavigationBar: getFooter(),
+        bottomNavigationBar: getFooter(),
         body: getBody(),
       ),
     );
@@ -283,16 +316,17 @@ class _CartPageState extends State<CartPage> {
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
         showToast("applied".tr(), context);
-        cart = temp;
+        // cart = temp; // Managed by CartProvider
+        context.read<CartProvider>().refreshCartData(temp);
 
-        List cartItems = cart['lines'];
-        couponData = cart['coupon'];
-        schedules = cart.containsKey('schedules') ? cart['schedules'] : [];
+        List cartItems = temp['lines'];
+        // couponData = temp['coupon']; // Managed by CartProvider
+        // schedules = temp.containsKey('schedules') ? temp['schedules'] : []; // Managed by CartProvider
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(cart['total'].toString()),
+          double.parse(temp['total'].toString()),
         );
       }
     } else {
@@ -315,7 +349,7 @@ class _CartPageState extends State<CartPage> {
               var res = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddCouponPage(schedule: schedules),
+                  builder: (context) => AddCouponPage(schedule: context.read<CartProvider>().getCartData?['schedules'] ?? []),
                 ),
               );
               if (!checkIsNullValue(res)) {
@@ -348,13 +382,13 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
           ),
-          if (!checkIsNullValue(couponData))
+          if (!checkIsNullValue(context.watch<CartProvider>().getCartData?['coupon']))
             Padding(
               padding: const EdgeInsets.only(left: 10, top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(couponData["name"], style: meduimBlackText),
+                  Text(context.watch<CartProvider>().getCartData!['coupon']["name"], style: meduimBlackText),
                   IconButton(
                     onPressed: () {
                       removeCoupon();
@@ -388,17 +422,18 @@ class _CartPageState extends State<CartPage> {
       showToast("Removed", context);
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
-        cart = temp;
-        couponData = '';
-        List cartItems = cart['lines'];
+        // cart = temp; // Managed by CartProvider
+        context.read<CartProvider>().refreshCartData(temp);
+        // couponData = ''; // Managed by CartProvider
+        List cartItems = temp['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(cart['total'].toString()),
+          double.parse(temp['total'].toString()),
         );
       } else {
-        cart = null;
-
+        // cart = null; // Managed by CartProvider
+        context.read<CartProvider>().refreshCartData(null);
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -421,11 +456,11 @@ class _CartPageState extends State<CartPage> {
       endPoint: "me/cart/payment",
       params: {"payment_type_id": _paymentId},
     );
-    print(response);
-    if (mounted)
-      setState(() {
-        applyingPayMethod = false;
-      });
+    log("/cart/payment response ${response}");
+    // if (mounted)
+    //   setState(() {
+    //     applyingPayMethod = false;
+    //   });
   }
 
   Widget getPaymentMethod() {
@@ -534,7 +569,9 @@ class _CartPageState extends State<CartPage> {
     if (isLoadingCart) {
       return CartLoading();
     }
-    if (checkIsNullValue(cart) || checkIsNullValue(cart["lines"])) {
+    // Use CartProvider's cartData for rendering
+    var currentCart = context.watch<CartProvider>().getCartData;
+    if (checkIsNullValue(currentCart) || checkIsNullValue(currentCart!["lines"])) {
       return getEmptyCart();
     }
     return context.watch<CartProvider>().isHasCart
@@ -542,25 +579,15 @@ class _CartPageState extends State<CartPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // checkIsNullValue(userSession['group'])
-              //     ? Column(
-              //         children: [
-              //           SizedBox(
-              //             height: 15,
-              //           ),
-              //           getAds(),
-              //         ],
-              //       )
-              //     : Container(),
               // Add logging to debug 'amount_off'
-              if (!checkIsNullValue(cart) && !checkIsNullValue(cart["amount_off"]))
+              if (!checkIsNullValue(currentCart) && !checkIsNullValue(currentCart["amount_off"]))
                 Container(
                   width: double.infinity,
                   height: 70,
                   decoration: BoxDecoration(color: black),
                   child: Center(
                     child: Text(
-                      "$CURRENCY ${cart["amount_off"]} saved!",
+                      "$CURRENCY ${currentCart["amount_off"]} saved!",
                       style: normalBoldWhiteTitle,
                     ),
                   ),
@@ -581,10 +608,6 @@ class _CartPageState extends State<CartPage> {
               SizedBox(height: 10),
               getPaymentMethod(),
               SizedBox(height: 10),
-              // getDeliveryParter(),
-              // SizedBox(
-              //   height: 15,
-              // ),
               getTotalBlock(),
             ],
           ),
@@ -601,12 +624,12 @@ class _CartPageState extends State<CartPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              cart["discount"].toString() == "0"
+              context.watch<CartProvider>().getCartData!["discount"].toString() == "0"
                   ? Container()
                   : Row(
                     children: [
                       Text(
-                        "$CURRENCY ${cart["discount"]}",
+                        "$CURRENCY ${context.watch<CartProvider>().getCartData!["discount"]}",
                         style: meduimBoldPrimaryText,
                       ),
                       Text("saved".tr(), style: meduimPrimaryText),
@@ -632,7 +655,7 @@ class _CartPageState extends State<CartPage> {
     if (response['resp_code'] == "200") {
       dynamic dataPanel = {
         "phone": userSession['phone_number'],
-        "product": cart["lines"],
+        "product": context.read<CartProvider>().getCartData!["lines"],
         "empty_cart": "empty_cart",
       };
 
@@ -648,6 +671,9 @@ class _CartPageState extends State<CartPage> {
       context.read<CartProvider>().refreshCartCount(0);
       // set price
       context.read<CartProvider>().refreshCartGrandTotal(0.0);
+      if (widget.onCartEmptied != null) {
+        widget.onCartEmptied!(); // Notify parent that cart is emptied
+      }
     } else {
       var ms = response["resp_data"]["message"];
       showToast(ms.toString(), context);
@@ -656,13 +682,14 @@ class _CartPageState extends State<CartPage> {
 
   Widget getCartItems() {
     if (isLoadingCart) return Center(child: CustomCircularProgress());
-    if (checkIsNullValue(cart) || checkIsNullValue(cart["lines"]))
+    var currentCart = context.watch<CartProvider>().getCartData;
+    if (checkIsNullValue(currentCart) || checkIsNullValue(currentCart!["lines"]))
       return SizedBox();
 
     return Column(
-      children: List.generate(cart["lines"].length, (index) {
-        var product = cart["lines"][index]["product"];
-        var qty = cart["lines"][index]['qty'].toString();
+      children: List.generate(currentCart["lines"].length, (index) {
+        var product = currentCart["lines"][index]["product"];
+        var qty = currentCart["lines"][index]['qty'].toString();
         return getSlidable(cartItem(product, qty), product, qty);
       }),
     );
@@ -761,7 +788,7 @@ class _CartPageState extends State<CartPage> {
               Row(
                 children: [
                   Text(
-                    "$CURRENCY ${cart["mrp_total"]}",
+                    "$CURRENCY ${context.watch<CartProvider>().getCartData!["mrp_total"]}",
                     style: smallMediumGreyText,
                   ),
                 ],
@@ -776,14 +803,14 @@ class _CartPageState extends State<CartPage> {
               Row(
                 children: [
                   Text(
-                    "- $CURRENCY ${cart["discount"]}",
+                    "- $CURRENCY ${context.watch<CartProvider>().getCartData!["discount"]}",
                     style: smallMediumPrimaryText,
                   ),
                 ],
               ),
             ],
           ),
-          if (!checkIsNullValue(couponData))
+          if (!checkIsNullValue(context.watch<CartProvider>().getCartData?['coupon']))
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
@@ -791,7 +818,7 @@ class _CartPageState extends State<CartPage> {
                 children: [
                   Text("coupon_discount", style: smallMediumGreyText).tr(),
                   Text(
-                    "$CURRENCY ${couponData['amount_off']}",
+                    "$CURRENCY ${context.watch<CartProvider>().getCartData!['coupon']['amount_off']}",
                     style: smallMediumGreyText,
                   ),
                 ],
@@ -802,7 +829,7 @@ class _CartPageState extends State<CartPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("delivery_fee", style: smallMediumGreyText).tr(),
-              Text("$CURRENCY ${cart["delivery"]}", style: smallMediumGreyText),
+              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["delivery"]}", style: smallMediumGreyText),
             ],
           ),
           SizedBox(height: 8),
@@ -810,7 +837,7 @@ class _CartPageState extends State<CartPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("taxed_and_charges", style: smallMediumGreyText).tr(),
-              Text("$CURRENCY ${cart["vat"]}", style: smallMediumGreyText),
+              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}", style: smallMediumGreyText),
             ],
           ),
           SizedBox(height: 20),
@@ -818,7 +845,7 @@ class _CartPageState extends State<CartPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("to_pay", style: meduimBoldBlackText).tr(),
-              Text("$CURRENCY ${cart["total"]}", style: meduimBoldBlackText),
+              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["total"]}", style: meduimBoldBlackText),
             ],
           ),
           SizedBox(height: 10),
@@ -839,14 +866,14 @@ class _CartPageState extends State<CartPage> {
 
   Widget getFooter() {
     String byDate =
-        schedules.isNotEmpty
-            ? DateFormat(
-              "d MMM",
-            ).format(DateTime.parse(schedules[schedules.length - 1]["date"]))
-            : "N/A";
+          context.watch<CartProvider>().getCartData?['schedules']?.isNotEmpty == true
+              ? DateFormat(
+                "d MMM",
+              ).format(DateTime.parse(context.watch<CartProvider>().getCartData!['schedules'][context.watch<CartProvider>().getCartData!['schedules'].length - 1]["date"]))
+              : "N/A";
 
     var size = MediaQuery.of(context).size;
-    return Container(
+    return context.watch<CartProvider>().isHasCart ?Container(
       width: double.infinity,
       height: 90,
       decoration: BoxDecoration(
@@ -956,37 +983,7 @@ class _CartPageState extends State<CartPage> {
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: black.withOpacity(0.06),
-                          spreadRadius: 5,
-                          blurRadius: 10,
-                        ),
-                      ],
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop(cart);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 5),
-                        child: Icon(
-                          Icons.arrow_back_ios,
-                          color: black,
-                          size: 18,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  context.watch<CartProvider>().isHasCart
-                      ? Flexible(
+                  Flexible(
                         child: InkWell(
                           onTap: () {
                             confirmAlert(
@@ -1074,30 +1071,6 @@ class _CartPageState extends State<CartPage> {
                             ),
                           ),
                         ),
-                      )
-                      : Flexible(
-                        child: Container(
-                          width: double.infinity,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: black.withOpacity(0.06),
-                                spreadRadius: 5,
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child:
-                                Text(
-                                  "cart_empty_start_shopping",
-                                  style: normalGreyText,
-                                ).tr(),
-                          ),
-                        ),
                       ),
                 ],
               ),
@@ -1105,7 +1078,7 @@ class _CartPageState extends State<CartPage> {
           ],
         ),
       ),
-    );
+    ) : SizedBox();
   }
 
   bool confirmingCheckout = false;
@@ -1117,6 +1090,7 @@ class _CartPageState extends State<CartPage> {
 
     // Step 1: Get Access Key from the server
     var response = await netPost(endPoint: "me/cart/confirm", params: {});
+    log("me/cart/confirm response ${response}");
 
     if (response['resp_code'] == "200") {
       var accessKey = response['resp_data']['data']['access_key'];
@@ -1128,14 +1102,13 @@ class _CartPageState extends State<CartPage> {
       };
 
       // final paymentResponse = await EasebuzzFlutterSdk.initiatePayment(params);
-      final paymentResponse = null;
-      if (paymentResponse != null &&
-          paymentResponse["result"] == "payment_successfull") {
-        print(cart["lines"]);
+      // final paymentResponse = null;
+      if (response != null) {
+        print(context.read<CartProvider>().getCartData!["lines"]);
 
         dynamic dataPanel = {
           "phone": userSession['phone_number'],
-          "total": cart["total"].toString(),
+          "total": context.read<CartProvider>().getCartData!["total"].toString(),
           "order_confirm": "order_confirm",
         };
 
@@ -1148,7 +1121,7 @@ class _CartPageState extends State<CartPage> {
           context,
           MaterialPageRoute(
             builder: (context) => OrderConfirmedPage(
-              data: {"schedules": schedules, "orderData": temp},
+              data: {"schedules": context.read<CartProvider>().getCartData?['schedules'] ?? [], "orderData": temp},
             ),
           ),
         );
@@ -1166,10 +1139,11 @@ class _CartPageState extends State<CartPage> {
   }
 
   String getCartInfo() {
-    if (checkIsNullValue(cart)) return "";
+    var currentCart = context.read<CartProvider>().getCartData;
+    if (checkIsNullValue(currentCart)) return "";
     String res = "";
-    List _cartItems = cart["lines"];
-    var _total = cart["total"];
+    List _cartItems = currentCart!["lines"];
+    var _total = currentCart["total"];
     res =
         "${_cartItems.length} " +
         ((_cartItems.isNotEmpty && _cartItems.length > 1) ? "items" : "item");

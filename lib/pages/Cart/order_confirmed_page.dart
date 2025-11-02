@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:tezchal/helpers/constant.dart';
 import 'package:tezchal/helpers/network.dart';
 import 'package:tezchal/helpers/styles.dart';
@@ -121,7 +122,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
           preferredSize: Size.fromHeight(120),
           child: CustomAppBar(subtitle: "your_order".tr()),
         ),
-        bottomNavigationBar: getFooter(),
+        bottomNavigationBar: _buildBottomNavigationBar(),
         body: getBody(),
       ),
     );
@@ -506,7 +507,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                           style: smallMediumBlackText,
                         ).tr(),
                         Text(
-                          "$CURRENCY ${orderData['vat']}",
+                          "$CURRENCY ${orderData['vat'] ?? 0}",
                           style: smallMediumBlackText,
                         ),
                       ],
@@ -553,114 +554,68 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
         );
   }
 
-  Widget getFooter() {
+  Widget _buildBottomNavigationBar() {
+    List<Map<String, dynamic>> bottomItems = [
+      {"icon": Feather.home, "label": "home".tr(), "page": 0},
+      {"icon": Feather.list, "label": "order".tr(), "page": 1},
+      {"icon": Feather.user, "label": "account".tr(), "page": 2},
+      {"icon": Feather.shopping_cart, "label": "cart".tr(), "page": 3},
+    ];
+
     return Container(
       width: double.infinity,
       height: 90,
       decoration: BoxDecoration(
-        color: white,
-        boxShadow: [
-          BoxShadow(
-            color: black.withOpacity(0.06),
-            spreadRadius: 5,
-            blurRadius: 10,
+        border: Border(
+          top: BorderSide(
+            color: greyLight70,
+            width: 1.5,
           ),
-        ],
+        ),
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 15,
-              right: 15,
-              top: 20,
-              bottom: 15,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: black.withOpacity(0.06),
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        "/root_app",
-                        (route) => false,
-                      );
-                    },
-                    child: Center(
-                      child: SvgPicture.asset(
-                        iconPath + "home_icon.svg",
-                        width: 25,
-                        color: greyLight,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: 40,
+          right: 40,
+          top: 15,
+          bottom: 20,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(
+            bottomItems.length,
+            (index) {
+              return InkWell(
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/root_app',
+                    (Route<dynamic> route) => false,
+                    arguments: {"activePageIndex": bottomItems[index]['page']},
+                  );
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      bottomItems[index]['icon'] as IconData?,
+                      color: bottomItems[index]['page'] == 3 ? primary : black, // Highlight cart icon
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      bottomItems[index]['label'] as String,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: bottomItems[index]['page'] == 3 ? primary : black, // Highlight cart label
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                SizedBox(width: 15),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      joinWhatsappGroup();
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: whatsAppColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: black.withOpacity(0.06),
-                            spreadRadius: 5,
-                            blurRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 5, right: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(LineIcons.whatSApp, color: white, size: 25),
-                            SizedBox(width: 15),
-                            Text(
-                              "Join Whatsapp Group",
-                              style: normalWhiteText,
-                            ).tr(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              );
+            },
           ),
-        ],
+        ),
       ),
     );
-  }
-
-  joinWhatsappGroup() async {
-    await launch("https://go.teznow.com/whatsapp-group");
-    dynamic dataPanel = {
-      "phone": userSession['phone_number'],
-      "Joined Whatsapp Group": "Joined Whatsapp Group",
-    };
-
-    mixpanel.track(CLICK_SHARE_ORDER_WHATSAPP, properties: dataPanel);
   }
 }

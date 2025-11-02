@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:tezchal/helpers/constant.dart';
 import 'package:http/http.dart' as http;
@@ -9,9 +10,10 @@ netGet(
     dynamic params = const {'row': "10", 'page': "1"},
     bool isUserToken = true}) async {
   String userToken = (isUserToken) ? userSession['access_token'] ?? "" : "";
+  // log(" TOKEN - ${userToken}");
   var url = Uri.parse(API_URL + endPoint);
   final newURI = url.replace(queryParameters: params);
-
+  
   final response = await http.get(newURI, headers: {
     "Authorization": "Bearer $userToken",
     "Accept": "application/json",

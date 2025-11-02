@@ -283,7 +283,7 @@ var alertStyle = AlertStyle(
     borderRadius: BorderRadius.circular(10.0),
     side: const BorderSide(color: Colors.grey),
   ),
-  constraints: const BoxConstraints.expand(width: 300),
+  constraints: BoxConstraints.loose(Size.infinite),
   overlayColor: const Color(0x55000000),
   alertElevation: 0,
   alertAlignment: Alignment.center,
@@ -299,16 +299,24 @@ dynamic confirmAlert(
   return Alert(
     context: context,
     style: alertStyle,
-    desc: des,
+    content: Padding(
+      padding: const EdgeInsets.only(top: 20.0), // Add top padding here
+      child: Text(
+        des,
+        style: alertStyle.descStyle,
+        textAlign: alertStyle.descTextAlign,
+      ),
+    ),
     buttons: [
       DialogButton(
         border: Border.all(color: primary, width: 1),
-        height: 50,
+        height: 60,
+        width: 150, // Explicitly set width for better control
         child: Text(
           btnCancelTitle,
           style: const TextStyle(
             color: primary,
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -317,12 +325,13 @@ dynamic confirmAlert(
         radius: BorderRadius.circular(10.0),
       ),
       DialogButton(
-        height: 50,
+        height: 60,
+        width: 150, // Explicitly set width for better control
         child: Text(
           btnConfirmTitle,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 15,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),

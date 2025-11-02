@@ -7,7 +7,8 @@ class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   double cartGrandTotal = 0;
 
-  List carts = [];
+  // Add a field to store the full cart data
+  Map<String, dynamic>? cartData;
 
   int get getCartCount => cartCount;
 
@@ -15,17 +16,17 @@ class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   bool get isCart => isHasCart;
 
-  List get getCarts => carts;
+  Map<String, dynamic>? get getCartData => cartData;
 
   Future<void> refreshCart(bool cart) async {
     isHasCart = cart;
     notifyListeners();
   }
 
-  // Future<void> refreshListCart(List productId) {
-  //   carts = productId;
-  //   notifyListeners();
-  // }
+  Future<void> refreshCartData(Map<String, dynamic>? data) async {
+    cartData = data;
+    notifyListeners();
+  }
 
   Future<void> refreshCartCount(count) async {
     cartCount = count;

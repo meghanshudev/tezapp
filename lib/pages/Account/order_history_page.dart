@@ -322,21 +322,31 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     };
 
     var response = await netGet(endPoint: "me/order", params: params);
-    var data = response["resp_data"]["data"];
-    int cnt = data["total"];
 
-    if (mounted)
-      setState(() {
-        if (page == 1)
-          orders = data['list'];
-        else
-          orders.addAll(data['list']);
+    if (response["resp_code"] == "200") {
+      var data = response["resp_data"]["data"];
+      int cnt = data["total"];
 
-        total = cnt;
-        isLoading = false;
-        isPulling = false;
-        page++;
-      });
-    return true;
+      if (mounted)
+        setState(() {
+          if (page == 1)
+            orders = data['list'];
+          else
+            orders.addAll(data['list']);
+
+          total = cnt;
+          isLoading = false;
+          isPulling = false;
+          page++;
+        });
+      return true;
+    } else {
+      if (mounted)
+        setState(() {
+          isLoading = false;
+          isPulling = false;
+        });
+      return false;
+    }
   }
 }

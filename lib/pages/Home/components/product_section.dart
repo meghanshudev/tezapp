@@ -105,48 +105,69 @@ class ProductSection extends StatelessWidget {
           padding: EdgeInsets.only(left: 15),
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: List.generate(products.length, (index) {
-              var product = products[index]['product'];
-              return Padding(
-                padding: const EdgeInsets.only(right: 20, top: 20, bottom: 20),
-                child: Card(
-                  color: DiwaliTheme.cardColor,
-                  elevation: 4,
-                  child: GestureDetector(
-                    onTap: () async {
-                      dynamic dataPanel = {
-                        "phone": userSession['phone_number'],
-                        "product": products[index]['product']['name'],
-                      };
+            children: products.isNotEmpty
+                ? List.generate(products.length, (index) {
+                    print('ProductSection: products[$index]: ${products[index].runtimeType} - ${products[index]}');
+                    if (products[index] == null ||
+                        !(products[index] is Map) ||
+                        !products[index].containsKey('product')) {
+                      print('ProductSection: Skipping invalid products[$index]');
+                      return SizedBox.shrink(); // Skip rendering invalid product
+                    }
+                    var product = products[index]['product'];
+                    print('ProductSection: product: ${product.runtimeType} - $product');
+                    if (product == null || !(product is Map)) {
+                      print('ProductSection: Skipping invalid product from products[$index]');
+                      return SizedBox.shrink(); // Skip rendering if 'product' key is invalid
+                    }
+                    return Padding(
+                      padding:
+                          const EdgeInsets.only(right: 20, top: 20, bottom: 20),
+                      child: Card(
+                        color: DiwaliTheme.cardColor,
+                        elevation: 4,
+                        child: GestureDetector(
+                          onTap: () async {
+                            dynamic dataPanel = {
+                              "phone": userSession['phone_number'],
+                              "product": product['name'],
+                            };
 
-                      mixpanel.track('CLICK_PRODUCT', properties: dataPanel);
-                      onLeave(false);
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProductDetailPage(
-                            data: {"product": products[index]},
+                            mixpanel.track('CLICK_PRODUCT',
+                                properties: dataPanel);
+                            onLeave(false);
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductDetailPage(
+                                  data: {"product": products[index]},
+                                ),
+                              ),
+                            );
+                            onLeave(true);
+                          },
+                          child: ProductItemNetwork(
+                            product: product,
+                            discountLabel:
+                                convertDouble(product['percent_off']).toInt(),
+                            kgLabel: () {
+                              print('ProductSection: product["attributes"] type: ${product["attributes"].runtimeType}');
+                              print('ProductSection: product["attributes"] content: ${product["attributes"]}');
+                              return product["attributes"] != null &&
+                                      product["attributes"].isNotEmpty
+                                  ? product["attributes"][0]["value"]
+                                  : "";
+                            }(),
+                            image: product['image'],
+                            name: product['name'],
+                            priceStrike: CURRENCY + "${product["unit_price"]}",
+                            price: CURRENCY + "${product["sale_price"]}",
                           ),
                         ),
-                      );
-                      onLeave(true);
-                    },
-                    child: ProductItemNetwork(
-                      product: product,
-                      discountLabel:
-                          convertDouble(product['percent_off']).toInt(),
-                      kgLabel: product["attributes"].length == 0
-                          ? ""
-                          : product["attributes"][0]["value"],
-                      image: product['image'],
-                      name: product['name'],
-                      priceStrike: CURRENCY + "${product["unit_price"]}",
-                      price: CURRENCY + "${product["sale_price"]}",
-                    ),
-                  ),
-                ),
-              );
-            }),
+                      ),
+                    );
+                  })
+                : [],
           ),
         ),
       ],

@@ -251,16 +251,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
-                  Positioned(
-                    right: 10,
-                    child: IconButton(
-                      icon: Icon(
-                        LineIcons.whatSApp,
-                        color: Color.fromRGBO(68, 192, 82, 1),
-                      ),
-                      onPressed: () => shareOrderonWhatsapp(),
-                    ),
-                  ),
+                  // Positioned(
+                  //   right: 10,
+                  //   child: IconButton(
+                  //     icon: Icon(
+                  //       LineIcons.whatSApp,
+                  //       color: Color.fromRGBO(68, 192, 82, 1),
+                  //     ),
+                  //     onPressed: () => shareOrderonWhatsapp(),
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: 20),
@@ -272,7 +272,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Text(products.first["name"], style: normalBlackText),
                     SizedBox(height: 5),
                     Text(
-                      products.first["attributes"][0]["value"],
+                      products.first["attributes"].isNotEmpty
+                          ? products.first["attributes"][0]["value"]
+                          : "",
                       style: smallBlackText,
                     ),
                     SizedBox(height: 10),
@@ -412,7 +414,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _attribute.isNotEmpty ? _attribute[0]["value"] : "N/A",
+                      _attribute != null && _attribute.isNotEmpty
+                          ? _attribute[0]["value"]
+                          : "N/A",
                       style: meduimBlackText,
                     ),
                     checkIsNullValue(_product['percent_off'])
@@ -497,11 +501,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           recommendedProducts[index]['percent_off'],
                         ).toInt(),
                     kgLabel:
-                        recommendedProducts[index]['product']["attributes"]
-                                    .length ==
-                                0
-                            ? ""
-                            : recommendedProducts[index]['product']["attributes"][0]["value"],
+                        recommendedProducts[index]['product']["attributes"] !=
+                                    null &&
+                                recommendedProducts[index]['product']["attributes"]
+                                    .isNotEmpty
+                            ? recommendedProducts[index]['product']["attributes"][0]["value"]
+                            : "",
                     image: recommendedProducts[index]['image'],
                     name: recommendedProducts[index]['product']['name'],
                     priceStrike:

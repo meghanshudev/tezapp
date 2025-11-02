@@ -26,38 +26,32 @@ class AddToCardButtonItem extends StatefulWidget {
 }
 
 class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
-  int productQty = 0;
-
-
   late Mixpanel mixpanel;
 
   @override
   void initState() {
-    // TODO: implement initState
-    initialize();
     super.initState();
-     initMixpanel();
+    initMixpanel();
   }
+
   Future<void> initMixpanel() async {
     mixpanel = await Mixpanel.init(MIX_PANEL, optOutTrackingDefault: false, trackAutomaticEvents: true);
   }
 
-  initialize() async {
-
-   
-    List<Cart> carts = await CartRepository().list();
-    for (Cart item in carts) {
-      if (item.productId == widget.product["id"].toString()) {
-        setState(() {
-          productQty = item.qty;
-        });
-        break;
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Get product quantity from CartProvider
+    int productQty = 0;
+    var cartData = context.watch<CartProvider>().getCartData;
+    if (cartData != null && cartData.containsKey('lines')) {
+      for (var item in cartData['lines']) {
+        if (item['product_id'].toString() == widget.product["id"].toString()) {
+          productQty = item['qty'];
+          break;
+        }
+      }
+    }
+
     return Stack(
       alignment: Alignment.centerRight,
       children: [
@@ -188,75 +182,95 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
 
    
 
-    Cart cart = new Cart();
-    int cnt = 0;
-    var response;
-    if (type == "minus" && productQty <= 1) {
-      cart = new Cart(productId: _productId.toString(), qty: 1);
-      cnt = await CartRepository().addOrUpdate(cart: cart, type: type);
-      response = await netDelete(
-        endPoint: "me/cart/product/${_productId.toString()}",
-        params: {
-          "qty": cnt,
-        },
-      );
-       context.read<CartProvider>().refreshCart(false);
-        //  set new number of cart item
-        context.read<CartProvider>().refreshCartCount(cnt);
+   Cart cartItem = new Cart();
+   int cnt = 0;
+   var response;
 
-    } else {
-      cart = new Cart(productId: _productId.toString(), qty: 1);
-      print(">>>>>>>>");
-      print(cart.qty);
-      cnt = await CartRepository().addOrUpdate(cart: cart, type: type);
-      print(">>>>>>>>");
-      print(cnt);
-      response = await netPatch(
-        endPoint: "me/cart/product",
-        params: {
-          "product_id": _productId,
-          "qty": cnt,
-        },
-      );
-      log(response.toString());
-    }
+   // Get current product quantity from CartProvider for accurate local update
+   int currentProductQty = 0;
+   var cartData = context.read<CartProvider>().getCartData;
+   if (cartData != null && cartData.containsKey('lines')) {
+     for (var item in cartData['lines']) {
+       if (item['product_id'].toString() == _productId.toString()) {
+         currentProductQty = item['qty'];
+         break;
+       }
+     }
+   }
 
-    setState(() {
-      productQty = cnt;
-    });
+   if (type == "minus" && currentProductQty <= 1) {
+     cartItem = new Cart(productId: _productId.toString(), qty: 1);
+     cnt = await CartRepository().addOrUpdate(cart: cartItem, type: type);
+     response = await netDelete(
+       endPoint: "me/cart/product/${_productId.toString()}",
+       params: {
+         "qty": cnt,
+       },
+     );
+     // Update CartProvider directly after deletion
+     if (response['resp_code'] == "200") {
+       var temp = response["resp_data"]["data"];
+       context.read<CartProvider>().refreshCartData(temp);
+       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
+         List cartItems = temp['lines'];
+         context.read<CartProvider>().refreshCart(true);
+         context.read<CartProvider>().refreshCartCount(cartItems.length);
+         context.read<CartProvider>().refreshCartGrandTotal(double.parse(temp['total'].toString()));
+       } else {
+         context.read<CartProvider>().refreshCart(false);
+         context.read<CartProvider>().refreshCartCount(0);
+         context.read<CartProvider>().refreshCartGrandTotal(0.0);
+       }
+     }
+   } else {
+     cartItem = new Cart(productId: _productId.toString(), qty: 1);
+     cnt = await CartRepository().addOrUpdate(cart: cartItem, type: type);
+     response = await netPatch(
+       endPoint: "me/cart/product",
+       params: {
+         "product_id": _productId,
+         "qty": cnt,
+       },
+     );
+     log(response.toString());
+     // Update CartProvider with full cart data after patch
+     if (response['resp_code'] == "200") {
+       var temp = response["resp_data"]["data"];
+       context.read<CartProvider>().refreshCartData(temp);
+       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
+         List cartItems = temp['lines'];
+         context.read<CartProvider>().refreshCart(true);
+         context.read<CartProvider>().refreshCartCount(cartItems.length);
+         context.read<CartProvider>().refreshCartGrandTotal(double.parse(temp['total'].toString()));
+       }
+     }
+   }
 
-    eventBus.fire(ProductListEvent(
-      id: _productId.toString(),
-      quantity: productQty
-    ));
-    if (response['resp_code'] == "200") {
-      
-      var temp = response["resp_data"]["data"];
-      if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
-        var cart = temp;
+   // No need for setState((){ productQty = cnt; }) here, as it's now derived from CartProvider.
+   // The UI will rebuild when CartProvider notifies listeners.
 
-        List cartItems = cart['lines'];
-        context.read<CartProvider>().refreshCart(true);
-        context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context
-            .read<CartProvider>()
-            .refreshCartGrandTotal(double.parse(cart['total'].toString()));
+   eventBus.fire(ProductListEvent(
+     id: _productId.toString(),
+     quantity: cnt, // Use the updated count
+   ));
 
-        if (type == "add") showToast("Added", context);
-      }
-    } else {
-      int cnt = await CartRepository()
-          .addOrUpdate(cart: cart, type: (type == "add") ? "minus" : "add");
-      setState(() {
-        productQty = cnt;
-      });
-      var msg = reponseErrorMessageDy(response,
-          requestedParams: ["product_id", "qty"]);
-      showToast(msg, context);
-    }
-    if (mounted)
-      setState(() {
-        isAddingCart = false;
-      });
+   if (response['resp_code'] == "200") {
+     // CartProvider is already updated above
+     if (type == "add") showToast("Added", context);
+   } else {
+     // Revert local cart if API call fails
+     int revertedCnt = await CartRepository()
+         .addOrUpdate(cart: cartItem, type: (type == "add") ? "minus" : "add");
+     // No need for setState((){ productQty = revertedCnt; }) here.
+     // The UI will rebuild when CartProvider notifies listeners.
+     var msg = reponseErrorMessageDy(response,
+         requestedParams: ["product_id", "qty"]);
+     showToast(msg, context);
+   }
+   if (mounted) {
+     setState(() {
+       isAddingCart = false;
+     });
+   }
   }
 }

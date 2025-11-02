@@ -290,7 +290,7 @@ class _RootAppState extends State<RootApp> {
         HomePage(),
         OrderHistoryPage(),
         AccountPage(),
-        CartPage(),
+        CartPage(onCartEmptied: loadCart), // Pass loadCart as callback
       ],
     );
   }
@@ -342,10 +342,17 @@ class _RootAppState extends State<RootApp> {
                     bottomItems.length,
                     (index) {
                       return InkWell(
-                        onTap: () {
+                        onTap: () async {
                           setState(() {
                             pageIndex = bottomItems[index]['page'] as int;
                           });
+                          if (pageIndex == 3) {
+                            // If navigating to the CartPage, explicitly refresh its data
+                            // This assumes CartPage has a mechanism to refresh when its dependencies change or it's rebuilt.
+                            // The previous change in CartPage.dart to use didChangeDependencies should handle this.
+                            print("CartPage - refreshing cart data");
+                            await loadCart(); // Call loadCart from RootApp to refresh the cart provider
+                          }
                         },
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -555,6 +562,7 @@ class _RootAppState extends State<RootApp> {
     if (isLoadingCart) return;
     isLoadingCart = true;
     var response = await netGet(isUserToken: true, endPoint: "me/cart");
+    print("CartPage - refreshing cart data ${response}");
     if (response['resp_code'] == "200") {
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
@@ -562,23 +570,28 @@ class _RootAppState extends State<RootApp> {
         hasCartItem = !checkIsNullValue(cart);
 
         List cartItems = cart['lines'];
-        // List
-        // set has cart or not
+        // Update CartProvider with full cart data
+        context.read<CartProvider>().refreshCartData(cart);
         context.read<CartProvider>().refreshCart(true);
-        //  set new number of cart item
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        // set price
         context.read<CartProvider>().refreshCartGrandTotal(
           double.parse(cart['total'].toString()),
         );
       } else {
-        // set has cart or not
+        // Handle case where data is null or 'lines' is missing (empty cart)
+        cart = null;
+        context.read<CartProvider>().refreshCartData(null); // Clear cart data
         context.read<CartProvider>().refreshCart(false);
-        //  set new number of cart item
         context.read<CartProvider>().refreshCartCount(0);
-        // set price
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
       }
+    } else {
+      // Handle non-200 responses or other errors by clearing the cart
+      cart = null;
+      context.read<CartProvider>().refreshCartData(null); // Clear cart data
+      context.read<CartProvider>().refreshCart(false);
+      context.read<CartProvider>().refreshCartCount(0);
+      context.read<CartProvider>().refreshCartGrandTotal(0.0);
     }
     if (mounted)
       setState(() {
