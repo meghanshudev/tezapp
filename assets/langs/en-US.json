@@ -54,7 +54,7 @@
     "item_total": "Item Total",
     "coupon_discount": "Coupon Discount",
     "delivery_fee": "Delivery Fee",
-    "taxed_and_charges": "Taxes and Charges",
+    "taxed_and_charges": "Packaging Charges",
     "to_pay": "To pay",
     "checkout": "Checkout",
     "popular": "POPULAR",
@@ -219,5 +219,6 @@
     "explore_products_and_place_order": "Explore products and place your first order!",
     "set_or_change_your_delivery_location" : "Set or Change your Delivery Location",
     "are_you_sure_you_want_to_logout?": "Are you sure you want to logout?",
-    "are_you_a_defence_personnel": "Are you a defence personnel?"
+    "are_you_a_defence_personnel": "Are you a defence personnel?",
+    "defence_discount": "Fauji Discount"
 }

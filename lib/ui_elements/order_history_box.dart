@@ -165,7 +165,7 @@ class OrderHistoryBox extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("discount", style: meduimPrimaryText).tr(),
+              Text("defence_discount", style: meduimPrimaryText).tr(),
               SizedBox(
                 width: 5,
               ),
@@ -215,6 +215,20 @@ class OrderHistoryBox extends StatelessWidget {
           SizedBox(
             height: 5,
           ),
+          if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(data['defence_discount_percent']))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("defence_discount", style: meduimPrimaryText).tr(),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "- $CURRENCY ${data['defence_discount_percent'].toStringAsFixed(2)}",
+                  style: TextStyle(color: primary),
+                ),
+              ],
+            ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

@@ -21,8 +21,8 @@ const String LANGUAGE = "LANGUAGE";
 const APP_LOCALES = [Locale('en', 'US'), Locale('hi', 'IN')];
 const String APP_VERSION = "v1.0";
 const String BUNDLE_VERSION = "v101";
-const String APP_EMAIL = "support@teznow.com";
-const String WHATSAPP = "918669904755";
+const String APP_EMAIL = "business@tezchal.com";
+const String WHATSAPP = "918981004435";
 const String PREFIX_PHONE = "+91";
 const String COUNTRY_CODE = "";
 

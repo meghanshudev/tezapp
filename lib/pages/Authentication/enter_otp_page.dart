@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -363,6 +365,7 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
 
     if (response['resp_code'] == "200") {
       var userData = response["resp_data"]['data'];
+      log("USER DATA ${userData}");
 
       // mix panel
       dynamic dataPanel = {"phone": phoneNumber, "otp": codeController.text};
@@ -385,6 +388,8 @@ class _EnterOTPPageState extends State<EnterOTPPage> {
       } else {
         // profile + token
         var user = await getProfileData(context);
+        log("USER DATA ${user}");
+
 
         await setStorage(STORAGE_USER, user);
 

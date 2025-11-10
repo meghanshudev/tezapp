@@ -799,7 +799,7 @@ if (response['resp_code'] == "200") {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("discount", style: smallMediumPrimaryText).tr(),
+              Text("defence_discount", style: smallMediumPrimaryText).tr(),
               Row(
                 children: [
                   Text(
@@ -840,6 +840,20 @@ if (response['resp_code'] == "200") {
               Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}", style: smallMediumGreyText),
             ],
           ),
+          if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(context.watch<CartProvider>().getCartData!['defence_discount_percent']))
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("defence_discount", style: smallMediumPrimaryText).tr(),
+                  Text(
+                    "- $CURRENCY ${context.watch<CartProvider>().getCartData!['defence_discount_percent'].toStringAsFixed(2)}",
+                    style: smallMediumPrimaryText,
+                  ),
+                ],
+              ),
+            ),
           SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -851,12 +865,12 @@ if (response['resp_code'] == "200") {
           SizedBox(height: 10),
           Divider(thickness: 0.8),
           SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("FREE Delivery above ₹500!", style: smallMediumPrimaryText),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     Text("FREE Delivery above ₹99!", style: smallMediumPrimaryText),
+          //   ],
+          // ),
           SizedBox(height: 10),
           Divider(thickness: 0.8),
         ],
@@ -988,7 +1002,7 @@ if (response['resp_code'] == "200") {
                           onTap: () {
                             confirmAlert(
                               context,
-                              des: "Confirm Order on Tez?".tr(),
+                              des: "Confirm Order on TezChal?".tr(),
                               onCancel: () {
                                 Navigator.pop(context);
                               },

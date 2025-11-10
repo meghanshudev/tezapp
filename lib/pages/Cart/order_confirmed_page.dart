@@ -233,7 +233,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       ),
                     ),
                     Text(
-                      "We will deliver your order in 24 hours!",
+                      "We will deliver your order in 10 minutes!",
                       style: smallMediumBlackText,
                     ).tr(),
                     SizedBox(height: 20),
@@ -442,7 +442,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("discount", style: smallMediumPrimaryText).tr(),
+                        Text("defence_discount", style: smallMediumPrimaryText).tr(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -513,6 +513,17 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       ],
                     ),
                     SizedBox(height: 10),
+                    if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(orderData['defence_discount_percent']))
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("defence_discount", style: smallMediumPrimaryText).tr(),
+                          Text(
+                            "- $CURRENCY ${orderData['defence_discount_percent'].toStringAsFixed(2)}",
+                            style: smallMediumPrimaryText,
+                          ),
+                        ],
+                      ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
