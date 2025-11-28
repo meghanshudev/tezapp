@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:easebuzz_flutter_sdk/easebuzz_flutter_sdk.dart';
+import 'package:easebuzz_flutter/easebuzz_flutter.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
@@ -23,6 +25,7 @@ import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_circular_progress.dart';
 import 'package:tezchal/ui_elements/slider_widget.dart';
 import 'package:tezchal/ui_elements/empty_page.dart';
+import 'package:rflutter_alert/rflutter_alert.dart' as rfa; // Added with prefix
 
 import '../../helpers/constant.dart';
 import '../../helpers/network.dart';
@@ -36,7 +39,7 @@ class CartPage extends StatefulWidget {
   _CartPageState createState() => _CartPageState();
 }
 
-class _CartPageState extends State<CartPage> {
+class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   bool checkSendToWhatsApp = true;
   bool isLoadingCart = false;
   // var cart; // Removed: Cart data will now be managed by CartProvider
@@ -60,10 +63,14 @@ class _CartPageState extends State<CartPage> {
 
   late Mixpanel mixpanel;
 
+  final EasebuzzFlutter _easebuzzFlutterPlugin = EasebuzzFlutter();
+  String? _pendingTransactionId;
+
   @override
   void initState() {
     print("APPU cart");
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     initPage();
 
     initMixpanel();
@@ -97,7 +104,7 @@ class _CartPageState extends State<CartPage> {
     var response = await netGet(isUserToken: true, endPoint: "me/cart");
     print("CartPage: Received response for me/cart: ${response['resp_code']}");
     print("CartPage: Full response: $response");
-if (response['resp_code'] == "200") {
+    if (response['resp_code'] == "200") {
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
         // cart = temp; // Removed: Cart data is now in CartProvider
@@ -208,12 +215,26 @@ if (response['resp_code'] == "200") {
   }
 
   fetchPaymentMethod() async {
-    var response = await netGet(isUserToken: true, endPoint: "payment");
+    var response = await netGet(
+      isUserToken: true,
+      endPoint: "payment/gateways",
+    );
     if (response['resp_code'] == "200") {
-      var data = response["resp_data"]["data"];
-      List paymentMethodItem = data['list'] ?? [];
+      List<dynamic> data = response["resp_data"]["data"] ?? [];
+      List<Map<String, dynamic>> fetchedPaymentMethods = [];
+
+      for (var item in data) {
+        fetchedPaymentMethods.add({
+          "id": item['id'],
+          "name": item['name'],
+          "code": item['code'], // Add the code
+          "image": item['config']['logo'], // Use config.logo for image
+        });
+      }
+
+      log("PAYMENT METHODS ${fetchedPaymentMethods}");
       setState(() {
-        paymentMethod = paymentMethodItem;
+        paymentMethod = fetchedPaymentMethods;
       });
     } else {
       setState(() {
@@ -247,14 +268,19 @@ if (response['resp_code'] == "200") {
       mixpanel.track(REMOVE_PRODUCT_FROM_CART, properties: dataPanel);
 
       // Update local cart repository
-      var localCartItem = new Cart(productId: pId.toString(), qty: int.parse(qty));
+      var localCartItem = new Cart(
+        productId: pId.toString(),
+        qty: int.parse(qty),
+      );
       await CartRepository().addOrUpdate(cart: localCartItem, type: "minus");
       showToast("Removed", context);
 
       // Refresh cart data from server after removal
       // This will trigger RootApp's loadCart() which updates CartProvider
       // and then CartPage will rebuild.
-      await context.read<CartProvider>().refreshCartData(null); // Temporarily clear to force refresh
+      await context.read<CartProvider>().refreshCartData(
+        null,
+      ); // Temporarily clear to force refresh
       // The actual refresh will happen when RootApp's loadCart is called,
       // which should be triggered by the navigation or a global event.
       // For now, we rely on the next navigation to CartPage to trigger RootApp's loadCart.
@@ -290,6 +316,62 @@ if (response['resp_code'] == "200") {
       setState(() {
         removingItem = false;
       });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (_pendingTransactionId != null) {
+        checkPaymentStatus(_pendingTransactionId!);
+      }
+    }
+  }
+
+  Future<void> checkPaymentStatus(String transactionId) async {
+    var response = await netGet(
+      endPoint: "payment/status/$transactionId",
+      isUserToken: true,
+    );
+
+    if (mounted) {
+      setState(() {
+        _pendingTransactionId = null; // Clear the pending transaction ID
+      });
+    }
+
+    if (response['resp_code'] == "200" && response['resp_data'] != null) {
+      var status = response['resp_data']['data']['status'];
+      var orderData = response['resp_data']['data']['transaction']['order'];
+      if (status == 'success') {
+        _showPaymentStatusDialog(
+            "Payment Successful", "Your payment was successful.");
+        await CartRepository().removeAll();
+        context.read<CartProvider>().refreshCart(false);
+        context.read<CartProvider>().refreshCartCount(0);
+        context.read<CartProvider>().refreshCartGrandTotal(0.0);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderConfirmedPage(
+              data: {
+                "schedules": orderData?['schedules'] ?? [],
+                "orderData": orderData,
+              },
+            ),
+          ),
+        );
+      } else if (status == 'failed') {
+        _showPaymentStatusDialog(
+            "Payment Failed", "Your payment has failed. Please try again.");
+      }
+      // If pending, do nothing and wait for the next check.
+    }
   }
 
   @override
@@ -349,7 +431,14 @@ if (response['resp_code'] == "200") {
               var res = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddCouponPage(schedule: context.read<CartProvider>().getCartData?['schedules'] ?? []),
+                  builder:
+                      (context) => AddCouponPage(
+                        schedule:
+                            context
+                                .read<CartProvider>()
+                                .getCartData?['schedules'] ??
+                            [],
+                      ),
                 ),
               );
               if (!checkIsNullValue(res)) {
@@ -382,13 +471,20 @@ if (response['resp_code'] == "200") {
               ),
             ),
           ),
-          if (!checkIsNullValue(context.watch<CartProvider>().getCartData?['coupon']))
+          if (!checkIsNullValue(
+            context.watch<CartProvider>().getCartData?['coupon'],
+          ))
             Padding(
               padding: const EdgeInsets.only(left: 10, top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(context.watch<CartProvider>().getCartData!['coupon']["name"], style: meduimBlackText),
+                  Text(
+                    context
+                        .watch<CartProvider>()
+                        .getCartData!['coupon']["name"],
+                    style: meduimBlackText,
+                  ),
                   IconButton(
                     onPressed: () {
                       removeCoupon();
@@ -449,12 +545,15 @@ if (response['resp_code'] == "200") {
   }
 
   bool applyingPayMethod = false;
-  applyPayMethod(int _paymentId) async {
+  applyPayMethod(String gatewayCode) async {
+    // Changed parameter type to String
     if (applyingPayMethod) return;
     applyingPayMethod = true;
     var response = await netPost(
       endPoint: "me/cart/payment",
-      params: {"payment_type_id": _paymentId},
+      params: {
+        "gateway_code": gatewayCode,
+      }, // Changed parameter name to gateway_code
     );
     log("/cart/payment response ${response}");
     // if (mounted)
@@ -481,7 +580,7 @@ if (response['resp_code'] == "200") {
                     paymentMethodId = paymentMethod[index]['id'];
                   });
 
-                  applyPayMethod(paymentMethodId);
+                  applyPayMethod(paymentMethod[index]['code']);
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20),
@@ -536,7 +635,7 @@ if (response['resp_code'] == "200") {
                               setState(() {
                                 paymentMethodId = paymentMethod[index]['id'];
                               });
-                              applyPayMethod(paymentMethodId);
+                              applyPayMethod(paymentMethod[index]['code']);
                             },
                           ),
                         ],
@@ -571,7 +670,8 @@ if (response['resp_code'] == "200") {
     }
     // Use CartProvider's cartData for rendering
     var currentCart = context.watch<CartProvider>().getCartData;
-    if (checkIsNullValue(currentCart) || checkIsNullValue(currentCart!["lines"])) {
+    if (checkIsNullValue(currentCart) ||
+        checkIsNullValue(currentCart!["lines"])) {
       return getEmptyCart();
     }
     return context.watch<CartProvider>().isHasCart
@@ -580,7 +680,8 @@ if (response['resp_code'] == "200") {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Add logging to debug 'amount_off'
-              if (!checkIsNullValue(currentCart) && !checkIsNullValue(currentCart["amount_off"]))
+              if (!checkIsNullValue(currentCart) &&
+                  !checkIsNullValue(currentCart["amount_off"]))
                 Container(
                   width: double.infinity,
                   height: 70,
@@ -624,7 +725,11 @@ if (response['resp_code'] == "200") {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              context.watch<CartProvider>().getCartData!["discount"].toString() == "0"
+              context
+                          .watch<CartProvider>()
+                          .getCartData!["discount"]
+                          .toString() ==
+                      "0"
                   ? Container()
                   : Row(
                     children: [
@@ -683,7 +788,8 @@ if (response['resp_code'] == "200") {
   Widget getCartItems() {
     if (isLoadingCart) return Center(child: CustomCircularProgress());
     var currentCart = context.watch<CartProvider>().getCartData;
-    if (checkIsNullValue(currentCart) || checkIsNullValue(currentCart!["lines"]))
+    if (checkIsNullValue(currentCart) ||
+        checkIsNullValue(currentCart!["lines"]))
       return SizedBox();
 
     return Column(
@@ -735,7 +841,8 @@ if (response['resp_code'] == "200") {
                             style: smallMediumBlackText,
                           ),
                           SizedBox(height: 2),
-                          if (!checkIsNullValue(_product["attributes"]) && _product["attributes"].isNotEmpty)
+                          if (!checkIsNullValue(_product["attributes"]) &&
+                              _product["attributes"].isNotEmpty)
                             Text(
                               _product["attributes"][0]["value"],
                               style: smallBlackText,
@@ -810,7 +917,9 @@ if (response['resp_code'] == "200") {
               ),
             ],
           ),
-          if (!checkIsNullValue(context.watch<CartProvider>().getCartData?['coupon']))
+          if (!checkIsNullValue(
+            context.watch<CartProvider>().getCartData?['coupon'],
+          ))
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
@@ -829,7 +938,10 @@ if (response['resp_code'] == "200") {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("delivery_fee", style: smallMediumGreyText).tr(),
-              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["delivery"]}", style: smallMediumGreyText),
+              Text(
+                "$CURRENCY ${context.watch<CartProvider>().getCartData!["delivery"]}",
+                style: smallMediumGreyText,
+              ),
             ],
           ),
           SizedBox(height: 8),
@@ -837,10 +949,19 @@ if (response['resp_code'] == "200") {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("taxed_and_charges", style: smallMediumGreyText).tr(),
-              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}", style: smallMediumGreyText),
+              Text(
+                "$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}",
+                style: smallMediumGreyText,
+              ),
             ],
           ),
-          if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(context.watch<CartProvider>().getCartData!['defence_discount_percent']))
+          if (!checkIsNullValue(userSession) &&
+              userSession['is_defence_personnel'] == true &&
+              !checkIsNullValue(
+                context
+                    .watch<CartProvider>()
+                    .getCartData!['defence_discount_percent'],
+              ))
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
@@ -859,7 +980,10 @@ if (response['resp_code'] == "200") {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("to_pay", style: meduimBoldBlackText).tr(),
-              Text("$CURRENCY ${context.watch<CartProvider>().getCartData!["total"]}", style: meduimBoldBlackText),
+              Text(
+                "$CURRENCY ${context.watch<CartProvider>().getCartData!["total"]}",
+                style: meduimBoldBlackText,
+              ),
             ],
           ),
           SizedBox(height: 10),
@@ -880,124 +1004,137 @@ if (response['resp_code'] == "200") {
 
   Widget getFooter() {
     String byDate =
-          context.watch<CartProvider>().getCartData?['schedules']?.isNotEmpty == true
-              ? DateFormat(
-                "d MMM",
-              ).format(DateTime.parse(context.watch<CartProvider>().getCartData!['schedules'][context.watch<CartProvider>().getCartData!['schedules'].length - 1]["date"]))
-              : "N/A";
+        context.watch<CartProvider>().getCartData?['schedules']?.isNotEmpty ==
+                true
+            ? DateFormat("d MMM").format(
+              DateTime.parse(
+                context.watch<CartProvider>().getCartData!['schedules'][context
+                        .watch<CartProvider>()
+                        .getCartData!['schedules']
+                        .length -
+                    1]["date"],
+              ),
+            )
+            : "N/A";
 
     var size = MediaQuery.of(context).size;
-    return context.watch<CartProvider>().isHasCart ?Container(
-      width: double.infinity,
-      height: 90,
-      decoration: BoxDecoration(
-        color: white,
-        boxShadow: [
-          BoxShadow(
-            color: black.withOpacity(0.06),
-            spreadRadius: 5,
-            blurRadius: 10,
+    return context.watch<CartProvider>().isHasCart
+        ? Container(
+          width: double.infinity,
+          height: 90,
+          decoration: BoxDecoration(
+            color: white,
+            boxShadow: [
+              BoxShadow(
+                color: black.withOpacity(0.06),
+                spreadRadius: 5,
+                blurRadius: 10,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 0, right: 0, top: 15, bottom: 5),
-        child: Column(
-          children: [
-            // Padding(
-            //   padding:
-            //       const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 5),
-            //   child: Container(
-            //     width: double.infinity,
-            //     height: 60,
-            //     child: Row(
-            //       children: [
-            //         Container(
-            //           width: 45,
-            //           height: 45,
-            //           decoration: BoxDecoration(
-            //               shape: BoxShape.circle,
-            //               image: DecorationImage(
-            //                   image: NetworkImage(
-            //                       checkIsNullValue(userSession['group'])
-            //                           ? groupProfile
-            //                           : userSession['group']['image']),
-            //                   fit: BoxFit.cover)),
-            //         ),
-            //         SizedBox(
-            //           width: 15,
-            //         ),
-            //         Flexible(
-            //           child: Container(
-            //             width: size.width * 0.5,
-            //             child: Column(
-            //               crossAxisAlignment: CrossAxisAlignment.start,
-            //               mainAxisAlignment: MainAxisAlignment.center,
-            //               children: [
-            //                 !checkIsNullValue(userSession['group'])
-            //                     ? Text(
-            //                         userSession['group']['name'],
-            //                         style: normalBlackText,
-            //                       )
-            //                     : Text(
-            //                         "no_group_found",
-            //                         style: normalBlackText,
-            //                       ).tr(),
-            //                 SizedBox(
-            //                   height: 5,
-            //                 ),
-            //                 !checkIsNullValue(userSession['group'])
-            //                     ? Text(
-            //                         "$byLeader" +
-            //                             (checkIsNullValue(leaderzipCode)
-            //                                 ? ""
-            //                                 : " - $leaderzipCode"),
-            //                         style: smallBlackText,
-            //                       )
-            //                     : Text(
-            //                         "no_group_leader_found",
-            //                         style: smallBlackText,
-            //                       ).tr()
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //         SizedBox(
-            //           width: 15,
-            //         ),
-            //         Padding(
-            //           padding: const EdgeInsets.only(top: 8, bottom: 8),
-            //           child: Container(
-            //             width: 90,
-            //             decoration: BoxDecoration(
-            //                 border: Border(
-            //                     left: BorderSide(
-            //                         width: 1, color: placeHolderColor))),
-            //             child: Column(
-            //               mainAxisAlignment: MainAxisAlignment.center,
-            //               children: [
-            //                 Text("delivery_by", style: smallBlackText).tr(),
-            //                 SizedBox(
-            //                   height: 5,
-            //                 ),
-            //                 Text(
-            //                   byDate,
-            //                   style: normalBlackText,
-            //                 ),
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-            // cart section
-            Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
-              child: Row(
-                children: [
-                  Flexible(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 0,
+              right: 0,
+              top: 15,
+              bottom: 5,
+            ),
+            child: Column(
+              children: [
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 5),
+                //   child: Container(
+                //     width: double.infinity,
+                //     height: 60,
+                //     child: Row(
+                //       children: [
+                //         Container(
+                //           width: 45,
+                //           height: 45,
+                //           decoration: BoxDecoration(
+                //               shape: BoxShape.circle,
+                //               image: DecorationImage(
+                //                   image: NetworkImage(
+                //                       checkIsNullValue(userSession['group'])
+                //                           ? groupProfile
+                //                           : userSession['group']['image']),
+                //                   fit: BoxFit.cover)),
+                //         ),
+                //         SizedBox(
+                //           width: 15,
+                //         ),
+                //         Flexible(
+                //           child: Container(
+                //             width: size.width * 0.5,
+                //             child: Column(
+                //               crossAxisAlignment: CrossAxisAlignment.start,
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: [
+                //                 !checkIsNullValue(userSession['group'])
+                //                     ? Text(
+                //                         userSession['group']['name'],
+                //                         style: normalBlackText,
+                //                       )
+                //                     : Text(
+                //                         "no_group_found",
+                //                         style: normalBlackText,
+                //                       ).tr(),
+                //                 SizedBox(
+                //                   height: 5,
+                //                 ),
+                //                 !checkIsNullValue(userSession['group'])
+                //                     ? Text(
+                //                         "$byLeader" +
+                //                             (checkIsNullValue(leaderzipCode)
+                //                                 ? ""
+                //                                 : " - $leaderzipCode"),
+                //                         style: smallBlackText,
+                //                       )
+                //                     : Text(
+                //                         "no_group_leader_found",
+                //                         style: smallBlackText,
+                //                       ).tr()
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //         SizedBox(
+                //           width: 15,
+                //         ),
+                //         Padding(
+                //           padding: const EdgeInsets.only(top: 8, bottom: 8),
+                //           child: Container(
+                //             width: 90,
+                //             decoration: BoxDecoration(
+                //                 border: Border(
+                //                     left: BorderSide(
+                //                         width: 1, color: placeHolderColor))),
+                //             child: Column(
+                //               mainAxisAlignment: MainAxisAlignment.center,
+                //               children: [
+                //                 Text("delivery_by", style: smallBlackText).tr(),
+                //                 SizedBox(
+                //                   height: 5,
+                //                 ),
+                //                 Text(
+                //                   byDate,
+                //                   style: normalBlackText,
+                //                 ),
+                //               ],
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // cart section
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: Row(
+                    children: [
+                      Flexible(
                         child: InkWell(
                           onTap: () {
                             confirmAlert(
@@ -1086,13 +1223,14 @@ if (response['resp_code'] == "200") {
                           ),
                         ),
                       ),
-                ],
-              ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ) : SizedBox();
+          ),
+        )
+        : SizedBox();
   }
 
   bool confirmingCheckout = false;
@@ -1102,50 +1240,190 @@ if (response['resp_code'] == "200") {
       confirmingCheckout = true;
     });
 
-    // Step 1: Get Access Key from the server
-    var response = await netPost(endPoint: "me/cart/confirm", params: {});
-    log("me/cart/confirm response ${response}");
+    // Find the selected payment method's code
+    String? selectedGatewayCode;
+    for (var method in paymentMethod) {
+      if (method['id'] == paymentMethodId) {
+        selectedGatewayCode = method['code'];
+        break;
+      }
+    }
 
-    if (response['resp_code'] == "200") {
-      var accessKey = response['resp_data']['data']['access_key'];
-      var payMode = "production";
+    if (selectedGatewayCode == null) {
+      showToast("No payment method selected or invalid.", context);
+      setState(() {
+        confirmingCheckout = false;
+      });
+      return;
+    }
 
-      Object params = {
-        "access_key": accessKey,
-        "pay_mode": payMode,
+    // Step 1: Call the backend API to confirm the cart and get payment data
+    log(
+      "ConfirmCheckout - Calling me/cart/confirm API with gateway_code: $selectedGatewayCode",
+    );
+    var apiResponse = await netPost(
+      endPoint: "me/cart/confirm",
+      params: {"gateway_code": selectedGatewayCode},
+    );
+
+    if (apiResponse['resp_code'] != "200" ||
+        apiResponse['resp_data'] == null ||
+        apiResponse['resp_data']['data'] == null) {
+      var errorMessage =
+          apiResponse["resp_data"]["message"] ??
+          "Failed to confirm cart or get payment data from API.";
+      showToast(errorMessage, context);
+      log(
+        "ConfirmCheckout - ERROR: API call to me/cart/confirm failed: $errorMessage",
+      );
+      setState(() {
+        confirmingCheckout = false;
+      });
+      return;
+    }
+
+    var orderData = apiResponse['resp_data']['data']['order'];
+    var paymentRequired = apiResponse['resp_data']['data']['payment_required'];
+    log("Easebuzz ${apiResponse}");
+
+    if (paymentRequired == true && selectedGatewayCode == "easebuzz") {
+      final paymentData = apiResponse['resp_data']['data']['payment_data'];
+      final transactionData = paymentData['transaction'];
+      final accessKey = paymentData['access_key'];
+      final paymentUrl = paymentData['payment_url'];
+
+      if (paymentData == null ||
+          transactionData == null ||
+          accessKey == null ||
+          paymentUrl == null) {
+        showToast(
+          "Invalid payment data received from API for Easebuzz.",
+          context,
+        );
+        log(
+          "ConfirmCheckout - ERROR: Invalid payment data structure from API for Easebuzz.",
+        );
+        setState(() {
+          confirmingCheckout = false;
+        });
+        return;
+      }
+
+      log("ConfirmCheckout - Easebuzz Payment Data from API: $paymentData");
+      log(
+        "ConfirmCheckout - Easebuzz Transaction Data from API: $transactionData",
+      );
+
+      final requestData = transactionData['request_data'];
+
+      if (requestData == null) {
+        showToast(
+          "Invalid request data received from API for Easebuzz.",
+          context,
+        );
+        log(
+          "ConfirmCheckout - ERROR: Invalid request data structure from API for Easebuzz.",
+        );
+        setState(() {
+          confirmingCheckout = false;
+        });
+        return;
+      }
+
+      final paymentModel = {
+        "txnid": requestData['txnid'].toString(),
+        "amount": double.parse(requestData['amount'].toString()),
+        "productinfo": requestData['productinfo'].toString(),
+        "firstname": requestData['firstname'].toString(),
+        "email": requestData['email'].toString(),
+        "phone": requestData['phone'].toString(),
+        "surl": requestData['surl'].toString(),
+        "furl": requestData['furl'].toString(),
+        "splitPayments": "",
+        "key": requestData['key'].toString(), // Use key from request_data
       };
 
-      // final paymentResponse = await EasebuzzFlutterSdk.initiatePayment(params);
-      // final paymentResponse = null;
-      if (response != null) {
-        print(context.read<CartProvider>().getCartData!["lines"]);
+      setState(() {
+        _pendingTransactionId = requestData['txnid'].toString();
+      });
 
-        dynamic dataPanel = {
-          "phone": userSession['phone_number'],
-          "total": context.read<CartProvider>().getCartData!["total"].toString(),
-          "order_confirm": "order_confirm",
-        };
+      log("ConfirmCheckout - Easebuzz Payment Model created: ${paymentModel}");
 
-        mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
-
-        await CartRepository().removeAll();
-        var temp = response["resp_data"]["data"];
-        showToast("your_order_is_completed".tr(), context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderConfirmedPage(
-              data: {"schedules": context.read<CartProvider>().getCartData?['schedules'] ?? [], "orderData": temp},
-            ),
-          ),
+      try {
+        log(
+          "ConfirmCheckout - Easebuzz - Triggering payment flow with Easebuzz...",
         );
-      } else {
-        showToast("Payment Failed", context);
+        // The `payWithEasebuzz` method from the plugin expects a single Map object
+        // containing all the payment parameters. The previous implementation was passing
+        // incorrect arguments, causing the "Empty payment response" error.
+        final paymentResponse = await _easebuzzFlutterPlugin.payWithEasebuzz(
+          accessKey,
+          "test",
+        );
+
+        // The response from the plugin is unreliable. Instead of parsing it,
+        // we will directly check the payment status from our backend.
+        // This ensures we have the correct status, even if the plugin reports failure.
+        if (_pendingTransactionId != null) {
+          // We have a transaction ID, so let's check its status.
+          log("ConfirmCheckout - Easebuzz - INFO: Plugin flow finished. Checking payment status from backend for transaction ID: $_pendingTransactionId");
+          await checkPaymentStatus(_pendingTransactionId!);
+        } else {
+          // This case should ideally not happen if the flow is correct.
+          log("ConfirmCheckout - Easebuzz - ERROR: No pending transaction ID found after payment attempt.");
+          _showPaymentStatusDialog(
+            "Payment Error",
+            "Could not verify payment status. Transaction ID not found.",
+          );
+        }
+      } on PlatformException catch (e) {
+        log(
+          "ConfirmCheckout - Easebuzz - ERROR: PlatformException during Easebuzz payment: ${e.message}",
+        );
+        log(
+          "ConfirmCheckout - Easebuzz - ERROR: PlatformException code: ${e.code}",
+        );
+        log(
+          "ConfirmCheckout - Easebuzz - ERROR: PlatformException details: ${e.details}",
+        );
+        showToast("Platform error: ${e.message}", context);
+      } catch (e, stack) {
+        log(
+          "ConfirmCheckout - Easebuzz - FATAL ERROR: Unexpected Payment Exception: $e",
+        );
+        log("ConfirmCheckout - Easebuzz - STACKTRACE: $stack");
+        showToast("Payment failed: ${e.toString()}", context);
       }
     } else {
-      var ms = response["resp_data"]["message"];
-      showToast(ms.toString(), context);
+      // Generic order confirmation for other payment methods or if payment is not required
+      print(context.read<CartProvider>().getCartData!["lines"]);
+
+      dynamic dataPanel = {
+        "phone": userSession['phone_number'],
+        "total": context.read<CartProvider>().getCartData!["total"].toString(),
+        "order_confirm": "order_confirm",
+      };
+
+      mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
+
+      await CartRepository().removeAll();
+      showToast("your_order_is_completed".tr(), context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => OrderConfirmedPage(
+                data: {
+                  "schedules":
+                      context.read<CartProvider>().getCartData?['schedules'] ??
+                      [],
+                  "orderData": orderData,
+                },
+              ),
+        ),
+      );
     }
+
     if (mounted)
       setState(() {
         confirmingCheckout = false;
@@ -1163,6 +1441,41 @@ if (response['resp_code'] == "200") {
         ((_cartItems.isNotEmpty && _cartItems.length > 1) ? "items" : "item");
     res = res + "  •  " + "$CURRENCY $_total";
     return res;
+  }
+
+  void _showPaymentStatusDialog(String title, String message) {
+    rfa.Alert(
+      context: context,
+      style: alertStyle, // Use the global alertStyle from utils.dart
+      title: title,
+      content: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Text(
+          message,
+          style: alertStyle.descStyle,
+          textAlign: alertStyle.descTextAlign,
+        ),
+      ),
+      buttons: [
+        rfa.DialogButton(
+          height: 60,
+          width: 150,
+          child: Text(
+            "OK",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop(); // Dismiss the dialog
+          },
+          color: primary,
+          radius: BorderRadius.circular(10.0),
+        ),
+      ],
+    ).show();
   }
 
   Widget getSlidable(Widget child, product, qty) {

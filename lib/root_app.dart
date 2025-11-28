@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,6 @@ class _RootAppState extends State<RootApp> {
   var zipCode = '';
   var deliverTo = '';
 
-
   // load cart
   bool hasCartItem = false;
   bool isLoadingCart = false;
@@ -88,7 +88,7 @@ class _RootAppState extends State<RootApp> {
       registerOnDeepLinkingCallback: true,
     );
 
-    // checkInOperationCity();
+    checkInOperationCity();
 
     await initMixpanel();
     await initPage();
@@ -99,9 +99,10 @@ class _RootAppState extends State<RootApp> {
         !checkIsNullValue(userSession['zip_code'])
             ? userSession['zip_code'] ?? ""
             : "";
-    address = !checkIsNullValue(userSession['address'])
-        ? userSession['address'] ?? ""
-        : "";
+    address =
+        !checkIsNullValue(userSession['address'])
+            ? userSession['address'] ?? ""
+            : "";
 
     if (mounted) {
       setState(() {
@@ -111,8 +112,11 @@ class _RootAppState extends State<RootApp> {
   }
 
   Future<void> initMixpanel() async {
-    mixpanel = await Mixpanel.init(MIX_PANEL,
-        optOutTrackingDefault: false, trackAutomaticEvents: true);
+    mixpanel = await Mixpanel.init(
+      MIX_PANEL,
+      optOutTrackingDefault: false,
+      trackAutomaticEvents: true,
+    );
   }
 
   void onOpenSearch() {
@@ -136,6 +140,7 @@ class _RootAppState extends State<RootApp> {
     if (response['resp_code'] == "200") {
       if (mounted) {
         setState(() {
+          log("PROFILE ${response['resp_data']['data']}");
           isInOperationCity =
               response['resp_data']['data']['is_in_operation_city'];
           isLoadingScreen = false;
@@ -218,6 +223,7 @@ class _RootAppState extends State<RootApp> {
     if (mounted) {
       if (response['resp_code'] == "200") {
         setState(() {
+          log("PROFILE ${response['resp_data']['data']}");
           isInOperationCity =
               response['resp_data']['data']['is_in_operation_city'];
           isLoadingScreen = false;
@@ -259,23 +265,24 @@ class _RootAppState extends State<RootApp> {
         backgroundColor: white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
-          child: pageIndex == 0
-              ? CustomAppBar(
-                  isClick: true,
-                  onCallBack: (result) async {
-                    await getCurrentLocation(
-                        lat: result['lat'], lng: result['lng']);
-                    await checkInOperationCity(
-                      lat: result['lat'],
-                      lng: result['lng'],
-                    );
-                  },
-                  subtitle: address + " - " + zipCode,
-                  subtitleIcon: Entypo.location_pin,
-                )
-              : CustomAppBar(
-                  subtitle: topItems[pageIndex]['label'],
-                ),
+          child:
+              pageIndex == 0
+                  ? CustomAppBar(
+                    isClick: true,
+                    onCallBack: (result) async {
+                      await getCurrentLocation(
+                        lat: result['lat'],
+                        lng: result['lng'],
+                      );
+                      await checkInOperationCity(
+                        lat: result['lat'],
+                        lng: result['lng'],
+                      );
+                    },
+                    subtitle: address + " - " + zipCode,
+                    subtitleIcon: Entypo.location_pin,
+                  )
+                  : CustomAppBar(subtitle: topItems[pageIndex]['label']),
         ),
         bottomNavigationBar: getFooter(),
         body: getBody(),
@@ -294,18 +301,6 @@ class _RootAppState extends State<RootApp> {
       ],
     );
   }
-  // Widget checkOperationCity(){
-  //   if(isLoadingScreen){
-  //     return Center(child: CustomCircularProgress());
-  //   }else {
-  //     if(isInOperationCity){
-  //       return HomePage();
-  //     }else {
-  //       return Container();
-  //     }
-  //   }
-
-  // }
 
   Widget getFooter() {
     List bottomItems = [
@@ -319,68 +314,62 @@ class _RootAppState extends State<RootApp> {
     } else {
       return isInOperationCity
           ? Container(
-              width: double.infinity,
-              height: 90,
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: greyLight70,
-                    width: 1.5,
-                  ),
-                ),
+            width: double.infinity,
+            height: 90,
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: greyLight70, width: 1.5)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                left: 40,
+                right: 40,
+                top: 15,
+                bottom: 20,
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 40,
-                  right: 40,
-                  top: 15,
-                  bottom: 20,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(
-                    bottomItems.length,
-                    (index) {
-                      return InkWell(
-                        onTap: () async {
-                          setState(() {
-                            pageIndex = bottomItems[index]['page'] as int;
-                          });
-                          if (pageIndex == 3) {
-                            // If navigating to the CartPage, explicitly refresh its data
-                            // This assumes CartPage has a mechanism to refresh when its dependencies change or it's rebuilt.
-                            // The previous change in CartPage.dart to use didChangeDependencies should handle this.
-                            print("CartPage - refreshing cart data");
-                            await loadCart(); // Call loadCart from RootApp to refresh the cart provider
-                          }
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              bottomItems[index]['icon'] as IconData?,
-                              color: pageIndex == bottomItems[index]['page']
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(bottomItems.length, (index) {
+                  return InkWell(
+                    onTap: () async {
+                      setState(() {
+                        pageIndex = bottomItems[index]['page'] as int;
+                      });
+                      if (pageIndex == 3) {
+                        // If navigating to the CartPage, explicitly refresh its data
+                        // This assumes CartPage has a mechanism to refresh when its dependencies change or it's rebuilt.
+                        // The previous change in CartPage.dart to use didChangeDependencies should handle this.
+                        print("CartPage - refreshing cart data");
+                        await loadCart(); // Call loadCart from RootApp to refresh the cart provider
+                      }
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          bottomItems[index]['icon'] as IconData?,
+                          color:
+                              pageIndex == bottomItems[index]['page']
                                   ? primary
                                   : black,
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              bottomItems[index]['label'] as String,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: pageIndex == bottomItems[index]['page']
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          bottomItems[index]['label'] as String,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color:
+                                pageIndex == bottomItems[index]['page']
                                     ? primary
                                     : black,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ),
+                      ],
+                    ),
+                  );
+                }),
               ),
-            )
+            ),
+          )
           : comingLocation();
     }
   }
