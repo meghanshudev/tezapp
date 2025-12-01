@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -15,6 +17,7 @@ import 'package:tezchal/respositories/transactions/transaction_repository.dart';
 import 'package:tezchal/ui_elements/border_button.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_footer.dart';
+import 'package:tezchal/ui_elements/custom_footer_buttons.dart';
 import 'package:tezchal/ui_elements/custom_sub_header.dart';
 import 'package:tezchal/ui_elements/icon_box.dart';
 
@@ -33,6 +36,8 @@ class _WalletPageState extends State<WalletPage> {
   var zipCode = '';
   var deliverTo = '';
   String phone = '';
+
+  bool isLoadingButton = false;
 
   @override
   void initState() {
@@ -63,11 +68,7 @@ class _WalletPageState extends State<WalletPage> {
         ),
       ),
       body: buildBody(),
-      bottomNavigationBar: CustomFooter(
-        onTapBack: () {
-          Navigator.of(context).pop();
-        },
-      ),
+      bottomNavigationBar: getFooter()
     );
   }
 
@@ -243,6 +244,17 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+  Widget getFooter() {
+    return CustomFooterButtons(
+      isLoading: isLoadingButton,
+      proceedTitle: "Add amount".tr(),
+      onTapProceed: () {
+      },
+      onTapBack: () {
+        Navigator.pop(context);
+      },
+    );
+  }
   fetchUserProfile() async {
     var data = await getProfileData(context);
     setState(() {

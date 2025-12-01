@@ -948,7 +948,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("taxed_and_charges", style: smallMediumGreyText).tr(),
+              Text("Value-Added Tax", style: smallMediumGreyText).tr(),
               Text(
                 "$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}",
                 style: smallMediumGreyText,

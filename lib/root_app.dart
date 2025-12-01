@@ -140,7 +140,7 @@ class _RootAppState extends State<RootApp> {
     if (response['resp_code'] == "200") {
       if (mounted) {
         setState(() {
-          log("PROFILE ${response['resp_data']['data']}");
+          log("PROFILE GET ${response['resp_data']['data']}");
           isInOperationCity =
               response['resp_data']['data']['is_in_operation_city'];
           isLoadingScreen = false;
@@ -172,7 +172,7 @@ class _RootAppState extends State<RootApp> {
     dynamic dataPanel = {
       "phone": userSession['phone_number'],
       "location": {"lat": newLat, "lng": newLng},
-    };
+  };
 
     mixpanel.track(CLICK_PERMISSION_LOCATION, properties: dataPanel);
 
@@ -223,7 +223,7 @@ class _RootAppState extends State<RootApp> {
     if (mounted) {
       if (response['resp_code'] == "200") {
         setState(() {
-          log("PROFILE ${response['resp_data']['data']}");
+          log("PROFILE UPDATE ${response['resp_data']['data']}");
           isInOperationCity =
               response['resp_data']['data']['is_in_operation_city'];
           isLoadingScreen = false;

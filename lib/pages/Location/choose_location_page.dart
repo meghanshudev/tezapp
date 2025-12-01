@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +52,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
     getCurrentLocation();
 
     initMixpanel();
+    log("Location: initState");
   }
 
   Future<void> initMixpanel() async {
@@ -68,6 +70,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    log("Location: build");
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -77,7 +80,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60),
           child: CustomAppBar(
-            subtitle: "Choose Location",
+            subtitle: "Location",
             subtitleIcon: Entypo.location_pin,
           ),
         ),
@@ -226,17 +229,20 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
                   child: TextField(
                     readOnly: true,
                     onTap: () async {
+                      log("Location: search for an address");
                       dynamic result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => LocationPickerPage(),
                         ),
                       );
-                      var lat = result['lat'];
-                      var lng = result['lng'];
+                      if (result != null) {
+                        var lat = result['lat'];
+                        var lng = result['lng'];
 
-                      await moveMapPin(lat, lng);
-                      await getNewLocation(result);
+                        await moveMapPin(lat, lng);
+                        await getNewLocation(result);
+                      }
                     },
                     cursorColor: black,
                     decoration: InputDecoration(
@@ -313,6 +319,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
               Flexible(
                 child: InkWell(
                   onTap: () {
+                    log("Location: confirm and continue");
                     Navigator.pop(context, {"lat": lat, "lng": lng});
                   },
                   child: Container(
@@ -375,6 +382,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
     //  double lng = -73.961452;
     double lat = result['lat'];
     double lng = result['lng'];
+    log("Location: getNewLocation: $lat, $lng");
 
     var apiURL =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$googleKeyApi";
@@ -407,6 +415,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
   }
 
   getCurrentLocation() async {
+    log("Location: getCurrentLocation");
     // get current lat and lng
     var currentLocation = await determineUserLocationPosition(context);
 
