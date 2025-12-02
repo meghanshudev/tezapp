@@ -33,6 +33,8 @@ class _TransactionPageState extends State<TransactionPage> {
   List<Transaction> list = [];
   var zipCode = '';
   var deliverTo = '';
+  var phone = '';
+
 
   @override
   void initState() {
@@ -40,6 +42,8 @@ class _TransactionPageState extends State<TransactionPage> {
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
+    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
+
     initialize();
     super.initState();
   }
@@ -58,11 +62,11 @@ class _TransactionPageState extends State<TransactionPage> {
     return Scaffold(
         backgroundColor: white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(120),
+          preferredSize: Size.fromHeight(80),
           child: CustomAppBar(
-            subtitle:
-                zipCode + " - " + context.watch<AccountInfoProvider>().name,
-            subtitleIcon: Entypo.location_pin,
+            isWidget: true,
+            title: "tez_cash".tr(),
+            subtitle: "$deliverTo • $phone",
           ),
         ),
         body: getBody(),

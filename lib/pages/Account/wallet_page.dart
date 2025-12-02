@@ -4,7 +4,9 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart' as rfa;
 import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/network.dart';
 import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
@@ -20,9 +22,10 @@ import 'package:tezchal/ui_elements/custom_footer.dart';
 import 'package:tezchal/ui_elements/custom_footer_buttons.dart';
 import 'package:tezchal/ui_elements/custom_sub_header.dart';
 import 'package:tezchal/ui_elements/icon_box.dart';
-
-class WalletPage extends StatefulWidget {
-  const WalletPage({Key? key}) : super(key: key);
+import 'package:tezchal/ui_elements/custom_textfield.dart';
+ 
+ class WalletPage extends StatefulWidget {
+   const WalletPage({Key? key}) : super(key: key);
 
   @override
   _WalletPageState createState() => _WalletPageState();
@@ -32,9 +35,10 @@ class _WalletPageState extends State<WalletPage> {
   List<Transaction> transactions = [];
   bool isLoading = false;
   String balance = "0";
-
-  var zipCode = '';
-  var deliverTo = '';
+  final TextEditingController _amountController = TextEditingController();
+ 
+   var zipCode = '';
+   var deliverTo = '';
   String phone = '';
 
   bool isLoadingButton = false;
@@ -249,6 +253,7 @@ class _WalletPageState extends State<WalletPage> {
       isLoading: isLoadingButton,
       proceedTitle: "Add amount".tr(),
       onTapProceed: () {
+        _showAddAmountDialog();
       },
       onTapBack: () {
         Navigator.pop(context);
@@ -280,5 +285,84 @@ class _WalletPageState extends State<WalletPage> {
         isLoading = false;
       });
     return true;
+  }
+
+  _showAddAmountDialog() {
+    rfa.Alert(
+      context: context,
+      style: alertStyle,
+      title: "Add Amount",
+      content: Column(
+        children: <Widget>[
+          SizedBox(height: 20),
+          CustomTextField(
+            controller: _amountController,
+            keyboardType: TextInputType.number,
+            hintText: 'Enter Amount',
+          ),
+        ],
+      ),
+      buttons: [
+        rfa.DialogButton(
+          height: 60,
+          width: 120,
+          child: Text(
+            "Cancel",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          color: Colors.grey,
+          radius: BorderRadius.circular(10.0),
+        ),
+        rfa.DialogButton(
+          height: 60,
+          width: 120,
+          child: Text(
+            "Add",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            addAmount();
+          },
+          color: primary,
+          radius: BorderRadius.circular(10.0),
+        ),
+      ],
+    ).show();
+  }
+
+  addAmount() async {
+    if (_amountController.text.isEmpty) {
+      showToast("Please enter amount", context);
+      return;
+    }
+    Navigator.pop(context);
+    setState(() {
+      isLoadingButton = true;
+    });
+    var response = await netPost(
+      isUserToken: true,
+      endPoint: 'me/wallet/add',
+      params: {'amount': _amountController.text},
+    );
+    if (response['resp_code'] == "200") {
+      showToast("Amount added successfully", context);
+      initialize();
+    } else {
+      showToast(response['resp_data']['message'], context);
+    }
+    setState(() {
+      isLoadingButton = false;
+    });
   }
 }
