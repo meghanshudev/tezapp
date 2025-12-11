@@ -6,12 +6,16 @@ import 'package:tezchal/helpers/theme.dart';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:tezchal/helpers/network.dart';
+
 import '../helpers/utils.dart';
 import 'custom_box.dart';
 
 class OrderHistoryBox extends StatelessWidget {
-  OrderHistoryBox({Key? key, required this.data}) : super(key: key);
+  OrderHistoryBox({Key? key, required this.data, this.onOrderCancelled})
+      : super(key: key);
   final data;
+  final VoidCallback? onOrderCancelled;
 
   @override
   Widget build(BuildContext context) {
@@ -98,33 +102,8 @@ class OrderHistoryBox extends StatelessWidget {
                               height: 1.5, fontWeight: FontWeight.w700))
                       : Expanded(
                           child: GestureDetector(
-                            onTap: () async {
-                              String text =
-                                  "Hi! I want to cancel my Order from Tez.";
-                              if (Platform.isIOS) {
-                                if (await canLaunch(WHATSAPP_IOS_URL)) {
-                                  await launch(WHATSAPP_IOS_URL +
-                                      WHATSAPP +
-                                      "&text=${Uri.encodeFull(text)}");
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: new Text(
-                                              "whatsapp_not_installed".tr())));
-                                }
-                              } else {
-                                if (await canLaunch(WHATSAPP_ANDROID_URL)) {
-                                  await launch(WHATSAPP_ANDROID_URL +
-                                      WHATSAPP +
-                                      "&text=" +
-                                      Uri.encodeFull(text));
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: new Text(
-                                              "whatsapp_not_installed".tr())));
-                                }
-                              }
+                            onTap: () {
+                              _cancelOrder(context, data['id'].toString());
                             },
                             child: Text("CANCEL ORDER?",
                                 style: TextStyle(
@@ -304,6 +283,31 @@ class OrderHistoryBox extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+
+  Future<void> _cancelOrder(BuildContext context, String orderId) async {
+    confirmAlert(
+      context,
+      des: 'are_you_sure_you_want_to_cancel_this_order'.tr(),
+      btnCancelTitle: 'no'.tr(),
+      btnConfirmTitle: 'yes'.tr(),
+      onCancel: () => Navigator.of(context).pop(),
+      onConfirm: () async {
+        Navigator.of(context).pop();
+        var response =
+            await netPost(endPoint: "me/order/$orderId/cancel", params: {});
+        if (response["resp_code"] == "200") {
+          showToast('order_cancelled_successfully'.tr(), context);
+          if (onOrderCancelled != null) {
+            onOrderCancelled!();
+          }
+        } else {
+          var ms = response["resp_data"]["message"] ??
+              'failed_to_cancel_order'.tr();
+          showToast(ms.toString(), context);
+        }
+      },
     );
   }
 }

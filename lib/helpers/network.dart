@@ -13,6 +13,9 @@ netGet(
   // log(" TOKEN - ${userToken}");
   var url = Uri.parse(API_URL + endPoint);
   final newURI = url.replace(queryParameters: params);
+  print("userToken ${userToken}");
+  log("Network: Getting to API: $url");
+  log("Network: Payload: $params");
   
   final response = await http.get(newURI, headers: {
     "Authorization": "Bearer $userToken",
@@ -38,10 +41,16 @@ netPost({
   String userTokenType =
       (isUserToken) ? userSession['token_type'] ?? "Bearer" : "";
   var url = Uri.parse(API_URL + endPoint);
-  final response = await http.post(url, body: json.encode(params), headers: {
+
+  final bodyParams =
+      params.map((key, value) => MapEntry(key.toString(), value.toString()));
+
+  log("Network: Posting to API: $url");
+  log("Network: Payload: $bodyParams");
+
+  final response = await http.post(url, body: bodyParams, headers: {
     "Authorization": "$userTokenType $userToken",
     "Accept": "application/json",
-    "content-type": "application/json",
     "Locale": "en"
   });
   redirectLogin(response);

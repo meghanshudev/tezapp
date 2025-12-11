@@ -220,5 +220,12 @@
     "set_or_change_your_delivery_location" : "Set or Change your Delivery Location",
     "are_you_sure_you_want_to_logout?": "Are you sure you want to logout?",
     "are_you_a_defence_personnel": "Are you a defence personnel?",
-    "defence_discount": "Fauji Discount"
+    "defence_discount": "Fauji Discount",
+    "cancel_order": "Cancel Order",
+    "are_you_sure_you_want_to_cancel_this_order": "Are you sure you want to cancel this order?",
+    "no": "No",
+    "yes": "Yes",
+    "order_cancelled_successfully": "Order cancelled successfully.",
+    "failed_to_cancel_order": "Failed to cancel order.",
+    "error.confirm_order_cant_cancel": "This order cannot be cancelled."
 }

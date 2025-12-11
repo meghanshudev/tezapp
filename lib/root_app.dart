@@ -132,31 +132,47 @@ class _RootAppState extends State<RootApp> {
   }
 
   checkInOperationCity({lat = 0.0, lng = 0.0}) async {
+    log("RootApp: Checking if in operation city...");
     setState(() {
       isLoadingScreen = true;
     });
-    var response = await netGet(isUserToken: true, endPoint: "me/profile");
 
-    if (response['resp_code'] == "200") {
-      if (mounted) {
-        setState(() {
-          log("PROFILE GET ${response['resp_data']['data']}");
-          isInOperationCity =
-              response['resp_data']['data']['is_in_operation_city'];
-          isLoadingScreen = false;
-        });
-      }
+    // If a new location is provided, get the address and update.
+    if (lat != 0.0 || lng != 0.0) {
+      log("RootApp: New location provided. Getting address...");
+      await getCurrentLocation(lat: lat, lng: lng);
     } else {
-      setState(() {
-        isInOperationCity = false;
-        isLoadingScreen = false;
-      });
-    }
+      // Otherwise, check the current profile.
+      log("RootApp: No new location. Checking profile...");
+      var response = await netGet(isUserToken: true, endPoint: "me/profile");
 
-    if (!isInOperationCity) {
-      // not in city call get location
-      // and update user location
-      getCurrentLocation(lat: lat, lng: lng);
+      if (response['resp_code'] == "200") {
+        var data = response['resp_data']['data'];
+        bool inCity = data['is_in_operation_city'];
+        if (mounted) {
+          log("RootApp: Profile received. In city: $inCity");
+          setState(() {
+            isInOperationCity = inCity;
+            address = data['address'] ?? "";
+            zipCode = data['zip_code'] ?? "";
+            userSession['address'] = address;
+            userSession['zip_code'] = zipCode;
+            isLoadingScreen = false;
+          });
+        }
+        if (!inCity) {
+          log("RootApp: Not in an operation city. Getting current location...");
+          await getCurrentLocation();
+        }
+      } else {
+        log("RootApp: Failed to get profile. Assuming not in city.");
+        if (mounted) {
+          setState(() {
+            isInOperationCity = false;
+            isLoadingScreen = false;
+          });
+        }
+      }
     }
   }
 
@@ -209,6 +225,7 @@ class _RootAppState extends State<RootApp> {
   }
 
   updateUserAddress(location, lat, lng, zipCode) async {
+    log("RootApp: Updating user address...");
     var response = await netPost(
       isUserToken: true,
       endPoint: "me/update/address",
@@ -222,13 +239,47 @@ class _RootAppState extends State<RootApp> {
 
     if (mounted) {
       if (response['resp_code'] == "200") {
+        log("RootApp: User address updated successfully.");
+        var data = response['resp_data']['data'];
         setState(() {
-          log("PROFILE UPDATE ${response['resp_data']['data']}");
-          isInOperationCity =
-              response['resp_data']['data']['is_in_operation_city'];
+          isInOperationCity = data['is_in_operation_city'];
+          address = data['address'] ?? "";
+          zipCode = data['zip_code'] ?? "";
+          userSession['address'] = address;
+          userSession['zip_code'] = zipCode;
           isLoadingScreen = false;
         });
       } else {
+        log("RootApp: Failed to update user address: ${response['resp_data']}");
+        setState(() {
+          isInOperationCity = false;
+          isLoadingScreen = false;
+        });
+      }
+    }
+  }
+
+  _refreshProfile() async {
+    log("RootApp: Refreshing profile...");
+    setState(() {
+      isLoadingScreen = true;
+    });
+    var response = await netGet(isUserToken: true, endPoint: "me/profile");
+
+    if (mounted) {
+      if (response['resp_code'] == "200") {
+        var data = response['resp_data']['data'];
+        log("RootApp: Profile refreshed successfully.");
+        setState(() {
+          isInOperationCity = data['is_in_operation_city'];
+          address = data['address'] ?? "";
+          zipCode = data['zip_code'] ?? "";
+          userSession['address'] = address;
+          userSession['zip_code'] = zipCode;
+          isLoadingScreen = false;
+        });
+      } else {
+        log("RootApp: Failed to refresh profile: ${response['resp_data']}");
         setState(() {
           isInOperationCity = false;
           isLoadingScreen = false;
@@ -270,14 +321,10 @@ class _RootAppState extends State<RootApp> {
                   ? CustomAppBar(
                     isClick: true,
                     onCallBack: (result) async {
-                      await getCurrentLocation(
-                        lat: result['lat'],
-                        lng: result['lng'],
-                      );
-                      await checkInOperationCity(
-                        lat: result['lat'],
-                        lng: result['lng'],
-                      );
+                      log("CallBack result from location page: $result");
+                      if (result != null && result['status'] == 'updated') {
+                        await _refreshProfile();
+                      }
                     },
                     subtitle: address + " - " + zipCode,
                     subtitleIcon: Entypo.location_pin,
@@ -422,9 +469,14 @@ class _RootAppState extends State<RootApp> {
                         ),
                       );
 
-                      var lat = result['lat'];
-                      var lng = result['lng'];
-                      checkInOperationCity(lat: lat, lng: lng);
+                      log("CallBack result from location picker page: $result");
+                      if (result != null &&
+                          result['lat'] != null &&
+                          result['lng'] != null) {
+                        var lat = result['lat'];
+                        var lng = result['lng'];
+                        checkInOperationCity(lat: lat, lng: lng);
+                      }
                     },
                     cursorColor: black,
                     decoration: InputDecoration(

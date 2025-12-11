@@ -151,6 +151,9 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
         itemBuilder: (context, index) {
           return OrderHistoryBox(
             data: orders[index],
+            onOrderCancelled: () {
+              onRefresh();
+            },
           );
         });
   }

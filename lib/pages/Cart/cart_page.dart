@@ -232,6 +232,12 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         });
       }
 
+      fetchedPaymentMethods.add({
+        "id": 99,
+        "name": "Tez Chal Wallet",
+        "code": "wallet",
+        "image": "https://cdn-icons-png.flaticon.com/512/196/196566.png"
+      });
       log("PAYMENT METHODS ${fetchedPaymentMethods}");
       setState(() {
         paymentMethod = fetchedPaymentMethods;
@@ -1394,6 +1400,38 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         log("ConfirmCheckout - Easebuzz - STACKTRACE: $stack");
         showToast("Payment failed: ${e.toString()}", context);
       }
+    } else if (selectedGatewayCode == "wallet") {
+      // Handle wallet payment
+      await CartRepository().removeAll();
+      showToast("Order placed using wallet", context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderConfirmedPage(
+            data: {
+              "schedules":
+                  context.read<CartProvider>().getCartData?['schedules'] ?? [],
+              "orderData": orderData,
+            },
+          ),
+        ),
+      );
+    } else if (selectedGatewayCode == "wallet") {
+      // Handle wallet payment
+      await CartRepository().removeAll();
+      showToast("Order placed using wallet", context);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderConfirmedPage(
+            data: {
+              "schedules":
+                  context.read<CartProvider>().getCartData?['schedules'] ?? [],
+              "orderData": orderData,
+            },
+          ),
+        ),
+      );
     } else {
       // Generic order confirmation for other payment methods or if payment is not required
       print(context.read<CartProvider>().getCartData!["lines"]);

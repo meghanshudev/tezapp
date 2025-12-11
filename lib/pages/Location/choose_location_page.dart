@@ -14,6 +14,7 @@ import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:http/http.dart' as http;
+import 'package:tezchal/helpers/network.dart';
 import 'package:tezchal/pages/Location/location_picker_page.dart';
 import 'package:tezchal/provider/credit_provider.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
@@ -39,6 +40,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
   );
 
   String addressLocation = '';
+  String zipCode = '';
 
   double lat = 0.0;
   double lng = 0.0;
@@ -239,7 +241,10 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
                       if (result != null) {
                         var lat = result['lat'];
                         var lng = result['lng'];
-
+                        setState(() {
+                          this.lat = lat;
+                          this.lng = lng;
+                        });
                         await moveMapPin(lat, lng);
                         await getNewLocation(result);
                       }
@@ -307,7 +312,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
                 ),
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context, {"lat": lat, "lng": lng});
+                    Navigator.pop(context);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5),
@@ -320,7 +325,7 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
                 child: InkWell(
                   onTap: () {
                     log("Location: confirm and continue");
-                    Navigator.pop(context, {"lat": lat, "lng": lng});
+                    _confirmLocation();
                   },
                   child: Container(
                     width: double.infinity,
@@ -392,16 +397,111 @@ class _ChoooseLocationPageState extends State<ChoooseLocationPage> {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var result = jsonDecode(response.body);
+      if (result['results'] != null && result['results'].isNotEmpty) {
+        List items = result['results'][0]['address_components'] ?? [];
 
-      var streetAddress = result['results'][0]['formatted_address'];
+        var postalCode = '';
+        if (items.length > 0) {
+        items.forEach((result) {
+          if (result['types'][0] == "postal_code") {
+            postalCode = result['long_name'];
+          }
+        });
+      }
 
-      setState(() {
-        addressLocation = streetAddress;
-      });
+        var location = result['results'][0]['formatted_address'];
+        if (checkIsNullValue(postalCode)) {
+          postalCode = DEFAULT_ZIP_CODE;
+        }
+
+        setState(() {
+          addressLocation = location;
+          zipCode = postalCode;
+        });
+      } else {
+        log("ChooseLocationPage: No results found for the given coordinates.");
+        setState(() {
+          addressLocation = "No address found";
+          zipCode = "";
+        });
+      }
     } else {
+      log("ChooseLocationPage: Failed to fetch address from Google API.");
       setState(() {
         addressLocation = "";
+        zipCode = "";
       });
+    }
+  }
+
+  _confirmLocation() async {
+    log("ChooseLocationPage: Confirming location and fetching fresh address...");
+
+    // 1. Fetch fresh address from Google API, similar to root_app.dart
+    var apiURL =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$googleKeyApi";
+    var url = Uri.parse(apiURL);
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      log("ChooseLocationPage: Failed to fetch address from Google API.");
+      return;
+    }
+
+    var result = jsonDecode(response.body);
+    if (result['results'] == null || result['results'].isEmpty) {
+      log("ChooseLocationPage: No address results found for the given coordinates.");
+      return;
+    }
+
+    // 2. Parse address and zip code
+    List items = result['results'][0]['address_components'] ?? [];
+    var postalCode = '';
+    if (items.isNotEmpty) {
+      items.forEach((item) {
+        if (item['types'][0] == "postal_code") {
+          postalCode = item['long_name'];
+        }
+      });
+    }
+
+    var finalLocation = result['results'][0]['formatted_address'];
+    var finalZipCode =
+        checkIsNullValue(postalCode) ? DEFAULT_ZIP_CODE : postalCode;
+
+    // 3. Call the update API
+    log("ChooseLocationPage: Updating address with location: $finalLocation, zip: $finalZipCode");
+    var updateResponse = await netPost(
+      isUserToken: true,
+      endPoint: "me/update/address",
+      params: {
+        "lat": lat,
+        "lng": lng,
+        "address": finalLocation,
+        "zip_code": finalZipCode,
+      },
+    );
+
+    if (mounted) {
+      if (updateResponse['resp_code'] == "200") {
+        log("ChooseLocationPage: Address updated successfully.");
+        var data = updateResponse['resp_data']['data'];
+        userSession['address'] = data['address'] ?? "";
+        userSession['zip_code'] = data['zip_code'] ?? "";
+        Navigator.pop(context, {'status': 'updated'});
+      } else {
+        log("ChooseLocationPage: Failed to update address: ${updateResponse['resp_data']}");
+        var errorMessage = "something_went_wrong".tr();
+        if (updateResponse['resp_data'] != null &&
+            updateResponse['resp_data']['message'] != null) {
+          errorMessage = updateResponse['resp_data']['message'];
+        }
+        final snackBar = SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
   }
 

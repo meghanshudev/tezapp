@@ -163,16 +163,7 @@ class _HomePageState extends State<HomePage> {
     return Theme(
       data: DiwaliTheme.themeData,
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/home-bg.png"),
-              fit: BoxFit.fitWidth,
-              alignment: Alignment.topCenter
-            ),
-          ),
-          child: getBody(),
-        ),
+        body: getBody(),
       ),
     );
   }

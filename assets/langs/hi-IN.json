@@ -208,5 +208,12 @@
     "set_or_change_your_delivery_location" : "अपना डिलीवरी का लोकेशन देखे या फिर बदले",
     "are_you_sure_you_want_to_logout?": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
     "are_you_a_defence_personnel": "क्या आप रक्षा कर्मी हैं?",
-    "defence_discount": "फौजी छूट"
+    "defence_discount": "फौजी छूट",
+    "cancel_order": "ऑर्डर रद्द करें",
+    "are_you_sure_you_want_to_cancel_this_order": "क्या आप वाकई इस ऑर्डर को रद्द करना चाहते हैं?",
+    "no": "नहीं",
+    "yes": "हाँ",
+    "order_cancelled_successfully": "ऑर्डर सफलतापूर्वक रद्द कर दिया गया है।",
+    "failed_to_cancel_order": "ऑर्डर रद्द करने में विफल।",
+    "error.confirm_order_cant_cancel": "यह आदेश रद्द नहीं किया जा सकता है।"
 }

@@ -180,7 +180,9 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
             getPlaceDetailWithLatLng: (prediction) {
               lat = double.parse(prediction.lat!);
               lng = double.parse(prediction.lng!);
-              Navigator.pop(context, {"lat": lat, "lng": lng});
+              if (mounted) {
+                Navigator.pop(context, {"lat": lat, "lng": lng});
+              }
             },
             itemClick: (prediction) {
               addressController.text = prediction.description!;
