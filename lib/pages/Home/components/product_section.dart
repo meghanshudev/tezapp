@@ -31,6 +31,7 @@ class ProductSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("subTitle ${subTitle}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,6 +39,7 @@ class ProductSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
@@ -50,7 +52,9 @@ class ProductSection extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    if (subTitle != "")
                     SizedBox(height: 3),
+                    if (subTitle != "")
                     Text(
                       subTitle,
                       style: TextStyle(fontSize: 14),

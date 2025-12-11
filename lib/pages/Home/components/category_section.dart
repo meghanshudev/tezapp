@@ -25,11 +25,10 @@ class CategorySection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Festive Categories",
+            "Categories",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: DiwaliTheme.primaryColor,
             ),
           ),
           SizedBox(height: 20),
