@@ -1275,6 +1275,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
     if (apiResponse['resp_code'] != "200" ||
         apiResponse['resp_data'] == null ||
         apiResponse['resp_data']['data'] == null) {
+          log("apiResponse ${apiResponse}");
       var errorMessage =
           apiResponse["resp_data"]["message"] ??
           "Failed to confirm cart or get payment data from API.";

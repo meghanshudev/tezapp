@@ -215,5 +215,7 @@
     "yes": "हाँ",
     "order_cancelled_successfully": "ऑर्डर सफलतापूर्वक रद्द कर दिया गया है।",
     "failed_to_cancel_order": "ऑर्डर रद्द करने में विफल।",
-    "error.confirm_order_cant_cancel": "यह आदेश रद्द नहीं किया जा सकता है।"
+    "error.confirm_order_cant_cancel": "यह आदेश रद्द नहीं किया जा सकता है।",
+    "delete_account": "खाता हटाएँ",
+    "are_you_sure_you_want_to_delete_account": "क्या आप वाकई अपना खाता हटाना चाहते हैं? यह कार्रवाई वापस नहीं की जा सकती।"
 }

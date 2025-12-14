@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
@@ -33,9 +34,10 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
   void initState() {
     super.initState();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code'] ?? ""
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code'] ?? ""
+            : "";
     phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
   }
 
@@ -45,14 +47,16 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
         await launch(WHATSAPP_IOS_URL + WHATSAPP);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("Install Whatsapp and try again")));
+          SnackBar(content: new Text("Install Whatsapp and try again")),
+        );
       }
     } else {
       if (await canLaunch(WHATSAPP_ANDROID_URL + WHATSAPP)) {
         await launch(WHATSAPP_ANDROID_URL + WHATSAPP);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: new Text("Install Whatsapp and try again")));
+          SnackBar(content: new Text("Install Whatsapp and try again")),
+        );
       }
     }
   }
@@ -60,20 +64,22 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: CustomAppBar(
-            isWidget: true,
-            title: "customer_support".tr(),
-            subtitle: "$deliverTo • $phone",
-          ),
+      backgroundColor: white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: CustomAppBar(
+          isWidget: true,
+          title: "customer_support".tr(),
+          subtitle: "$deliverTo • $phone",
         ),
-        body: buildBody(),
-        bottomNavigationBar: CustomFooter(
-          onTapBack: () {
-            Navigator.of(context).pop();
-          },
-        ));
+      ),
+      body: buildBody(),
+      bottomNavigationBar: CustomFooter(
+        onTapBack: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 
   Widget buildBody() {
@@ -81,9 +87,7 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 23,
-          ),
+          SizedBox(height: 23),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
             child: CustomButton(
@@ -96,23 +100,19 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
                     Text(
                       "chat_with_us",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ).tr(),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                    ),
+                    Icon(Icons.arrow_forward_ios, color: Colors.white),
                   ],
                 ),
               ),
               onTap: () => onlaunchWhatsapp(),
             ),
           ),
-          SizedBox(
-            height: 15,
-          ),
+          SizedBox(height: 15),
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
             child: CustomButton(
@@ -125,14 +125,12 @@ class _CustomerSupportPageState extends State<CustomerSupportPage> {
                     Text(
                       "email_us",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ).tr(),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.white,
-                    ),
+                    Icon(Icons.arrow_forward_ios, color: Colors.white),
                   ],
                 ),
               ),

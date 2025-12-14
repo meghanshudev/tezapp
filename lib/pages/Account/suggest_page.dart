@@ -72,6 +72,7 @@ class _SuggestPageState extends State<SuggestPage> {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
+        backgroundColor: white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(80),
           child: CustomAppBar(

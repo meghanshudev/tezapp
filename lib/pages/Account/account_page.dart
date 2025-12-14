@@ -324,8 +324,37 @@ class _AccountPageState extends State<AccountPage> {
           },
           child: Text("logout", style: normalBoldPrimaryTitle).tr(),
         ),
+        SizedBox(height: 10),
+        TextButton(
+          onPressed: () {
+            confirmAlert(
+              context,
+              des: "are_you_sure_you_want_to_delete_account".tr(),
+              onCancel: () => Navigator.pop(context),
+              onConfirm: () => onDeleteAccount(context),
+            );
+          },
+          child: Text(
+            "delete_account",
+            style: normalBoldPrimaryTitle.copyWith(color: Colors.red),
+          ).tr(),
+        ),
       ],
     );
+  }
+
+  onDeleteAccount(BuildContext context) async {
+    var response = await netDelete(
+      endPoint: "me/profile/delete",
+      params: {},
+    );
+    if (response['resp_code'] == "200") {
+      showToast("Account deleted successfully", context);
+      onSignOut(context);
+    } else {
+      var ms = response["resp_data"]["message"];
+      showToast(ms.toString(), context);
+    }
   }
 
   onChangedLang() async {
@@ -339,6 +368,7 @@ class _AccountPageState extends State<AccountPage> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Container(
+              // color: white,
               padding: EdgeInsets.all(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

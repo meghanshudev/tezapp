@@ -42,15 +42,13 @@ netPost({
       (isUserToken) ? userSession['token_type'] ?? "Bearer" : "";
   var url = Uri.parse(API_URL + endPoint);
 
-  final bodyParams =
-      params.map((key, value) => MapEntry(key.toString(), value.toString()));
-
   log("Network: Posting to API: $url");
-  log("Network: Payload: $bodyParams");
+  log("Network: Payload: ${jsonEncode(params)}");
 
-  final response = await http.post(url, body: bodyParams, headers: {
+  final response = await http.post(url, body: jsonEncode(params), headers: {
     "Authorization": "$userTokenType $userToken",
     "Accept": "application/json",
+    "Content-Type": "application/json",
     "Locale": "en"
   });
   redirectLogin(response);

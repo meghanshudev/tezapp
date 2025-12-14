@@ -4,6 +4,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:tezchal/helpers/constant.dart';
+import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
@@ -31,9 +32,10 @@ class _TermConditionPageState extends State<TermConditionPage> {
   void initState() {
     super.initState();
     deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" : "";
-    zipCode = !checkIsNullValue(userSession['zip_code'])
-        ? userSession['zip_code'] ?? ""
-        : "";
+    zipCode =
+        !checkIsNullValue(userSession['zip_code'])
+            ? userSession['zip_code'] ?? ""
+            : "";
     phone = !checkIsNullValue(userSession) ? userSession['phone_number'] : "";
     fetchTermCondition();
   }
@@ -67,38 +69,40 @@ class _TermConditionPageState extends State<TermConditionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: CustomAppBar(
-            title: "terms_&_conditions".tr(),
-            subtitle: "$deliverTo • $phone",
-            isWidget: true,
-          ),
+      backgroundColor: white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: CustomAppBar(
+          title: "terms_&_conditions".tr(),
+          subtitle: "$deliverTo • $phone",
+          isWidget: true,
         ),
-        // body: buildBody(),
-        body: isLoading ? LoadingData() : getBody(),
-        bottomNavigationBar: CustomFooter(
-          onTapBack: () {
-            Navigator.of(context).pop();
-          },
-        ));
+      ),
+      // body: buildBody(),
+      body: isLoading ? LoadingData() : getBody(),
+      bottomNavigationBar: CustomFooter(
+        onTapBack: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 
   Widget getBody() {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-      child: Column(children: <Widget>[
-        // Text(
-        //   title,
-        //   textAlign: TextAlign.center,
-        //   style: TextStyle(
-        //       fontSize: 18, height: 1.5, fontWeight: FontWeight.bold),
-        // ),
-        // SizedBox(height: 15,),
-        Html(
-          data: content,
-        ),
-      ]),
+      child: Column(
+        children: <Widget>[
+          // Text(
+          //   title,
+          //   textAlign: TextAlign.center,
+          //   style: TextStyle(
+          //       fontSize: 18, height: 1.5, fontWeight: FontWeight.bold),
+          // ),
+          // SizedBox(height: 15,),
+          Html(data: content),
+        ],
+      ),
     );
   }
 }

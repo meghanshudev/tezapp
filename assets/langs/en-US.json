@@ -227,5 +227,7 @@
     "yes": "Yes",
     "order_cancelled_successfully": "Order cancelled successfully.",
     "failed_to_cancel_order": "Failed to cancel order.",
-    "error.confirm_order_cant_cancel": "This order cannot be cancelled."
+    "error.confirm_order_cant_cancel": "This order cannot be cancelled.",
+    "delete_account": "Delete Account",
+    "are_you_sure_you_want_to_delete_account": "Are you sure you want to delete your account? This action cannot be undone."
 }

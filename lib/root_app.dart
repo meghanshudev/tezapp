@@ -7,11 +7,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:geocode/geocode.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tezchal/helpers/constant.dart';
 import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/pages/Account/account_page.dart';
 import 'package:tezchal/pages/Account/order_history_page.dart';
+import 'package:tezchal/pages/Authentication/add_name_page.dart';
 import 'package:tezchal/pages/Cart/cart_page.dart';
 import 'package:tezchal/pages/Home/home_page.dart';
 import 'package:tezchal/pages/Location/location_picker_page.dart';
@@ -148,6 +150,14 @@ class _RootAppState extends State<RootApp> {
 
       if (response['resp_code'] == "200") {
         var data = response['resp_data']['data'];
+        log("PROFILE ${data}");
+        if (data['name'] == null) {
+          // first time
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddNamePage()),
+          );
+        }
         bool inCity = data['is_in_operation_city'];
         if (mounted) {
           log("RootApp: Profile received. In city: $inCity");
@@ -164,6 +174,14 @@ class _RootAppState extends State<RootApp> {
           log("RootApp: Not in an operation city. Getting current location...");
           await getCurrentLocation();
         }
+      } else if (response['resp_code'] == 403) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/login_page",
+          (Route<dynamic> route) => false,
+        );
       } else {
         log("RootApp: Failed to get profile. Assuming not in city.");
         if (mounted) {
@@ -188,7 +206,7 @@ class _RootAppState extends State<RootApp> {
     dynamic dataPanel = {
       "phone": userSession['phone_number'],
       "location": {"lat": newLat, "lng": newLng},
-  };
+    };
 
     mixpanel.track(CLICK_PERMISSION_LOCATION, properties: dataPanel);
 

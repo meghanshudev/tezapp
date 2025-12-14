@@ -10,6 +10,7 @@ import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/pages/Cart/cart_page.dart';
+import 'package:tezchal/root_app.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/product_detail_loading.dart';
 import 'package:tezchal/ui_elements/product_item_network.dart';
@@ -653,9 +654,14 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           setState(() {
                             isInPage = false;
                           });
-                          await Navigator.push(
+                          // Pop until root
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                          // Then push RootApp with cart tab active
+                          await Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => CartPage()),
+                            MaterialPageRoute(
+                              builder: (context) => RootApp(data: {"activePageIndex": 3}),
+                            ),
                           );
                           setState(() {
                             isInPage = true;

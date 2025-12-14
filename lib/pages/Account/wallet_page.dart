@@ -63,6 +63,7 @@ class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(80),
         child: CustomAppBar(
@@ -350,11 +351,13 @@ class _WalletPageState extends State<WalletPage> {
     setState(() {
       isLoadingButton = true;
     });
+    int? amount = int.tryParse(_amountController.text);
     var response = await netPost(
       isUserToken: true,
       endPoint: 'me/wallet/add',
-      params: {'amount': _amountController.text},
+      params: {'amount': amount},
     );
+    log("WALLET - ${response}");
     if (response['resp_code'] == "200") {
       showToast("Amount added successfully", context);
       initialize();
