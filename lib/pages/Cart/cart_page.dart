@@ -340,43 +340,67 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   }
 
   Future<void> checkPaymentStatus(String transactionId) async {
-    var response = await netGet(
-      endPoint: "payment/status/$transactionId",
-      isUserToken: true,
-    );
-
-    if (mounted) {
-      setState(() {
-        _pendingTransactionId = null; // Clear the pending transaction ID
-      });
-    }
-
-    if (response['resp_code'] == "200" && response['resp_data'] != null) {
-      var status = response['resp_data']['data']['status'];
-      var orderData = response['resp_data']['data']['transaction']['order'];
-      if (status == 'success') {
-        _showPaymentStatusDialog(
-            "Payment Successful", "Your payment was successful.");
-        await CartRepository().removeAll();
-        context.read<CartProvider>().refreshCart(false);
-        context.read<CartProvider>().refreshCartCount(0);
-        context.read<CartProvider>().refreshCartGrandTotal(0.0);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderConfirmedPage(
-              data: {
-                "schedules": orderData?['schedules'] ?? [],
-                "orderData": orderData,
-              },
-            ),
-          ),
-        );
-      } else if (status == 'failed') {
-        _showPaymentStatusDialog(
-            "Payment Failed", "Your payment has failed. Please try again.");
+    try {
+      var response = await netGet(
+        endPoint: "payment/status/$transactionId",
+        isUserToken: true,
+      );
+      if (mounted) {
+        setState(() {
+          _pendingTransactionId = null;
+        });
       }
-      // If pending, do nothing and wait for the next check.
+      if (response['resp_code'] == "200" && response['resp_data'] != null) {
+        var data = response['resp_data']['data'];
+        var status = data['status'];
+        if (status == 'success') {
+          _showPaymentStatusDialog("Payment Successful", "Your payment was successful.");
+          await CartRepository().removeAll();
+          context.read<CartProvider>().refreshCart(false);
+          context.read<CartProvider>().refreshCartCount(0);
+          context.read<CartProvider>().refreshCartGrandTotal(0.0);
+          var rawOrderData = data.containsKey('transaction') && data['transaction'] != null
+              ? data['transaction']['order']
+              : data;
+
+          // Map rawOrderData to expected orderData structure for OrderConfirmedPage
+          var orderData = {
+            'invoice_number': rawOrderData['order_id']?.toString() ?? 'N/A',
+            'lines': rawOrderData['lines'] ?? [],
+            'schedules': rawOrderData['schedules'] ?? [],
+            'paymentType': rawOrderData['payment_method'] ?? null,
+            'order_date': rawOrderData['completed_at'] ?? null,
+            'mrp_total': rawOrderData['amount'] ?? null,
+            'discount': rawOrderData['discount'] ?? 0,
+            'sub_total': rawOrderData['amount'] ?? null,
+            'amount_off': rawOrderData['amount_off'] ?? 0,
+            'delivery': rawOrderData['delivery'] ?? 0,
+            'vat': rawOrderData['vat'] ?? 0,
+            'defence_discount_percent': rawOrderData['defence_discount_percent'] ?? 0,
+            'total': rawOrderData['amount'] ?? null,
+          };
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderConfirmedPage(
+                data: {
+                  "schedules": orderData['schedules'],
+                  "orderData": orderData,
+                },
+              ),
+            ),
+          );
+        } else if (status == 'failed') {
+          _showPaymentStatusDialog("Payment Failed", "Your payment has failed. Please try again.");
+        } else {
+          showToast("Payment status is pending. Please wait...", context);
+        }
+      } else {
+        showToast("Failed to get payment status. Please try again later.", context);
+      }
+    } catch (e) {
+      showToast("Error checking payment status: ${e.toString()}", context);
     }
   }
 
@@ -1485,7 +1509,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   void _showPaymentStatusDialog(String title, String message) {
     rfa.Alert(
       context: context,
-      style: alertStyle, // Use the global alertStyle from utils.dart
+      style: alertStyle,
       title: title,
       content: Padding(
         padding: const EdgeInsets.only(top: 20.0),
@@ -1508,7 +1532,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             ),
           ),
           onPressed: () {
-            Navigator.of(context).pop(); // Dismiss the dialog
+            Navigator.of(context).pop();
           },
           color: primary,
           radius: BorderRadius.circular(10.0),
