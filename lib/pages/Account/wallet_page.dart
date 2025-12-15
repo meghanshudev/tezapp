@@ -23,7 +23,7 @@ import 'package:tezchal/ui_elements/custom_footer_buttons.dart';
 import 'package:tezchal/ui_elements/custom_sub_header.dart';
 import 'package:tezchal/ui_elements/icon_box.dart';
 import 'package:tezchal/ui_elements/custom_textfield.dart';
- 
+import 'package:easebuzz_flutter/easebuzz_flutter.dart';
  class WalletPage extends StatefulWidget {
    const WalletPage({Key? key}) : super(key: key);
 
@@ -359,13 +359,110 @@ class _WalletPageState extends State<WalletPage> {
     );
     log("WALLET - ${response}");
     if (response['resp_code'] == "200") {
-      showToast("Amount added successfully", context);
-      initialize();
+      var respData = response['resp_data'];
+      if (respData != null && respData['success'] == true && respData['data'] != null) {
+        var paymentUrl = respData['data']['payment_url'];
+        var accessKey = respData['data']['access_key'];
+        var method = respData['data']['method'];
+        var transactionId = respData['data']['transaction_id'].toString();
+        if (paymentUrl != null && accessKey != null && method != null) {
+          // Trigger EaseBuzz payment flow
+          await _startEaseBuzzPayment(accessKey, paymentUrl, transactionId);
+        } else {
+          showToast("Amount added successfully", context);
+          initialize();
+        }
+      } else {
+        showToast(respData['message'] ?? "Failed to add amount", context);
+      }
     } else {
       showToast(response['resp_data']['message'], context);
     }
     setState(() {
       isLoadingButton = false;
     });
+  }
+
+  final EasebuzzFlutter _easebuzzFlutterPlugin = EasebuzzFlutter();
+  String? _pendingTransactionId;
+
+  Future<void> _startEaseBuzzPayment(String accessKey, String paymentUrl, String transactionId) async {
+    setState(() {
+      _pendingTransactionId = transactionId;
+    });
+    try {
+      // The EasebuzzFlutter plugin expects the accessKey and environment (e.g., "test" or "prod")
+      final paymentResponse = await _easebuzzFlutterPlugin.payWithEasebuzz(
+        accessKey,
+        "test", // Assuming test environment; change if needed
+      );
+      // After payment flow, check payment status from backend
+      if (_pendingTransactionId != null) {
+        await _checkPaymentStatus(_pendingTransactionId!);
+      } else {
+        _showPaymentStatusDialog(
+          "Payment Error",
+          "Could not verify payment status. Transaction ID not found.",
+        );
+      }
+    } catch (e) {
+      showToast("Payment failed: ${e.toString()}", context);
+    }
+  }
+
+  Future<void> _checkPaymentStatus(String transactionId) async {
+    var response = await netGet(
+      endPoint: "payment/status/$transactionId",
+      isUserToken: true,
+    );
+    if (mounted) {
+      setState(() {
+        _pendingTransactionId = null;
+      });
+    }
+    if (response['resp_code'] == "200" && response['resp_data'] != null) {
+      var status = response['resp_data']['data']['status'];
+      if (status == 'success') {
+        _showPaymentStatusDialog("Payment Successful", "Your payment was successful.");
+        initialize();
+      } else if (status == 'failed') {
+        _showPaymentStatusDialog("Payment Failed", "Your payment has failed. Please try again.");
+      }
+    }
+  }
+
+  void _showPaymentStatusDialog(String title, String message) {
+    rfa.Alert(
+      context: context,
+      style: alertStyle,
+      title: title,
+      content: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Text(
+          message,
+          style: alertStyle.descStyle,
+          textAlign: alertStyle.descTextAlign,
+        ),
+      ),
+      buttons: [
+        rfa.DialogButton(
+          height: 60,
+          width: 150,
+          child: Text(
+            "OK",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          color: primary,
+          radius: BorderRadius.circular(10.0),
+        ),
+      ],
+    ).show();
   }
 }

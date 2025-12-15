@@ -24,6 +24,7 @@ netGet(
     "Locale": "en",
   });
   print(response);
+  log("Network: Response: ${response.body}");
   
   redirectLogin(response);
   return {

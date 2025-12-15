@@ -34,7 +34,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
   var couponData;
   var paymentType;
   String expectedConfirmDate = "N/A";
-  late String timeStamp;
+  String? timeStamp;
   bool isAdsLoading = false;
   List ads = [];
   late Mixpanel mixpanel;
@@ -65,12 +65,13 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
         orderData.containsKey('schedules') ? orderData['schedules'] : [];
     paymentType =
         orderData.containsKey('paymentType') ? orderData['paymentType'] : null;
-    timeStamp =
-        DateFormat(
-          "EEEE, MMM d",
-        ).format(DateTime.parse(orderData['order_date'])) +
-        " at " +
-        DateFormat("hh:mmaaa").format(DateTime.parse(orderData['order_date']));
+    if (orderData['order_date'] != null) {
+      timeStamp = DateFormat("EEEE, MMM d").format(DateTime.parse(orderData['order_date'])) +
+          " at " +
+          DateFormat("hh:mmaaa").format(DateTime.parse(orderData['order_date']));
+    } else {
+      timeStamp = "N/A";
+    }
 
     if (orderData.containsKey('schedules')) {
       for (int i = 0; i < orderData['schedules'].length; i++) {
