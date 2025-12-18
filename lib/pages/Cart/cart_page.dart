@@ -234,9 +234,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
       fetchedPaymentMethods.add({
         "id": 99,
-        "name": "Tez Chal Wallet",
+        "name": "tez_cash",
         "code": "wallet",
-        "image": "https://cdn-icons-png.flaticon.com/512/196/196566.png"
+        "icon": MaterialCommunityIcons.wallet,
       });
       log("PAYMENT METHODS ${fetchedPaymentMethods}");
       setState(() {
@@ -354,16 +354,20 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         var data = response['resp_data']['data'];
         var status = data['status'];
         if (status == 'success') {
-          _showPaymentStatusDialog("Payment Successful", "Your payment was successful.");
+          _showPaymentStatusDialog(
+            "Payment Successful",
+            "Your payment was successful.",
+          );
           await CartRepository().removeAll();
           context.read<CartProvider>().refreshCart(false);
           context.read<CartProvider>().refreshCartCount(0);
           context.read<CartProvider>().refreshCartGrandTotal(0.0);
-          var rawOrderData = data.containsKey('transaction') && data['transaction'] != null
-              ? data['transaction']['order']
-              : data;
+          var rawOrderData =
+              data.containsKey('transaction') && data['transaction'] != null
+                  ? data['transaction']['order']
+                  : data;
 
-          // Map rawOrderData to expected orderData structure for OrderConfirmedPage
+          // Map rawOrderData to expected orderDat structure for OrderConfirmedPag
           var orderData = {
             'invoice_number': rawOrderData['order_id']?.toString() ?? 'N/A',
             'lines': rawOrderData['lines'] ?? [],
@@ -376,28 +380,36 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             'amount_off': rawOrderData['amount_off'] ?? 0,
             'delivery': rawOrderData['delivery'] ?? 0,
             'vat': rawOrderData['vat'] ?? 0,
-            'defence_discount_percent': rawOrderData['defence_discount_percent'] ?? 0,
+            'defence_discount_percent':
+                rawOrderData['defence_discount_percent'] ?? 0,
             'total': rawOrderData['amount'] ?? null,
           };
 
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrderConfirmedPage(
-                data: {
-                  "schedules": orderData['schedules'],
-                  "orderData": orderData,
-                },
-              ),
+              builder:
+                  (context) => OrderConfirmedPage(
+                    data: {
+                      "schedules": orderData['schedules'],
+                      "orderData": orderData,
+                    },
+                  ),
             ),
           );
         } else if (status == 'failed') {
-          _showPaymentStatusDialog("Payment Failed", "Your payment has failed. Please try again.");
+          _showPaymentStatusDialog(
+            "Payment Failed",
+            "Your payment has failed. Please try again.",
+          );
         } else {
           showToast("Payment status is pending. Please wait...", context);
         }
       } else {
-        showToast("Failed to get payment status. Please try again later.", context);
+        showToast(
+          "Failed to get payment status. Please try again later.",
+          context,
+        );
       }
     } catch (e) {
       showToast("Error checking payment status: ${e.toString()}", context);
@@ -598,9 +610,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("payment_method", style: meduimBlackText).tr(),
+          Text("select_payment_method", style: meduimBlackText).tr(),
           SizedBox(height: 5),
-          Text("choose_the_payment_method", style: smallBlackText).tr(),
+          Text("payment_method_note", style: smallBlackText).tr(),
           SizedBox(height: 25),
           Column(
             children: List.generate(paymentMethod.length, (index) {
@@ -636,19 +648,31 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                               Container(
                                 width: 25,
                                 height: 25,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(25),
-                                  child: Image.network(
-                                    paymentMethod[index]['image'],
-                                  ),
+                                  child:
+                                      paymentMethod[index]['image'] != null &&
+                                              paymentMethod[index]['image']
+                                                  .toString()
+                                                  .isNotEmpty
+                                          ? Image.network(
+                                            paymentMethod[index]['image'],
+                                            fit: BoxFit.cover,
+                                          )
+                                          : Icon(
+                                            paymentMethod[index]['icon'],
+                                            size: 18,
+                                            color: primary.withOpacity(0.6),
+                                          ),
                                 ),
                               ),
+
                               SizedBox(width: 15),
                               Text(
-                                paymentMethod[index]['name'],
+                                paymentMethod[index]['name'].toString().tr(),
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -764,7 +788,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                   : Row(
                     children: [
                       Text(
-                        "$CURRENCY ${context.watch<CartProvider>().getCartData!["discount"]}",
+                        "$CURRENCY ${context.watch<CartProvider>().getCartData!["discount"]} ",
                         style: meduimBoldPrimaryText,
                       ),
                       Text("saved".tr(), style: meduimPrimaryText),
@@ -774,7 +798,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                 onTap: () {
                   setEmptyCart();
                 },
-                child: Text("Empty Cart".toUpperCase(), style: meduimBlackText),
+                child: Text("empty_cart".tr(), style: meduimBlackText),
               ),
             ],
           ),
@@ -978,7 +1002,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Value-Added Tax", style: smallMediumGreyText).tr(),
+              Text("value_added_tax", style: smallMediumGreyText).tr(),
               Text(
                 "$CURRENCY ${context.watch<CartProvider>().getCartData!["vat"] ?? 0}",
                 style: smallMediumGreyText,
@@ -1019,12 +1043,15 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           SizedBox(height: 10),
           Divider(thickness: 0.8),
           SizedBox(height: 10),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     Text("FREE Delivery above ₹99!", style: smallMediumPrimaryText),
-          //   ],
-          // ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "free_delivery_above_amount".tr(),
+                style: smallMediumPrimaryText,
+              ),
+            ],
+          ),
           SizedBox(height: 10),
           Divider(thickness: 0.8),
         ],
@@ -1071,95 +1098,6 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             ),
             child: Column(
               children: [
-                // Padding(
-                //   padding:
-                //       const EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 5),
-                //   child: Container(
-                //     width: double.infinity,
-                //     height: 60,
-                //     child: Row(
-                //       children: [
-                //         Container(
-                //           width: 45,
-                //           height: 45,
-                //           decoration: BoxDecoration(
-                //               shape: BoxShape.circle,
-                //               image: DecorationImage(
-                //                   image: NetworkImage(
-                //                       checkIsNullValue(userSession['group'])
-                //                           ? groupProfile
-                //                           : userSession['group']['image']),
-                //                   fit: BoxFit.cover)),
-                //         ),
-                //         SizedBox(
-                //           width: 15,
-                //         ),
-                //         Flexible(
-                //           child: Container(
-                //             width: size.width * 0.5,
-                //             child: Column(
-                //               crossAxisAlignment: CrossAxisAlignment.start,
-                //               mainAxisAlignment: MainAxisAlignment.center,
-                //               children: [
-                //                 !checkIsNullValue(userSession['group'])
-                //                     ? Text(
-                //                         userSession['group']['name'],
-                //                         style: normalBlackText,
-                //                       )
-                //                     : Text(
-                //                         "no_group_found",
-                //                         style: normalBlackText,
-                //                       ).tr(),
-                //                 SizedBox(
-                //                   height: 5,
-                //                 ),
-                //                 !checkIsNullValue(userSession['group'])
-                //                     ? Text(
-                //                         "$byLeader" +
-                //                             (checkIsNullValue(leaderzipCode)
-                //                                 ? ""
-                //                                 : " - $leaderzipCode"),
-                //                         style: smallBlackText,
-                //                       )
-                //                     : Text(
-                //                         "no_group_leader_found",
-                //                         style: smallBlackText,
-                //                       ).tr()
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //         SizedBox(
-                //           width: 15,
-                //         ),
-                //         Padding(
-                //           padding: const EdgeInsets.only(top: 8, bottom: 8),
-                //           child: Container(
-                //             width: 90,
-                //             decoration: BoxDecoration(
-                //                 border: Border(
-                //                     left: BorderSide(
-                //                         width: 1, color: placeHolderColor))),
-                //             child: Column(
-                //               mainAxisAlignment: MainAxisAlignment.center,
-                //               children: [
-                //                 Text("delivery_by", style: smallBlackText).tr(),
-                //                 SizedBox(
-                //                   height: 5,
-                //                 ),
-                //                 Text(
-                //                   byDate,
-                //                   style: normalBlackText,
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                // cart section
                 Padding(
                   padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Row(
@@ -1169,7 +1107,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                           onTap: () {
                             confirmAlert(
                               context,
-                              des: "Confirm Order on TezChal?".tr(),
+                              des: "confirm_order_on_app".tr(),
                               onCancel: () {
                                 Navigator.pop(context);
                               },
@@ -1228,7 +1166,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                                   Row(
                                     children: [
                                       Text(
-                                        "Place Order",
+                                        "place_order",
                                         style: smallMediumWhiteText,
                                       ).tr(),
                                       SizedBox(width: 8),
@@ -1289,7 +1227,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
     // Step 1: Call the backend API to confirm the cart and get payment data
     log(
-      "ConfirmCheckout - Calling me/cart/confirm API with gateway_code: $selectedGatewayCode",
+      "ConfirmCheckou - Calling me/cart/confirm API with gateway_code: $selectedGatewayCode",
     );
     var apiResponse = await netPost(
       endPoint: "me/cart/confirm",
@@ -1299,13 +1237,13 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
     if (apiResponse['resp_code'] != "200" ||
         apiResponse['resp_data'] == null ||
         apiResponse['resp_data']['data'] == null) {
-          log("apiResponse ${apiResponse}");
+      log("apiResponse ${apiResponse}");
       var errorMessage =
           apiResponse["resp_data"]["message"] ??
           "Failed to confirm cart or get payment data from API.";
       showToast(errorMessage, context);
       log(
-        "ConfirmCheckout - ERROR: API call to me/cart/confirm failed: $errorMessage",
+        "ConfirmCheckou - ERROR: API call to me/cart/confirm failed: $errorMessage",
       );
       setState(() {
         confirmingCheckout = false;
@@ -1314,6 +1252,20 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
     }
 
     var orderData = apiResponse['resp_data']['data']['order'];
+    log("orderData $orderData");
+    // Navigator.push(
+    //     context,
+    //     MaterialPageRoute(
+    //       builder: (context) => OrderConfirmedPage(
+    //         data: {
+    //           "schedules":
+    //               context.read<CartProvider>().getCartData?['schedules'] ?? [],
+    //           "orderData": orderData,
+    //         },
+    //       ),
+    //     ),
+    //   );
+
     var paymentRequired = apiResponse['resp_data']['data']['payment_required'];
     log("Easebuzz ${apiResponse}");
 
@@ -1332,7 +1284,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           context,
         );
         log(
-          "ConfirmCheckout - ERROR: Invalid payment data structure from API for Easebuzz.",
+          "ConfirmCheckou - ERROR: Invalid payment data structure from API for Easebuzz.",
         );
         setState(() {
           confirmingCheckout = false;
@@ -1340,9 +1292,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         return;
       }
 
-      log("ConfirmCheckout - Easebuzz Payment Data from API: $paymentData");
+      log("ConfirmCheckou - Easebuzz Payment Data from API: $paymentData");
       log(
-        "ConfirmCheckout - Easebuzz Transaction Data from API: $transactionData",
+        "ConfirmCheckou - Easebuzz Transaction Data from API: $transactionData",
       );
 
       final requestData = transactionData['request_data'];
@@ -1353,7 +1305,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           context,
         );
         log(
-          "ConfirmCheckout - ERROR: Invalid request data structure from API for Easebuzz.",
+          "ConfirmCheckou - ERROR: Invalid request data structure from API for Easebuzz.",
         );
         setState(() {
           confirmingCheckout = false;
@@ -1378,11 +1330,11 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         _pendingTransactionId = requestData['txnid'].toString();
       });
 
-      log("ConfirmCheckout - Easebuzz Payment Model created: ${paymentModel}");
+      log("ConfirmCheckou - Easebuzz Payment Model created: ${paymentModel}");
 
       try {
         log(
-          "ConfirmCheckout - Easebuzz - Triggering payment flow with Easebuzz...",
+          "ConfirmCheckou - Easebuzz - Triggering payment flow with Easebuzz...",
         );
         // The `payWithEasebuzz` method from the plugin expects a single Map object
         // containing all the payment parameters. The previous implementation was passing
@@ -1397,11 +1349,15 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         // This ensures we have the correct status, even if the plugin reports failure.
         if (_pendingTransactionId != null) {
           // We have a transaction ID, so let's check its status.
-          log("ConfirmCheckout - Easebuzz - INFO: Plugin flow finished. Checking payment status from backend for transaction ID: $_pendingTransactionId");
+          log(
+            "ConfirmCheckou - Easebuzz - INFO: Plugin flow finished. Checking payment status from backend for transaction ID: $_pendingTransactionId",
+          );
           await checkPaymentStatus(_pendingTransactionId!);
         } else {
           // This case should ideally not happen if the flow is correct.
-          log("ConfirmCheckout - Easebuzz - ERROR: No pending transaction ID found after payment attempt.");
+          log(
+            "ConfirmCheckou - Easebuzz - ERROR: No pending transaction ID found after payment attempt.",
+          );
           _showPaymentStatusDialog(
             "Payment Error",
             "Could not verify payment status. Transaction ID not found.",
@@ -1409,20 +1365,20 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
         }
       } on PlatformException catch (e) {
         log(
-          "ConfirmCheckout - Easebuzz - ERROR: PlatformException during Easebuzz payment: ${e.message}",
+          "ConfirmCheckou - Easebuzz - ERROR: PlatformException during Easebuzz payment: ${e.message}",
         );
         log(
-          "ConfirmCheckout - Easebuzz - ERROR: PlatformException code: ${e.code}",
+          "ConfirmCheckou - Easebuzz - ERROR: PlatformException code: ${e.code}",
         );
         log(
-          "ConfirmCheckout - Easebuzz - ERROR: PlatformException details: ${e.details}",
+          "ConfirmCheckou - Easebuzz - ERROR: PlatformException details: ${e.details}",
         );
         showToast("Platform error: ${e.message}", context);
       } catch (e, stack) {
         log(
-          "ConfirmCheckout - Easebuzz - FATAL ERROR: Unexpected Payment Exception: $e",
+          "ConfirmCheckou - Easebuzz - FATAL ERROR: Unexpected Payment Exception: $e",
         );
-        log("ConfirmCheckout - Easebuzz - STACKTRACE: $stack");
+        log("ConfirmCheckou - Easebuzz - STACKTRACE: $stack");
         showToast("Payment failed: ${e.toString()}", context);
       }
     } else if (selectedGatewayCode == "wallet") {
@@ -1432,29 +1388,15 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OrderConfirmedPage(
-            data: {
-              "schedules":
-                  context.read<CartProvider>().getCartData?['schedules'] ?? [],
-              "orderData": orderData,
-            },
-          ),
-        ),
-      );
-    } else if (selectedGatewayCode == "wallet") {
-      // Handle wallet payment
-      await CartRepository().removeAll();
-      showToast("Order placed using wallet", context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OrderConfirmedPage(
-            data: {
-              "schedules":
-                  context.read<CartProvider>().getCartData?['schedules'] ?? [],
-              "orderData": orderData,
-            },
-          ),
+          builder:
+              (context) => OrderConfirmedPage(
+                data: {
+                  "schedules":
+                      context.read<CartProvider>().getCartData?['schedules'] ??
+                      [],
+                  "orderData": orderData,
+                },
+              ),
         ),
       );
     } else {
@@ -1468,6 +1410,8 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       };
 
       mixpanel.track(CLICK_ORDER_CONFIRM, properties: dataPanel);
+
+      var cartData = context.read<CartProvider>().getCartData!;
 
       await CartRepository().removeAll();
       showToast("your_order_is_completed".tr(), context);

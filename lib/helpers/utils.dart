@@ -292,8 +292,8 @@ dynamic confirmAlert(
   context, {
   final GestureTapCallback? onCancel,
   final GestureTapCallback? onConfirm,
-  final String btnCancelTitle = "Cancel",
-  final String btnConfirmTitle = "Continue",
+  final String btnCancelTitle = "cancel",
+  final String btnConfirmTitle = "continue",
   final des = "",
 }) {
   return Alert(
@@ -313,7 +313,7 @@ dynamic confirmAlert(
         height: 60,
         width: 150, // Explicitly set width for better control
         child: Text(
-          btnCancelTitle,
+          btnCancelTitle.tr(),
           style: const TextStyle(
             color: primary,
             fontSize: 16,
@@ -328,7 +328,7 @@ dynamic confirmAlert(
         height: 60,
         width: 150, // Explicitly set width for better control
         child: Text(
-          btnConfirmTitle,
+          btnConfirmTitle.tr(),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,

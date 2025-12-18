@@ -373,7 +373,6 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // DiwaliTitle(),
         SizedBox(height: 15),
         getSearchButton(
           context,
@@ -387,8 +386,7 @@ class _HomePageState extends State<HomePage> {
         ),
         SizedBox(height: 25),
         getCategories(),
-        SizedBox(height: 5),
-        SizedBox(height: 10),
+        SizedBox(height: 15),
         (isLoading && page == 1 && !isPulling)
             ? SizedBox(
               height: 150,

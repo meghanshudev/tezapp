@@ -89,7 +89,7 @@ class ProductSection extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Text("Explore More", style: TextStyle(fontSize: 16, color: DiwaliTheme.accentColor)).tr(),
+                    Text("explore_more", style: TextStyle(fontSize: 16, color: DiwaliTheme.accentColor)).tr(),
                     SizedBox(width: 3),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),

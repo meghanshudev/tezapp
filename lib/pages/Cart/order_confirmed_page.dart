@@ -492,7 +492,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("delivery", style: smallMediumBlackText).tr(),
+                        Text("delivery_fee", style: smallMediumBlackText).tr(),
                         Text(
                           "$CURRENCY ${orderData['delivery']}",
                           style: smallMediumBlackText,
@@ -504,7 +504,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "taxed_and_charges",
+                          "value_added_tax",
                           style: smallMediumBlackText,
                         ).tr(),
                         Text(

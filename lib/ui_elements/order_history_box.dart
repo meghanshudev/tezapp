@@ -81,7 +81,7 @@ class OrderHistoryBox extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text("Payment Method: ",
+                Text("payment_method".tr(),
                     style: TextStyle(height: 1.5, fontWeight: FontWeight.w700)),
                 Text(data['payment_type']['name'],
                     style: TextStyle(
@@ -105,7 +105,7 @@ class OrderHistoryBox extends StatelessWidget {
                             onTap: () {
                               _cancelOrder(context, data['id'].toString());
                             },
-                            child: Text("CANCEL ORDER?",
+                            child: Text("cancel_order?".tr(),
                                 style: TextStyle(
                                     height: 1.5,
                                     color: primary,

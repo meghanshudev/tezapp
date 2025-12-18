@@ -34,7 +34,6 @@ class BorderButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
         height: height,
         padding: padding,
         decoration: BoxDecoration(
