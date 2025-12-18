@@ -35,7 +35,7 @@ const String NETWORK_DEFAULT_IMAGE =
 const String DEFAULT_GROUP_IMAGE =
     "https://tez-production.s3.ap-south-1.amazonaws.com/groups/2022/5/2cb9a7919e01c5a1c22a824a0481e735.png";
 
-const googleKeyApi = "AIzaSyDkfxJAip5t6WE3hlHBgJHp-QE8PLigsUM";
+const googleKeyApi = "AIzaSyDAKJm45MSgKC5a3dlXYEMMICReH4bTGbM";
 
 const String WHATSAPP_ANDROID_URL = "whatsapp://send?phone=";
 const String WHATSAPP_IOS_URL = "whatsapp://send?phone=";
