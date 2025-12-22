@@ -119,7 +119,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     case '/order_confirmed_page':
       return MaterialPageRoute(
-        builder: (_) => OrderConfirmedPage(data: args),
+        builder: (_) => OrderConfirmedPage(orderId: args['orderId']),
       );
 
     case '/member_profile_page':

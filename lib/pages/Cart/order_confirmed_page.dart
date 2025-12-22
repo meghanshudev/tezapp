@@ -18,8 +18,8 @@ import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 import '../../ui_elements/custom_appbar.dart';
 
 class OrderConfirmedPage extends StatefulWidget {
-  const OrderConfirmedPage({Key? key, required this.data}) : super(key: key);
-  final data;
+  final String orderId;
+  const OrderConfirmedPage({Key? key, required this.orderId}) : super(key: key);
 
   @override
   State<OrderConfirmedPage> createState() => _OrderConfirmedPageState();
@@ -36,14 +36,14 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
   String expectedConfirmDate = "N/A";
   String? timeStamp;
   bool isAdsLoading = false;
+  bool isLoading = false;
   List ads = [];
   late Mixpanel mixpanel;
 
   @override
   void initState() {
     super.initState();
-
-    initData();
+    loadOrderDetails();
     initMixpanel();
   }
 
@@ -55,33 +55,55 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
     );
   }
 
-  initData() async {
-    orderData = widget.data['orderData'];
-    cart =
-        (!checkIsNullValue(orderData) && orderData.containsKey('lines'))
-            ? orderData['lines']
-            : cart;
-    schedules =
-        orderData.containsKey('schedules') ? orderData['schedules'] : [];
-    paymentType =
-        orderData.containsKey('paymentType') ? orderData['paymentType'] : null;
-    if (orderData['order_date'] != null) {
-      timeStamp = DateFormat("EEEE, MMM d").format(DateTime.parse(orderData['order_date'])) +
-          " at " +
-          DateFormat("hh:mmaaa").format(DateTime.parse(orderData['order_date']));
-    } else {
-      timeStamp = "N/A";
-    }
+  loadOrderDetails() async {
+    setState(() {
+      isLoading = true;
+    });
 
-    if (orderData.containsKey('schedules')) {
-      for (int i = 0; i < orderData['schedules'].length; i++) {
-        if (orderData['schedules'][i]['state']['code'] == "group_confirm") {
-          expectedConfirmDate = DateFormat(
-            "EEEE, d MMM",
-          ).format(DateTime.parse(orderData['schedules'][i]['date']));
-          break;
-        }
+    var id = widget.orderId;
+
+    var response = await netGet(endPoint: "me/order/$id");
+    if (response["resp_code"] == "200") {
+      var data = response["resp_data"]["data"];
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          orderData = data;
+          cart =
+              (!checkIsNullValue(orderData) && orderData.containsKey('lines'))
+                  ? orderData['lines']
+                  : cart;
+          schedules =
+              orderData.containsKey('schedules') ? orderData['schedules'] : [];
+          paymentType =
+              orderData.containsKey('paymentType') ? orderData['paymentType'] : null;
+          if (orderData['order_date'] != null) {
+            timeStamp = DateFormat("EEEE, MMM d").format(DateTime.parse(orderData['order_date'])) +
+                " at " +
+                DateFormat("hh:mmaaa").format(DateTime.parse(orderData['order_date']));
+          } else {
+            timeStamp = "N/A";
+          }
+
+          if (orderData.containsKey('schedules')) {
+            for (int i = 0; i < orderData['schedules'].length; i++) {
+              if (orderData['schedules'][i]['state']['code'] == "group_confirm") {
+                expectedConfirmDate = DateFormat(
+                  "EEEE, d MMM",
+                ).format(DateTime.parse(orderData['schedules'][i]['date']));
+                break;
+              }
+            }
+          }
+        });
       }
+    } else {
+      var ms = response["resp_data"]["message"];
+      showToast(ms.toString(), context);
+      setState(() {
+        isLoading = false;
+        orderData = {};
+      });
     }
 
     await fetchAds();
@@ -124,7 +146,9 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
           child: CustomAppBar(subtitle: "your_order".tr()),
         ),
         bottomNavigationBar: _buildBottomNavigationBar(),
-        body: getBody(),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : getBody(),
       ),
     );
   }
@@ -198,10 +222,10 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
   Widget getBody() {
     var size = MediaQuery.of(context).size;
 
-    return checkIsNullValue(schedules)
+    return orderData == null
         ? Container(child: Center(child: Text("no_data").tr()))
         : SingleChildScrollView(
-          child: Column(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(

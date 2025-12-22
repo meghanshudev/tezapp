@@ -2,10 +2,10 @@ import 'dart:ui';
 
 import 'package:event_bus/event_bus.dart';
 
-const ENV = 'production';
+const ENV = 'dev';
 
 const API_URL = (ENV == "production")
-    ? "https://tezapi.demogames.cloud/api/v1/"
+    ? "https://tezchalapi.tezchal.com/api/v1/"
     : "https://tezapi.demogames.cloud/api/v1/";
 
 const ONE_SIGNAL_ID = (ENV == "production")

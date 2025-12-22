@@ -188,7 +188,7 @@ class OrderHistoryBox extends StatelessWidget {
               SizedBox(
                 width: 5,
               ),
-              Text("$CURRENCY ${data['vat']}"),
+              Text("$CURRENCY ${data['vat'] ?? 0}"),
             ],
           ),
           SizedBox(

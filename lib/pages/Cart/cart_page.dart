@@ -388,13 +388,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) => OrderConfirmedPage(
-                    data: {
-                      "schedules": orderData['schedules'],
-                      "orderData": orderData,
-                    },
-                  ),
+              builder: (context) => OrderConfirmedPage(
+                orderId: rawOrderData['order_id'].toString(),
+              ),
             ),
           );
         } else if (status == 'failed') {
@@ -1388,15 +1384,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => OrderConfirmedPage(
-                data: {
-                  "schedules":
-                      context.read<CartProvider>().getCartData?['schedules'] ??
-                      [],
-                  "orderData": orderData,
-                },
-              ),
+          builder: (context) => OrderConfirmedPage(
+            orderId: orderData['id'].toString(),
+          ),
         ),
       );
     } else {
@@ -1418,15 +1408,9 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder:
-              (context) => OrderConfirmedPage(
-                data: {
-                  "schedules":
-                      context.read<CartProvider>().getCartData?['schedules'] ??
-                      [],
-                  "orderData": orderData,
-                },
-              ),
+          builder: (context) => OrderConfirmedPage(
+            orderId: orderData['id'].toString(),
+          ),
         ),
       );
     }
