@@ -23,7 +23,6 @@ class OrderHistoryBox extends StatelessWidget {
         DateFormat("MMM d").format(DateTime.parse(data['order_date'])) +
             " at " +
             DateFormat("hh:mmaaa").format(DateTime.parse(data['order_date']));
-    String deliveryState = data["state"]["name"];
     String expectedDate = "N/A";
     if (data.containsKey('schedules')) {
       for (int i = 0; i < data['schedules'].length; i++) {
@@ -35,7 +34,8 @@ class OrderHistoryBox extends StatelessWidget {
       }
     }
     bool isCancelled = data["is_cancelled"] ? true : false;
-    bool isDelivered = deliveryState == "Order Delivered" ? true : false;
+    bool isDelivered = data["state"]["code"] == "delivery_to_you";
+    bool canCancel = data['can_cancel'] ?? false;
 
     var cart = data['lines'];
     return Container(
@@ -90,28 +90,37 @@ class OrderHistoryBox extends StatelessWidget {
               ],
             ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              isCancelled
-                  ? Text("ORDER CANCELLED",
-                      style:
-                          TextStyle(height: 1.5, fontWeight: FontWeight.w700))
-                  : isDelivered
-                      ? Text("ORDER DELIVERED",
-                          style: TextStyle(
-                              height: 1.5, fontWeight: FontWeight.w700))
-                      : Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              _cancelOrder(context, data['id'].toString());
-                            },
-                            child: Text("cancel_order?".tr(),
-                                style: TextStyle(
-                                    height: 1.5,
-                                    color: primary,
-                                    fontWeight: FontWeight.w700)),
-                          ),
-                        ),
+              Text(
+                isCancelled
+                    ? "Order Cancelled"
+                    : isDelivered
+                        ? "Order Delivered"
+                        : "In Progress",
+                style: TextStyle(
+                  height: 1.5,
+                  fontWeight: FontWeight.w700,
+                  color: isCancelled
+                      ? Colors.red
+                      : isDelivered
+                          ? Colors.green
+                          : Colors.orange,
+                ),
+              ),
+              if (!isCancelled && !isDelivered)
+                GestureDetector(
+                  onTap: canCancel
+                      ? () {
+                          _cancelOrder(context, data['id'].toString());
+                        }
+                      : null,
+                  child: Text("cancel_order?".tr(),
+                      style: TextStyle(
+                          height: 1.5,
+                          color: canCancel ? primary : Colors.grey,
+                          fontWeight: FontWeight.w700)),
+                ),
             ],
           ),
 

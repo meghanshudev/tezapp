@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -44,16 +47,30 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   var deliverTo = '';
   String phone = '';
 
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     initPage();
 
-    deliverTo = !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
+    deliverTo =
+        !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
     zipCode = !checkIsNullValue(userSession['zip_code'])
         ? userSession['zip_code']
         : "";
-    phone = !checkIsNullValue(userSession) ? userSession['phone_number'] ?? "" : "";
+    phone =
+        !checkIsNullValue(userSession) ? userSession['phone_number'] ?? "" : "";
+
+    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
+      onRefresh();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   initPage() async {
@@ -329,6 +346,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
       int cnt = data["total"];
+      log("ORDER RESPONE, $data");
 
       if (mounted)
         setState(() {
