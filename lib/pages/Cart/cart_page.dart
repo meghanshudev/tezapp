@@ -19,6 +19,7 @@ import 'package:tezchal/pages/Cart/order_confirmed_page.dart';
 import 'package:tezchal/pages/Product/product_detail_page.dart';
 import 'package:tezchal/provider/cart_provider.dart';
 import 'package:tezchal/provider/has_group.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/respositories/cart/cart_repository.dart';
 import 'package:tezchal/ui_elements/cart_loading.dart';
 import 'package:tezchal/ui_elements/custom_appbar.dart';
@@ -118,19 +119,19 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(temp['total'].toString()),
-        );
+        context
+            .read<CartProvider>()
+            .refreshCartData(temp, context.read<AccountInfoProvider>());
       } else {
         // Handle case where data is null or 'lines' is missing (empty cart)
-        context.read<CartProvider>().refreshCartData(null);
+        context.read<CartProvider>().refreshCartData(null, context.read<AccountInfoProvider>());
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
       }
     } else {
       // Handle non-200 responses or other errors by clearing the cart
-      context.read<CartProvider>().refreshCartData(null);
+      context.read<CartProvider>().refreshCartData(null, context.read<AccountInfoProvider>());
       context.read<CartProvider>().refreshCart(false);
       context.read<CartProvider>().refreshCartCount(0);
       context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -142,6 +143,22 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   }
 
   getMember() async {
+    var profileResponse =
+        await netGet(isUserToken: true, endPoint: "me/profile") as dynamic;
+    log("PROFILE ${profileResponse['resp_data']['data']}");
+    if (profileResponse['resp_code'] == "200") {
+      var isDefence =
+          profileResponse['resp_data']['data']['is_defence_personnel'];
+      final accountProvider = context.read<AccountInfoProvider>();
+      accountProvider.refreshIsDefencePersonnel(isDefence == true || isDefence == 1);
+
+      // Trigger cart recalculation
+      final cartProvider = context.read<CartProvider>();
+      if (cartProvider.getCartData != null) {
+        cartProvider.refreshCartData(cartProvider.getCartData, accountProvider);
+      }
+    }
+
     if (!checkIsNullValue(userSession['group'])) {
       var groupId = userSession['group']['id'];
 
@@ -284,9 +301,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       // Refresh cart data from server after removal
       // This will trigger RootApp's loadCart() which updates CartProvider
       // and then CartPage will rebuild.
-      await context.read<CartProvider>().refreshCartData(
-        null,
-      ); // Temporarily clear to force refresh
+      await context.read<CartProvider>().refreshCartData(null, context.read<AccountInfoProvider>()); // Temporarily clear to force refresh
       // The actual refresh will happen when RootApp's loadCart is called,
       // which should be triggered by the navigation or a global event.
       // For now, we rely on the next navigation to CartPage to trigger RootApp's loadCart.
@@ -297,19 +312,16 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       // For now, let's just update the provider to reflect an empty state if the cart becomes empty.
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
-        context.read<CartProvider>().refreshCartData(temp);
+        context.read<CartProvider>().refreshCartData(temp, context.read<AccountInfoProvider>());
         List cartItems = temp['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(temp['total'].toString()),
-        );
         if (cartItems.length == 0) {
           context.read<CartProvider>().refreshCart(false);
           context.read<CartProvider>().refreshCartCount(cartItems.length);
         }
       } else {
-        context.read<CartProvider>().refreshCartData(null);
+        context.read<CartProvider>().refreshCartData(null, context.read<AccountInfoProvider>());
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -437,7 +449,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
         showToast("applied".tr(), context);
         // cart = temp; // Managed by CartProvider
-        context.read<CartProvider>().refreshCartData(temp);
+        context.read<CartProvider>().refreshCartData(temp, context.read<AccountInfoProvider>());
 
         List cartItems = temp['lines'];
         // couponData = temp['coupon']; // Managed by CartProvider
@@ -445,9 +457,6 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(temp['total'].toString()),
-        );
       }
     } else {
       var ms = response["resp_data"]["message"];
@@ -557,17 +566,14 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       var temp = response["resp_data"]["data"];
       if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
         // cart = temp; // Managed by CartProvider
-        context.read<CartProvider>().refreshCartData(temp);
+        context.read<CartProvider>().refreshCartData(temp, context.read<AccountInfoProvider>());
         // couponData = ''; // Managed by CartProvider
         List cartItems = temp['lines'];
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
-        context.read<CartProvider>().refreshCartGrandTotal(
-          double.parse(temp['total'].toString()),
-        );
       } else {
         // cart = null; // Managed by CartProvider
-        context.read<CartProvider>().refreshCartData(null);
+        context.read<CartProvider>().refreshCartData(null, context.read<AccountInfoProvider>());
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -844,14 +850,16 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
     return Column(
       children: List.generate(currentCart["lines"].length, (index) {
-        var product = currentCart["lines"][index]["product"];
-        var qty = currentCart["lines"][index]['qty'].toString();
-        return getSlidable(cartItem(product, qty), product, qty);
+        var lineItem = currentCart["lines"][index];
+        var product = lineItem["product"];
+        var qty = lineItem['qty'].toString();
+        return getSlidable(cartItem(lineItem, qty), product, qty);
       }),
     );
   }
 
-  Widget cartItem(_product, qty) {
+  Widget cartItem(_lineItem, qty) {
+    var _product = _lineItem['product'];
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -910,23 +918,23 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           SizedBox(width: 20),
           checkIsNullValue(_product['percent_off'])
               ? Text(
-                "$CURRENCY ${_product["unit_price"]}",
-                style: meduimBoldBlackText,
-              )
+                  "$CURRENCY ${_lineItem["unit_price_total"]}",
+                  style: meduimBoldBlackText,
+                )
               : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "$CURRENCY ${_product["sale_price"]}",
-                    style: meduimBoldBlackText,
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    "$CURRENCY ${_product["unit_price"]}",
-                    style: smallStrikeBoldPrimaryText,
-                  ),
-                ],
-              ),
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "$CURRENCY ${_lineItem["sale_price_total"]}",
+                      style: meduimBoldBlackText,
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      "$CURRENCY ${_lineItem["unit_price_total"]}",
+                      style: smallStrikeBoldPrimaryText,
+                    ),
+                  ],
+                ),
           SizedBox(width: 10),
         ],
       ),
@@ -956,7 +964,22 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("defence_discount", style: smallMediumPrimaryText).tr(),
+              Text("sub_total", style: smallMediumGreyText).tr(),
+              Row(
+                children: [
+                  Text(
+                    "$CURRENCY ${context.watch<CartProvider>().getCartData!["sub_total"]}",
+                    style: smallMediumGreyText,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("discount", style: smallMediumPrimaryText).tr(),
               Row(
                 children: [
                   Text(
@@ -1005,8 +1028,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
               ),
             ],
           ),
-          if (!checkIsNullValue(userSession) &&
-              userSession['is_defence_personnel'] == true &&
+          if (context.watch<AccountInfoProvider>().getIsDefencePersonnel &&
               !checkIsNullValue(
                 context
                     .watch<CartProvider>()
@@ -1019,7 +1041,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                 children: [
                   Text("defence_discount", style: smallMediumPrimaryText).tr(),
                   Text(
-                    "- $CURRENCY ${context.watch<CartProvider>().getCartData!['defence_discount_percent'].toStringAsFixed(2)}",
+                    "- $CURRENCY ${(double.parse(context.watch<CartProvider>().getCartData!['sub_total'].toString()) * double.parse(context.watch<CartProvider>().getCartData!['defence_discount_percent'].toString()) / 100).toStringAsFixed(2)}",
                     style: smallMediumPrimaryText,
                   ),
                 ],
@@ -1031,7 +1053,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             children: [
               Text("to_pay", style: meduimBoldBlackText).tr(),
               Text(
-                "$CURRENCY ${context.watch<CartProvider>().getCartData!["total"]}",
+                "$CURRENCY ${context.watch<CartProvider>().getCartGrandTotal.toStringAsFixed(2)}",
                 style: meduimBoldBlackText,
               ),
             ],
@@ -1043,7 +1065,12 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "free_delivery_above_amount".tr(),
+                "free_delivery_above_amount".tr(namedArgs: {
+                  'amount': context
+                      .watch<CartProvider>()
+                      .getCartData!['free_delivery_min_order_amount']
+                      .toString()
+                }),
                 style: smallMediumPrimaryText,
               ),
             ],
@@ -1137,12 +1164,10 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                                             " " +
                                             "items".tr() +
                                             " • $CURRENCY" +
-                                            double.parse(
-                                              context
-                                                  .watch<CartProvider>()
-                                                  .cartGrandTotal
-                                                  .toString(),
-                                            ).toStringAsFixed(0)
+                                            context
+                                                .watch<CartProvider>()
+                                                .cartGrandTotal
+                                                .toStringAsFixed(0)
                                         : context
                                                 .watch<CartProvider>()
                                                 .cartCount
@@ -1150,12 +1175,10 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                                             " " +
                                             "item".tr() +
                                             " • $CURRENCY" +
-                                            double.parse(
-                                              context
-                                                  .watch<CartProvider>()
-                                                  .cartGrandTotal
-                                                  .toString(),
-                                            ).toStringAsFixed(0),
+                                            context
+                                                .watch<CartProvider>()
+                                                .cartGrandTotal
+                                                .toStringAsFixed(0),
                                     style: smallMediumWhiteText,
                                   ),
                                   SizedBox(width: 5),
@@ -1381,6 +1404,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
       // Handle wallet payment
       await CartRepository().removeAll();
       showToast("Order placed using wallet", context);
+      await refreshCreditBalance(context);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -1426,11 +1450,11 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
     if (checkIsNullValue(currentCart)) return "";
     String res = "";
     List _cartItems = currentCart!["lines"];
-    var _total = currentCart["total"];
+    var _total = context.read<CartProvider>().getCartGrandTotal;
     res =
         "${_cartItems.length} " +
         ((_cartItems.isNotEmpty && _cartItems.length > 1) ? "items" : "item");
-    res = res + "  •  " + "$CURRENCY $_total";
+    res = res + "  •  " + "$CURRENCY ${_total.toStringAsFixed(2)}";
     return res;
   }
 

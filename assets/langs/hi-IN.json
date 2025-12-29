@@ -201,6 +201,7 @@
     "order_detail" : "आर्डर का विवरण",
     "you_have_request_to_group_successfully" : "आप Tez Chal ग्रुप में शामिल हो गए है!",
     "mrp_total" : "MRP कुल",
+    "sub_total" : "Sub कुल",
     "discount" : "छूट",
     "delete_group" : "डिलीट करे ग्रुप",
     "delete_group_des" : "क्या आपको सच में ग्रुप डिलीट करना है?",
@@ -222,9 +223,12 @@
     "delete_account": "खाता हटाएँ",
     "are_you_sure_you_want_to_delete_account": "क्या आप वाकई अपना खाता हटाना चाहते हैं? यह कार्रवाई वापस नहीं की जा सकती।",
     "explore_more": "और देखें",
-    "free_delivery_above_amount": "₹99 से ऊपर मुफ़्त डिलीवरी!",
+    "free_delivery_above_amount": "₹{amount} से ऊपर मुफ़्त डिलीवरी!",
     "place_order": "ऑर्डर करें",
     "confirm_order_on_app": "TezChal पर ऑर्डर की पुष्टि करें?",
     "cancel": "रद्द करें",
-    "continue": "जारी रखें"
+    "continue": "जारी रखें",
+    "order_cancelled": "ऑर्डर रद्द",
+    "order_delivered": "ऑर्डर दिया गया",
+    "in_progress": "प्रगति में है"
 }

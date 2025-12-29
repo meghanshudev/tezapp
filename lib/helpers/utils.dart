@@ -627,3 +627,12 @@ Future<String?> networkImageToBase64(String imageUrl) async {
   final bytes = response.bodyBytes;
   return (bytes != null ? HEADER_IMAGE_BASE64 + base64Encode(bytes) : null);
 }
+
+Future<void> refreshCreditBalance(BuildContext context) async {
+  var response = await netGet(isUserToken: true, endPoint: "me/profile");
+  if (response['resp_code'] == "200") {
+    context.read<CreditProvider>().refreshCredit(
+          convertDouble(response['resp_data']['data']['balance']),
+        );
+  }
+}

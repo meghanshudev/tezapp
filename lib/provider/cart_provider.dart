@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
+import 'package:tezchal/helpers/utils.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 
 class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
   bool isHasCart = false;
@@ -23,8 +27,29 @@ class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
     notifyListeners();
   }
 
-  Future<void> refreshCartData(Map<String, dynamic>? data) async {
+  Future<void> refreshCartData(
+      Map<String, dynamic>? data, AccountInfoProvider accountInfoProvider) async {
     cartData = data;
+    if (data != null) {
+      if (data['total'] != null) {
+        double total = double.parse(data['total'].toString());
+        if (accountInfoProvider.getIsDefencePersonnel &&
+            !checkIsNullValue(data['defence_discount_percent'])) {
+          double subTotal = double.parse(data['sub_total'].toString());
+          double discountPercent =
+              double.parse(data['defence_discount_percent'].toString());
+          double discount = (subTotal * discountPercent) / 100;
+          cartGrandTotal = total - discount;
+        } else {
+          cartGrandTotal = total;
+        }
+        // Update cartData total to reflect discounted total
+        cartData!['total'] = cartGrandTotal;
+      } else {
+        cartGrandTotal = 0.0;
+      }
+    }
+    log("cartGrandTotal $cartGrandTotal");
     notifyListeners();
   }
 
@@ -37,4 +62,5 @@ class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
     cartGrandTotal = total;
     notifyListeners();
   }
+
 }

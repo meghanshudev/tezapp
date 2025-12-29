@@ -212,6 +212,7 @@
     "order_detail" : "Order Detail",
     "you_have_request_to_group_successfully" : "You have successfully joined a Tez Chal Group!",
     "mrp_total" : "MRP Total",
+    "sub_total" : "Sub Total",
     "discount" : "Discount",
     "delete_group" : "Delete Group",
     "delete_group_des" : "Are you sure you want to delete this group?",
@@ -233,9 +234,12 @@
     "delete_account": "Delete Account",
     "are_you_sure_you_want_to_delete_account": "Are you sure you want to delete your account? This action cannot be undone.",
     "explore_more": "Explore More",
-    "free_delivery_above_amount": "FREE Delivery above ₹99!",
+    "free_delivery_above_amount": "FREE Delivery above ₹{amount}!",
     "place_order": "Place Order",
     "confirm_order_on_app": "Confirm Order on TezChal?",
     "cancel": "Cancel",
-    "continue": "Continue"
+    "continue": "Continue",
+    "order_cancelled": "Order Cancelled",
+    "order_delivered": "Order Delivered",
+    "in_progress": "In Progress"
 }

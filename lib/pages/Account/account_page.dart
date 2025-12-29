@@ -18,6 +18,7 @@ import 'package:tezchal/pages/Location/choose_location_page.dart';
 import 'package:tezchal/pages/UserGroup/user_group_page.dart';
 import 'package:tezchal/pages/UserGroup/user_group_view_page.dart';
 import 'package:tezchal/provider/has_group.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/ui_elements/card_item.dart';
 import '../../ui_elements/slider_widget.dart';
 
@@ -57,6 +58,7 @@ class _AccountPageState extends State<AccountPage> {
         !checkIsNullValue(userSession['phone_number'])
             ? userSession['phone_number']
             : "N/A";
+    context.read<AccountInfoProvider>().refreshName(name);
   }
 
   @override
@@ -173,20 +175,21 @@ class _AccountPageState extends State<AccountPage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name, style: normalBoldBlackTitle),
+                  Consumer<AccountInfoProvider>(
+                    builder: (context, provider, child) {
+                      return Text(provider.name, style: normalBoldBlackTitle);
+                    },
+                  ),
                   SizedBox(height: 2),
                   Text(phoneNumber, style: smallMediumGreyText),
                 ],
               ),
               TextButton(
-                onPressed: () async {
-                  dynamic result = await Navigator.push(
+                onPressed: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => EditProfile()),
                   );
-                  setState(() {
-                    name = result;
-                  });
                 },
                 child: Text(
                   "edit_profile".tr().toUpperCase(),

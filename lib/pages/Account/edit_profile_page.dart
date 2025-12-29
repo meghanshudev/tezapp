@@ -108,13 +108,13 @@ class _EditProfileState extends State<EditProfile> {
         await getStorageUser();
 
         notifyAlert(context,
-            desc: "your_profile_has_been_updated".tr(),
-            btnTitle: "Ok", onConfirm: () {
-          Navigator.pop(context);
-        });
-      }
-      setState(() {
-        isLoadingButton = false;
+                  desc: "your_profile_has_been_updated".tr(),
+                  btnTitle: "Ok", onConfirm: () {
+                Navigator.pop(context);
+              });
+            }
+            setState(() {
+              isLoadingButton = false;
       });
     }
   }
@@ -229,7 +229,7 @@ class _EditProfileState extends State<EditProfile> {
         updateUserProfile();
       },
       onTapBack: () {
-        Navigator.pop(context, name);
+        Navigator.pop(context);
       },
     );
   }

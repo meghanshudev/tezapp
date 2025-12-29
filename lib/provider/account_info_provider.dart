@@ -6,8 +6,17 @@ class AccountInfoProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   String get getName => name;
 
+  bool isDefencePersonnel = false;
+
+  bool get getIsDefencePersonnel => isDefencePersonnel;
+
   Future<void> refreshName(String fullname) async {
     name = fullname;
+    notifyListeners();
+  }
+
+  Future<void> refreshIsDefencePersonnel(bool isDefence) async {
+    isDefencePersonnel = isDefence;
     notifyListeners();
   }
   

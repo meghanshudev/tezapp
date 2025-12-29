@@ -30,7 +30,8 @@ class OrderHistoryPage extends StatefulWidget {
   _OrderHistoryPageState createState() => _OrderHistoryPageState();
 }
 
-class _OrderHistoryPageState extends State<OrderHistoryPage> {
+class _OrderHistoryPageState extends State<OrderHistoryPage>
+    with WidgetsBindingObserver {
   RefreshController refreshController = RefreshController();
   bool isLoading = false;
   bool isPulling = false;
@@ -53,6 +54,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   void initState() {
     super.initState();
     initPage();
+    WidgetsBinding.instance.addObserver(this);
 
     deliverTo =
         !checkIsNullValue(userSession) ? userSession['name'] ?? "" ?? "" : "";
@@ -62,7 +64,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
     phone =
         !checkIsNullValue(userSession) ? userSession['phone_number'] ?? "" : "";
 
-    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
       onRefresh();
     });
   }
@@ -70,6 +72,7 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -124,6 +127,18 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
   //       loading = false;
   //     });
   // }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      onRefresh();
+      _timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+        onRefresh();
+      });
+    } else {
+      _timer?.cancel();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -104,32 +104,6 @@ class _PrivacyPageState extends State<PrivacyPage> {
           // SizedBox(height: 15,),
           Html(data: content),
           SizedBox(height: 15),
-          Padding(
-            padding: const EdgeInsets.only(left: 0, right: 0),
-            child: CustomButton(
-              height: 55,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 29, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Delete Account",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ).tr(),
-                    Icon(Icons.arrow_forward_ios, color: Colors.white),
-                  ],
-                ),
-              ),
-              onTap: () async {
-                await launch("https://www.teznow.com/account-deletion");
-              },
-            ),
-          ),
         ],
       ),
     );

@@ -630,7 +630,9 @@ class _RootAppState extends State<RootApp> {
 
         List cartItems = cart['lines'];
         // Update CartProvider with full cart data
-        context.read<CartProvider>().refreshCartData(cart);
+        context
+            .read<CartProvider>()
+            .refreshCartData(cart, context.read<AccountInfoProvider>());
         context.read<CartProvider>().refreshCart(true);
         context.read<CartProvider>().refreshCartCount(cartItems.length);
         context.read<CartProvider>().refreshCartGrandTotal(
@@ -639,7 +641,9 @@ class _RootAppState extends State<RootApp> {
       } else {
         // Handle case where data is null or 'lines' is missing (empty cart)
         cart = null;
-        context.read<CartProvider>().refreshCartData(null); // Clear cart data
+        context
+            .read<CartProvider>()
+            .refreshCartData(null, context.read<AccountInfoProvider>()); // Clear cart data
         context.read<CartProvider>().refreshCart(false);
         context.read<CartProvider>().refreshCartCount(0);
         context.read<CartProvider>().refreshCartGrandTotal(0.0);
@@ -647,7 +651,9 @@ class _RootAppState extends State<RootApp> {
     } else {
       // Handle non-200 responses or other errors by clearing the cart
       cart = null;
-      context.read<CartProvider>().refreshCartData(null); // Clear cart data
+      context
+          .read<CartProvider>()
+          .refreshCartData(null, context.read<AccountInfoProvider>()); // Clear cart data
       context.read<CartProvider>().refreshCart(false);
       context.read<CartProvider>().refreshCartCount(0);
       context.read<CartProvider>().refreshCartGrandTotal(0.0);

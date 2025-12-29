@@ -129,7 +129,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
                             width: 10,
                           ),
                           Text(
-                            "₹" +
+                            "₹ " +
                                 context
                                     .watch<CreditProvider>()
                                     .balance

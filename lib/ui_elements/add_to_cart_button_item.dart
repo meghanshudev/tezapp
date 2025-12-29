@@ -12,6 +12,7 @@ import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/models/cart.dart';
 import 'package:tezchal/provider/cart_provider.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/respositories/cart/cart_repository.dart';
 
 class AddToCardButtonItem extends StatefulWidget {
@@ -210,7 +211,8 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
      // Update CartProvider directly after deletion
      if (response['resp_code'] == "200") {
        var temp = response["resp_data"]["data"];
-       context.read<CartProvider>().refreshCartData(temp);
+       context.read<CartProvider>().refreshCartData(
+           temp, context.read<AccountInfoProvider>());
        if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
          List cartItems = temp['lines'];
          context.read<CartProvider>().refreshCart(true);
@@ -236,7 +238,8 @@ class _AddToCardButtonItemState extends State<AddToCardButtonItem> {
      // Update CartProvider with full cart data after patch
      if (response['resp_code'] == "200") {
        var temp = response["resp_data"]["data"];
-       context.read<CartProvider>().refreshCartData(temp);
+       context.read<CartProvider>().refreshCartData(
+           temp, context.read<AccountInfoProvider>());
        if (!checkIsNullValue(temp) && temp.containsKey('lines')) {
          List cartItems = temp['lines'];
          context.read<CartProvider>().refreshCart(true);

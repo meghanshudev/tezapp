@@ -94,10 +94,10 @@ class OrderHistoryBox extends StatelessWidget {
             children: [
               Text(
                 isCancelled
-                    ? "Order Cancelled"
+                    ? "order_cancelled".tr()
                     : isDelivered
-                        ? "Order Delivered"
-                        : "In Progress",
+                        ? "order_delivered".tr()
+                        : "in_progress".tr(),
                 style: TextStyle(
                   height: 1.5,
                   fontWeight: FontWeight.w700,
@@ -316,6 +316,7 @@ class OrderHistoryBox extends StatelessWidget {
               'failed_to_cancel_order'.tr();
           showToast(ms.toString(), context);
         }
+        refreshCreditBalance(context);
       },
     );
   }
