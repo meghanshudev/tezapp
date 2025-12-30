@@ -26,7 +26,9 @@ import 'package:tezchal/ui_elements/custom_appbar.dart';
 import 'package:tezchal/ui_elements/custom_circular_progress.dart';
 import 'package:tezchal/ui_elements/slider_widget.dart';
 import 'package:tezchal/ui_elements/empty_page.dart';
-import 'package:rflutter_alert/rflutter_alert.dart' as rfa; // Added with prefix
+import 'dart:async';
+import 'package:rflutter_alert/rflutter_alert.dart' as rfa;
+
 
 import '../../helpers/constant.dart';
 import '../../helpers/network.dart';
@@ -330,12 +332,48 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       if (_pendingTransactionId != null) {
-        checkPaymentStatus(_pendingTransactionId!);
+        _showPaymentStatusCheckingDialog(_pendingTransactionId!).then((result) {
+          if (result != null) {
+            var status = result['status'];
+            if (status == 'success') {
+              CartRepository().removeAll();
+              context.read<CartProvider>().refreshCart(false);
+              context.read<CartProvider>().refreshCartCount(0);
+              context.read<CartProvider>().refreshCartGrandTotal(0.0);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OrderConfirmedPage(
+                    orderId: '', // TODO: Pass actual orderId if available
+                  ),
+                ),
+              );
+            } else if (status == 'failed') {
+              var data = result['data'];
+              var errorMessage = data != null && data['error_message'] != null
+                  ? data['error_message']
+                  : "Your payment has failed. Please try again.";
+              _showPaymentStatusDialog(
+                "Payment Failed",
+                errorMessage,
+              );
+            } else {
+              _showPaymentStatusDialog(
+                "Payment Pending",
+                "Your payment is currently pending. Please check again after some time.",
+              );
+            }
+          }
+          setState(() {
+            _pendingTransactionId = null;
+          });
+        });
       }
     }
   }
 
   Future<void> checkPaymentStatus(String transactionId) async {
+    // This method is kept for backward compatibility but will not be used for repeated checks.
     try {
       var response = await netGet(
         endPoint: "payment/status/$transactionId",
@@ -372,9 +410,10 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
             ),
           );
         } else if (status == 'failed') {
+          var errorMessage = data['error_message'] ?? "Your payment has failed. Please try again.";
           _showPaymentStatusDialog(
             "Payment Failed",
-            "Your payment has failed. Please try again.",
+            errorMessage,
           );
         } else {
           showToast("Payment status is pending. Please wait...", context);
@@ -388,6 +427,89 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
     } catch (e) {
       showToast("Error checking payment status: ${e.toString()}", context);
     }
+  }
+
+  Future<Map<String, dynamic>?> _showPaymentStatusCheckingDialog(
+      String transactionId) async {
+    int attempts = 0;
+    bool paymentCompleted = false;
+    bool isCancelled = false;
+
+    Completer<Map<String, dynamic>> completer =
+        Completer<Map<String, dynamic>>();
+
+    rfa.Alert(
+      context: context,
+      style: rfa.AlertStyle(
+        titleStyle: normalBoldBlackTitle,
+        isCloseButton: false,
+        isOverlayTapDismiss: false,
+      ),
+      title: "Checking Payment Status",
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          Future<void> checkStatus() async {
+            while (attempts < 3 && !paymentCompleted && !isCancelled) {
+              attempts++;
+              try {
+                var response = await netGet(
+                  endPoint: "payment/status/$transactionId",
+                  isUserToken: true,
+                );
+                if (response['resp_code'] == "200" &&
+                    response['resp_data'] != null) {
+                  var data = response['resp_data']['data'];
+                  var status = data['status'];
+                  if (status == 'success' || status == 'failed') {
+                    paymentCompleted = true;
+                    setState(() {});
+                    await Future.delayed(Duration(seconds: 3));
+                    Navigator.of(context).pop();
+                    completer.complete({'status': status, 'data': data});
+                    return;
+                  }
+                }
+              } catch (e) {
+                // Ignore errors and retry
+              }
+              await Future.delayed(Duration(seconds: 2));
+            }
+            if (!paymentCompleted && !isCancelled) {
+              Navigator.of(context).pop();
+              completer.complete({'status': 'pending'});
+            }
+          }
+
+          if (attempts == 0) {
+            checkStatus();
+          }
+
+          return Column(
+            children: <Widget>[
+              SizedBox(height: 20),
+              CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(primary),
+              ),
+              SizedBox(height: 20),
+              paymentCompleted
+                  ? Text(
+                      "Payment status updated. Please do not press any button or go back.",
+                      style: meduimBlackText.copyWith(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    )
+                  : Text(
+                      "Please wait while we check your payment status...",
+                      style: meduimBlackText,
+                      textAlign: TextAlign.center,
+                    ),
+            ],
+          );
+        },
+      ),
+      buttons: [],
+    ).show();
+
+    return completer.future;
   }
 
   @override
@@ -1089,6 +1211,8 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                       Flexible(
                         child: InkWell(
                           onTap: () {
+    // _showPaymentStatusCheckingDialog("_pendingTransactionId");
+
                             confirmAlert(
                               context,
                               des: "confirm_order_on_app".tr(),

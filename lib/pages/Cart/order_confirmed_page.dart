@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,15 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
     var id = widget.orderId;
 
     var response = await netGet(endPoint: "me/order/$id");
+    log("OrderConfirm ${response['resp_code']}");
     if (response["resp_code"] == "200") {
       var data = response["resp_data"]["data"];
+      if (data.containsKey('list')) {
+        if (data['list'].length > 0) {
+          data = data['list'][0];
+        }
+      }
+    log("OrderConfir data ${data}");
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -98,6 +106,8 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
             }
           }
         });
+    log("OrderConfirm ${orderData}");
+
       }
     } else {
       var ms = response["resp_data"]["message"];
@@ -106,6 +116,8 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
         isLoading = false;
         orderData = {};
       });
+    log("OrderConfirm else ${orderData}");
+
     }
 
     await fetchAds();
@@ -264,139 +276,6 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       style: smallMediumBlackText,
                     ).tr(),
                     SizedBox(height: 20),
-                    // Row(
-                    //   children: [
-                    //     Text(
-                    //       "your_order_will_be_confirmed_on",
-                    //       style: smallBlackText,
-                    //     ).tr(),
-                    //     Text(
-                    //       expectedConfirmDate,
-                    //       style: smallBoldBlackText,
-                    //     )
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 2,
-                    // ),
-                    // Row(
-                    //   children: [
-                    //     Text(
-                    //       "as_per",
-                    //       style: smallBlackText,
-                    //     ).tr(),
-                    //     Text(
-                    //       !checkIsNullValue(userSession['group'])
-                    //           ? userSession['group']['name']
-                    //           : "N/A",
-                    //       style: smallBoldBlackText,
-                    //     ),
-                    //     Text(
-                    //       " " + "settings".tr(),
-                    //       style: smallBlackText,
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 25,
-                    // ),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: List.generate(schedules.length, (index) {
-                    //     return activeOrder == index
-                    //         ? Container(
-                    //             width: 50,
-                    //             height: 50,
-                    //             decoration: BoxDecoration(
-                    //                 border: Border.all(
-                    //                     width: 2,
-                    //                     color: activeOrder != index
-                    //                         ? primary
-                    //                         : Colors.transparent),
-                    //                 color: activeOrder == index
-                    //                     ? primary
-                    //                     : Colors.transparent,
-                    //                 shape: BoxShape.circle),
-                    //             child: Center(
-                    //               child: Icon(
-                    //                 MaterialIcons.check,
-                    //                 color: white,
-                    //               ),
-                    //             ),
-                    //           )
-                    //         : Row(
-                    //             children: [
-                    //               Container(
-                    //                 width: 70,
-                    //                 height: 5,
-                    //                 decoration: BoxDecoration(color: primary),
-                    //               ),
-                    //               Container(
-                    //                 width: 50,
-                    //                 height: 50,
-                    //                 decoration: BoxDecoration(
-                    //                     border: Border.all(
-                    //                         width: 2,
-                    //                         color: activeOrder != index
-                    //                             ? primary
-                    //                             : Colors.transparent),
-                    //                     color: activeOrder == index
-                    //                         ? primary
-                    //                         : Colors.transparent,
-                    //                     shape: BoxShape.circle),
-                    //                 child: Center(
-                    //                   child: Icon(
-                    //                     MaterialIcons.check,
-                    //                     color: white,
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ],
-                    //           );
-                    //   }),
-                    // ),
-                    // SizedBox(
-                    //   height: 10,
-                    // ),
-                    // Column(
-                    //   children: [
-                    //     Row(
-                    //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    //       children: List.generate(schedules.length, (index) {
-                    //         return Container(
-                    //           width: 70,
-                    //           child: Text(
-                    //             schedules[index]['state']["name"],
-                    //             textAlign: TextAlign.center,
-                    //             maxLines: 3,
-                    //             style: smallMediumGreyText,
-                    //           ),
-                    //         );
-                    //       }),
-                    //     ),
-                    //     SizedBox(
-                    //       height: 10,
-                    //     ),
-                    //     Row(
-                    //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    //       children: List.generate(schedules.length, (index) {
-                    //         return Container(
-                    //           width: 70,
-                    //           child: Text(
-                    //             DateFormat("d MMM").format(DateTime.parse(
-                    //                 schedules[index]['date'])),
-                    //                 textAlign: TextAlign.center,
-                    //                 maxLines: 1,
-                    //             style: smallMediumBlackText,
-                    //           ),
-                    //         );
-                    //       }),
-                    //     ),
-                    //   ],
-                    // ),
-                    // SizedBox(
-                    //   height: 25,
-                    // ),
                     GestureDetector(
                       onTap:
                           () => Navigator.push(
@@ -415,9 +294,10 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.chat, color: white),
+                              SizedBox(width: 20,),
                               Text(
                                 "customer_support_have_an_issue",
                                 style: smallMediumWhiteText,
@@ -546,7 +426,7 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                         children: [
                           Text("defence_discount", style: smallMediumPrimaryText).tr(),
                           Text(
-                            "- $CURRENCY ${orderData['defence_discount_amount'].toStringAsFixed(2)}",
+                            "- $CURRENCY ${orderData['defence_discount_amount']}",
                             style: smallMediumPrimaryText,
                           ),
                         ],
