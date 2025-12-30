@@ -192,12 +192,16 @@ getProfileData(BuildContext context) async {
       "access_token": userSession['access_token'] ?? "",
       "is_first_time_login": userSession['is_first_time_login'],
       "token_type": userSession['token_type'],
+      "is_defence_personnel": response['resp_data']['data']['is_defence_personnel']
     };
     context.read<CreditProvider>().refreshCredit(
       convertDouble(response['resp_data']['data']['balance']),
     );
     context.read<AccountInfoProvider>().refreshName(
       response['resp_data']['data']['name'] ?? '',
+    );
+    context.read<AccountInfoProvider>().refreshIsDefencePersonnel(
+      response['resp_data']['data']['is_defence_personnel'] == true || response['resp_data']['data']['is_defence_personnel'] == 1
     );
     // set group
     bool hasGroup =

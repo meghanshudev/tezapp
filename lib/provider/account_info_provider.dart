@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:tezchal/helpers/utils.dart';
 
@@ -17,6 +19,7 @@ class AccountInfoProvider with ChangeNotifier, DiagnosticableTreeMixin {
 
   Future<void> refreshIsDefencePersonnel(bool isDefence) async {
     isDefencePersonnel = isDefence;
+    log("isDefencePersonnel $isDefencePersonnel");
     notifyListeners();
   }
   

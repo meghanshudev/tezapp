@@ -32,19 +32,7 @@ class CartProvider with ChangeNotifier, DiagnosticableTreeMixin {
     cartData = data;
     if (data != null) {
       if (data['total'] != null) {
-        double total = double.parse(data['total'].toString());
-        if (accountInfoProvider.getIsDefencePersonnel &&
-            !checkIsNullValue(data['defence_discount_percent'])) {
-          double subTotal = double.parse(data['sub_total'].toString());
-          double discountPercent =
-              double.parse(data['defence_discount_percent'].toString());
-          double discount = (subTotal * discountPercent) / 100;
-          cartGrandTotal = total - discount;
-        } else {
-          cartGrandTotal = total;
-        }
-        // Update cartData total to reflect discounted total
-        cartData!['total'] = cartGrandTotal;
+          cartGrandTotal = data['total'];
       } else {
         cartGrandTotal = 0.0;
       }

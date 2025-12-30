@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tezchal/helpers/constant.dart';
 import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,6 +23,7 @@ class OrderHistoryBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("OrderHistoryBox : $data \n\n\n");
     String timeStamp =
         DateFormat("MMM d").format(DateTime.parse(data['order_date'])) +
             " at " +
@@ -137,94 +142,88 @@ class OrderHistoryBox extends StatelessWidget {
               color: dividerColor,
             ),
           ),
+          if (!checkIsNullValue(data['coupon']))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("coupon_discount", style: smallMediumGreyText).tr(),
+                  SizedBox(width: 5),
+                  Text(
+                    "- $CURRENCY ${data['coupon']['amount_off']}",
+                    style: smallMediumGreyText,
+                  ),
+                ],
+              ),
+            ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("mrp_total", style: meduimBlackText).tr(),
-              SizedBox(
-                width: 5,
-              ),
+              Text("mrp_total", style: smallMediumGreyText).tr(),
+              SizedBox(width: 5),
               Text("$CURRENCY ${data['mrp_total']}"),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("defence_discount", style: meduimPrimaryText).tr(),
-              SizedBox(
-                width: 5,
-              ),
-              Text("- $CURRENCY ${data['discount']}",
-                  style: TextStyle(color: primary)),
-            ],
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("item_total", style: meduimBlackText).tr(),
-              SizedBox(
-                width: 5,
-              ),
+              Text("sub_total", style: smallMediumGreyText).tr(),
+              SizedBox(width: 5),
               Text("$CURRENCY ${data['sub_total']}"),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("delivery_fee", style: meduimBlackText).tr(),
-              SizedBox(
-                width: 5,
-              ),
+              Text("discount", style: smallMediumPrimaryText).tr(),
+              SizedBox(width: 5),
+              Text("- $CURRENCY ${data['discount']}", style: TextStyle(color: primary)),
+            ],
+          ),
+          SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("delivery_fee", style: smallMediumGreyText).tr(),
+              SizedBox(width: 5),
               Text("$CURRENCY ${data['delivery']}"),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("charges_&_taxed", style: meduimBlackText).tr(),
-              SizedBox(
-                width: 5,
-              ),
+              Text("value_added_tax", style: smallMediumGreyText).tr(),
+              SizedBox(width: 5),
               Text("$CURRENCY ${data['vat'] ?? 0}"),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
-          if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(data['defence_discount_percent']))
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("defence_discount", style: meduimPrimaryText).tr(),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  "- $CURRENCY ${data['defence_discount_percent'].toStringAsFixed(2)}",
-                  style: TextStyle(color: primary),
-                ),
-              ],
+          if (context.watch<AccountInfoProvider>().getIsDefencePersonnel)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("defence_discount", style: smallMediumPrimaryText).tr(),
+                  SizedBox(width: 5),
+                  Text(
+                    "- $CURRENCY ${data['defence_discount_amount'] ?? 0}",
+                    style: TextStyle(color: primary),
+                  ),
+                ],
+              ),
             ),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("total", style: meduimBlackText).tr(),
-              SizedBox(
-                width: 5,
-              ),
-              Text("$CURRENCY ${data['total']}"),
+              Text("to_pay", style: meduimBoldBlackText).tr(),
+              SizedBox(width: 5),
+              Text("$CURRENCY ${data['total']}", style: meduimBoldBlackText),
             ],
           ),
           // Text("Group Leader Address:", style: meduimBlackText),
@@ -277,14 +276,14 @@ class OrderHistoryBox extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          "$CURRENCY ${cart[index]['unit_price']}",
+                          "$CURRENCY ${cart[index]['unit_price_total']}",
                           style: smallMediumStrikeBlackText,
                         ),
                         SizedBox(
                           width: 5,
                         ),
                         Text(
-                          "$CURRENCY ${cart[index]['sale_price']}",
+                          "$CURRENCY ${cart[index]['sale_price_total']}",
                         )
                       ],
                     )

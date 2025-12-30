@@ -308,6 +308,9 @@ class _AddNamePageState extends State<AddNamePage> {
       await getStorageUser();
 
       context.read<AccountInfoProvider>().refreshName(userSession['name'] ?? "");
+      context.read<AccountInfoProvider>().refreshIsDefencePersonnel(
+      user['is_defence_personnel'] == true || user['is_defence_personnel'] == 1
+      );
 
 
       Future.delayed(Duration.zero, () async {

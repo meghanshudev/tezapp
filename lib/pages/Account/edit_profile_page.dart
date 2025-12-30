@@ -102,6 +102,9 @@ class _EditProfileState extends State<EditProfile> {
         });
 
         context.read<AccountInfoProvider>().refreshName(name);
+        context.read<AccountInfoProvider>().refreshIsDefencePersonnel(
+        user['is_defence_personnel'] == true || user['is_defence_personnel'] == 1
+        );
 
         await setStorage(STORAGE_USER, user);
 

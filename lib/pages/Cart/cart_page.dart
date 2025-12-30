@@ -143,22 +143,6 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
   }
 
   getMember() async {
-    var profileResponse =
-        await netGet(isUserToken: true, endPoint: "me/profile") as dynamic;
-    log("PROFILE ${profileResponse['resp_data']['data']}");
-    if (profileResponse['resp_code'] == "200") {
-      var isDefence =
-          profileResponse['resp_data']['data']['is_defence_personnel'];
-      final accountProvider = context.read<AccountInfoProvider>();
-      accountProvider.refreshIsDefencePersonnel(isDefence == true || isDefence == 1);
-
-      // Trigger cart recalculation
-      final cartProvider = context.read<CartProvider>();
-      if (cartProvider.getCartData != null) {
-        cartProvider.refreshCartData(cartProvider.getCartData, accountProvider);
-      }
-    }
-
     if (!checkIsNullValue(userSession['group'])) {
       var groupId = userSession['group']['id'];
 
@@ -378,24 +362,6 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
               data.containsKey('transaction') && data['transaction'] != null
                   ? data['transaction']['order']
                   : data;
-
-          // Map rawOrderData to expected orderDat structure for OrderConfirmedPag
-          var orderData = {
-            'invoice_number': rawOrderData['order_id']?.toString() ?? 'N/A',
-            'lines': rawOrderData['lines'] ?? [],
-            'schedules': rawOrderData['schedules'] ?? [],
-            'paymentType': rawOrderData['payment_method'] ?? null,
-            'order_date': rawOrderData['completed_at'] ?? null,
-            'mrp_total': rawOrderData['amount'] ?? null,
-            'discount': rawOrderData['discount'] ?? 0,
-            'sub_total': rawOrderData['amount'] ?? null,
-            'amount_off': rawOrderData['amount_off'] ?? 0,
-            'delivery': rawOrderData['delivery'] ?? 0,
-            'vat': rawOrderData['vat'] ?? 0,
-            'defence_discount_percent':
-                rawOrderData['defence_discount_percent'] ?? 0,
-            'total': rawOrderData['amount'] ?? null,
-          };
 
           Navigator.push(
             context,
@@ -1028,12 +994,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
               ),
             ],
           ),
-          if (context.watch<AccountInfoProvider>().getIsDefencePersonnel &&
-              !checkIsNullValue(
-                context
-                    .watch<CartProvider>()
-                    .getCartData!['defence_discount_percent'],
-              ))
+          if (context.watch<AccountInfoProvider>().getIsDefencePersonnel)
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Row(
@@ -1041,7 +1002,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                 children: [
                   Text("defence_discount", style: smallMediumPrimaryText).tr(),
                   Text(
-                    "- $CURRENCY ${(double.parse(context.watch<CartProvider>().getCartData!['sub_total'].toString()) * double.parse(context.watch<CartProvider>().getCartData!['defence_discount_percent'].toString()) / 100).toStringAsFixed(2)}",
+                    "- $CURRENCY ${context.watch<CartProvider>().getCartData!['defence_discount_amount'] ?? 0}",
                     style: smallMediumPrimaryText,
                   ),
                 ],
@@ -1135,6 +1096,7 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
                                 Navigator.pop(context);
                               },
                               onConfirm: () async {
+                                Navigator.pop(context);
                                 await confirmCheckout();
                               },
                             );
@@ -1272,18 +1234,6 @@ class _CartPageState extends State<CartPage> with WidgetsBindingObserver {
 
     var orderData = apiResponse['resp_data']['data']['order'];
     log("orderData $orderData");
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //       builder: (context) => OrderConfirmedPage(
-    //         data: {
-    //           "schedules":
-    //               context.read<CartProvider>().getCartData?['schedules'] ?? [],
-    //           "orderData": orderData,
-    //         },
-    //       ),
-    //     ),
-    //   );
 
     var paymentRequired = apiResponse['resp_data']['data']['payment_required'];
     log("Easebuzz ${apiResponse}");

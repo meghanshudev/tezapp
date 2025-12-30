@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:provider/provider.dart';
 import 'package:tezchal/helpers/constant.dart';
 import 'package:tezchal/helpers/network.dart';
 import 'package:tezchal/helpers/styles.dart';
 import 'package:tezchal/helpers/theme.dart';
 import 'package:tezchal/helpers/utils.dart';
 import 'package:tezchal/pages/Account/customer_support_page.dart';
+import 'package:tezchal/provider/account_info_provider.dart';
 import 'package:tezchal/ui_elements/slider_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:line_icons/line_icons.dart';
@@ -200,12 +202,12 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                "$CURRENCY ${cart[index]['unit_price']}",
+                                "$CURRENCY ${cart[index]['unit_price_total']}",
                                 style: smallMediumStrikeBlackText,
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "$CURRENCY ${cart[index]['sale_price']}",
+                                "$CURRENCY ${cart[index]['sale_price_total']}",
                                 style: smallMediumBlackText,
                               ),
                             ],
@@ -467,7 +469,23 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("defence_discount", style: smallMediumPrimaryText).tr(),
+                        Text("sub_total", style: smallMediumBlackText).tr(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              "$CURRENCY ${orderData['sub_total']}",
+                              style: smallMediumBlackText,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("discount", style: smallMediumPrimaryText).tr(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -480,21 +498,6 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("item_total", style: smallMediumBlackText).tr(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              "$CURRENCY ${orderData['sub_total']}",
-                              style: smallMediumBlackText,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
                     if (!checkIsNullValue(orderData['amount_off']))
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
@@ -512,7 +515,6 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                           ],
                         ),
                       ),
-                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -538,17 +540,18 @@ class _OrderConfirmedPageState extends State<OrderConfirmedPage> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    if (!checkIsNullValue(userSession) && userSession['is_defence_personnel'] == true && !checkIsNullValue(orderData['defence_discount_percent']))
+                    if (context.watch<AccountInfoProvider>().getIsDefencePersonnel)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("defence_discount", style: smallMediumPrimaryText).tr(),
                           Text(
-                            "- $CURRENCY ${orderData['defence_discount_percent'].toStringAsFixed(2)}",
+                            "- $CURRENCY ${orderData['defence_discount_amount'].toStringAsFixed(2)}",
                             style: smallMediumPrimaryText,
                           ),
                         ],
                       ),
+                    SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
